@@ -1,0 +1,256 @@
+/*======================================================================
+Loads the appropriate JDBC driver associated with a JDBC URL.
+Application : Siard2
+Description : Loads the appropriate JDBC driver associated with a JDBC URL.
+------------------------------------------------------------------------
+Copyright  : Swiss Federal Archives, Berne, Switzerland, 2008
+Created    : 08.05.2017, Hartwig Thomas, Enter AG, Rüti ZH
+======================================================================*/
+package ch.admin.bar.siard2.cmd;
+
+import java.io.*;
+import java.text.*;
+import java.util.*;
+import ch.enterag.utils.*;
+import ch.enterag.utils.io.*;
+import ch.enterag.utils.jdbc.*;
+import ch.admin.bar.siard2.jdbc.*;
+
+/*====================================================================*/
+/** Loads the appropriate JDBC driver associated with a JDBC URL.
+ @author Hartwig Thomas
+ */
+@SuppressWarnings("serial")
+public class SiardConnection extends Properties
+{
+  /** singleton */
+  private static SiardConnection _sc = null;
+  public static final int iDEFAULT_QUERY_TIMEOUT_SECONDS = 75;
+  public static final int iDEFAULT_LOGIN_TIMEOUT_SECONDS = 300;
+  
+  /*--------------------------------------------------------------------*/
+  /** Properties file containing the map from JDBC sub schemes to 
+   * JDBC driver class names is located in ../etc/jdbcdrivers.properties
+   * relative to the JAR file containing this class.
+   * @return name of properties file.
+   */
+  private static final String sCONFIG_FOLDER = "etc";
+  private static final String sJDBCDRIVERS_PROPERTIES = "jdbcdrivers.properties";
+  private static final String sTITLE_SUFFIX = "_title";
+  private static final String sSAMPLE_SUFFIX = "_sample";
+  private static final String sSUPPORTS_ARRAYS_SUFFIX = "_supports_arrays";
+  private static File getJdbcDriversPropertiesFile()
+  {
+    File fileDrivers = null;
+    String sFileDrivers = System.getProperty("ch.admin.bar.siard2.cmd.drivers");
+    if (sFileDrivers != null)
+      fileDrivers = new File(sFileDrivers);
+    else
+    {
+      fileDrivers = SpecialFolder.getMainJar();
+      // System.out.println("Main JAR: "+fileDrivers.getAbsolutePath());
+      if (fileDrivers.isFile())
+        fileDrivers = fileDrivers.getParentFile();
+      fileDrivers = fileDrivers.getParentFile();
+      fileDrivers = new File(fileDrivers.getAbsolutePath()+File.separator+
+        sCONFIG_FOLDER+File.separator+
+        sJDBCDRIVERS_PROPERTIES);
+    }
+    // System.out.println("Drivers file: "+fileDrivers.getAbsolutePath());
+    return fileDrivers;
+  } /* getJdbcDriversPropertiesFile */
+
+  /*------------------------------------------------------------------*/
+  /** Default properties mapping JDCB sub schemes to JDBC driver class names.
+   * @return default properties.
+   */
+  private static Properties getJdbcDriversDefaultProperties()
+  {
+    Properties propDrivers = new Properties();
+    propDrivers.put(OracleDriver.sORACLE_SCHEME, OracleDriver.class.getName());
+    propDrivers.put(OracleDriver.sORACLE_SCHEME+sTITLE_SUFFIX, "Oracle");
+    propDrivers.put(OracleDriver.sORACLE_SCHEME+sSAMPLE_SUFFIX, "jdbc:oracle:thin:@dbserver.enterag.ch:1521:orcl");
+    propDrivers.put(OracleDriver.sORACLE_SCHEME+sSUPPORTS_ARRAYS_SUFFIX, "true");
+    propDrivers.put(MsSqlDriver.sSQLSERVER_SCHEME, MsSqlDriver.class.getName());
+    propDrivers.put(MsSqlDriver.sSQLSERVER_SCHEME+sTITLE_SUFFIX, "SQL Server");
+    propDrivers.put(MsSqlDriver.sSQLSERVER_SCHEME+sSAMPLE_SUFFIX, "jdbc:sqlserver://dbserver.enterag.ch\\testdb:1433");
+    propDrivers.put(MsSqlDriver.sSQLSERVER_SCHEME+sSUPPORTS_ARRAYS_SUFFIX, "false");
+    propDrivers.put(MySqlDriver.sMYSQL_SCHEME, MySqlDriver.class.getName());
+    propDrivers.put(MySqlDriver.sMYSQL_SCHEME+sTITLE_SUFFIX, "SQL Server");
+    propDrivers.put(MySqlDriver.sMYSQL_SCHEME+sSAMPLE_SUFFIX, "jdbc:mysql://dbserver.enterag.ch:3306/testdb");
+    propDrivers.put(MySqlDriver.sMYSQL_SCHEME+sSUPPORTS_ARRAYS_SUFFIX, "false");
+    propDrivers.put(Db2Driver.sDB2_SCHEME, Db2Driver.class.getName());
+    propDrivers.put(Db2Driver.sDB2_SCHEME+sTITLE_SUFFIX, "DB/2");
+    propDrivers.put(Db2Driver.sDB2_SCHEME+sSAMPLE_SUFFIX, "jdbc:db2:dbserver.enterag.ch:50000/testdb");
+    propDrivers.put(Db2Driver.sDB2_SCHEME+sSUPPORTS_ARRAYS_SUFFIX, "false");
+    propDrivers.put(AccessDriver.sACCESS_SCHEME, AccessDriver.class.getName());
+    propDrivers.put(AccessDriver.sACCESS_SCHEME+sTITLE_SUFFIX, "Microsoft Access");
+    propDrivers.put(AccessDriver.sACCESS_SCHEME+sSAMPLE_SUFFIX, "jdbc:access:D:\\Projekte\\SIARD2\\JdbcAccess\\testfiles\\dbfile.mdb");
+    propDrivers.put(AccessDriver.sACCESS_SCHEME+sSUPPORTS_ARRAYS_SUFFIX, "false");
+    propDrivers.put(H2Driver.sH2_SCHEME, H2Driver.class.getName());
+    propDrivers.put(H2Driver.sH2_SCHEME+sTITLE_SUFFIX, "H2 database");
+    propDrivers.put(H2Driver.sH2_SCHEME+sSAMPLE_SUFFIX, "jdbc:h2:D:/Projekte/SIARD2/JdbcH2/data/prefixdbfile");
+    propDrivers.put(H2Driver.sH2_SCHEME+sSUPPORTS_ARRAYS_SUFFIX, "false");
+    return propDrivers;
+  } /* getJdbcDriversDefaultProperties */
+
+  /*------------------------------------------------------------------*/
+  /** make keys() return elements in alphabetic order.
+   * This produces a nicer properties file, when store() is called.
+   */
+  @Override
+  public synchronized Enumeration<Object> keys() 
+  {
+    return Collections.enumeration(new TreeSet<Object>(super.keySet()));
+  } /* keys */
+  
+  /*------------------------------------------------------------------*/
+  /** constructor loads properties.
+   */
+  private SiardConnection()
+  {
+    super();
+    File fileJdbcDrivers = getJdbcDriversPropertiesFile();
+    try
+    {
+      if (fileJdbcDrivers.exists())
+      {
+        FileReader fr = new FileReader(fileJdbcDrivers); 
+        load(fr);
+        fr.close();
+      }
+      else
+      {
+        Properties propDefault = getJdbcDriversDefaultProperties();
+        Set<String> setSchemes = propDefault.stringPropertyNames();
+        for (Iterator<String> iterScheme = setSchemes.iterator(); iterScheme.hasNext(); )
+        {
+          String sScheme = iterScheme.next();
+          setProperty(sScheme,propDefault.getProperty(sScheme));
+        }
+        FileWriter fw = new FileWriter(fileJdbcDrivers);
+        store(fw, "Map from JDBC sub schema to title, sample URL and JDBC Driver class to be loaded.");
+        fw.close();
+      }
+    }
+    catch(IOException ie) { System.err.println(EU.getExceptionMessage(ie)); }
+  } /* constructor */
+  
+  /*------------------------------------------------------------------*/
+  /** factory
+   * @return SiarcConection instance.
+   */
+  public static SiardConnection getSiardConnection()
+  {
+    if (_sc == null)
+      _sc = new SiardConnection();
+    return _sc;
+  } /* getSiardConnection */
+  
+  /*--------------------------------------------------------------------*/
+  /** load JDBC driver for given JDBC URL.
+   * @param sJdbcUrl JDBC URL.
+   * @return null, if no error occurred, otherwise English error message.
+   */
+  public String loadDriver(String sJdbcUrl)
+  {
+    // System.out.println("loadDriver: "+sJdbcUrl);
+    String sError = null; 
+    
+    if (sJdbcUrl == null)
+      sError = "JDBC URL of database must be given!";
+    else if (sJdbcUrl.startsWith(BaseDriver.sJDBC_SCHEME))
+    {
+      // System.out.println("URL starts with "+BaseDriver.sJDBC_SCHEME);
+      String sSubScheme = sJdbcUrl.substring(BaseDriver.sJDBC_SCHEME.length()+1);
+      int iSubScheme = sSubScheme.indexOf(":");
+      if (iSubScheme >= 0)
+      {
+        sSubScheme = sSubScheme.substring(0,iSubScheme);
+        // System.out.println("Sub scheme "+sSubScheme);
+        /* open JDBC driver */
+        String sJdbcDriverClass = getProperty(sSubScheme);
+        if (sJdbcDriverClass != null)
+        {
+          // System.out.println("Driver class "+sJdbcDriverClass);
+          try { Class.forName(sJdbcDriverClass); }
+          catch(ClassNotFoundException cnfe)
+          {
+            sError = "Driver "+sJdbcDriverClass+" could not be loaded ("+EU.getExceptionMessage(cnfe)+")!";
+          }
+        }
+        else
+          sError = "No driver found for sub scheme \""+sSubScheme+"\"!";
+      }
+      else
+        sError = "JDBC URL "+sJdbcUrl+" must contain a subs scheme terminated by colon (\":\")!";
+    }
+    else
+      sError = "JDBC URL "+sJdbcUrl+" must start with \""+BaseDriver.sJDBC_SCHEME+"\"!";
+    if (sError != null)
+      System.err.println(sError);
+    return sError;
+  } /* loadDriver */
+  
+  /*--------------------------------------------------------------------*/
+  /** getSchemes returns the list of JDBC schemes configured in properties.
+   * @return list of JDBC schemes configured in properties.
+   */
+  public String[] getSchemes()
+  {
+    List<String> listSchemes = new ArrayList<String>();
+    for (Enumeration<Object> enumKeys = keys(); enumKeys.hasMoreElements(); ) 
+    {
+      String sKey = (String)enumKeys.nextElement();
+      if ((!sKey.endsWith(sTITLE_SUFFIX)) && (!sKey.endsWith(sSAMPLE_SUFFIX)) && (!sKey.endsWith(sSUPPORTS_ARRAYS_SUFFIX)))
+        listSchemes.add(sKey);
+    }
+    return listSchemes.toArray(new String[]{});
+  } /* getSchemes */
+  
+  /*--------------------------------------------------------------------*/
+  /** getDriverClass returns the name of the JDBC driver class for a JDBC scheme.
+   * @param sScheme JDBC scheme.
+   * @return name of the JDBC driver class associated with this scheme.
+   */
+  public String getDriverClass(String sScheme)
+  {
+    return getProperty(sScheme);
+  } /* getDriverClass */
+  
+  /*--------------------------------------------------------------------*/
+  /** getTitle returns the title for the database type for a JDBC scheme.
+   * @param sScheme JDBC scheme.
+   * @return title for the database type for a JDBC scheme.
+   */
+  public String getTitle(String sScheme)
+  {
+    return getProperty(sScheme+sTITLE_SUFFIX);
+  } /* getTitle */
+  
+  /*--------------------------------------------------------------------*/
+  /** getSampleUrl returns a sample JDBC URL for the JDBC scheme.
+   * Either host or folder must not be null.
+   * @param sScheme JDBC scheme.
+   * @param sHost host name.
+   * @param sFolder folder name.
+   * @param sDatabase database name.
+   * @return sample JDBC URL for the JDBC scheme.
+   */
+  public String getSampleUrl(String sScheme, String sHost, String sFolder, String sDatabase)
+  {
+    return MessageFormat.format(getProperty(sScheme+sSAMPLE_SUFFIX),sHost,sFolder.replace("\\", "/"),sDatabase);
+  } /* getSampleUrl */
+  
+  /*------------------------------------------------------------------*/
+  /** supportsArrays returns true, if DBMS associated with the JDBC scheme
+   * supports SQL arrays on upload. 
+   * @param sScheme JDBC scheme.
+   * @return true, if DBMS associated with the JDBC scheme supports SQL arrays
+   *   on upload.
+   */
+  public boolean supportsArrays(String sScheme)
+  {
+    return Boolean.valueOf(getProperty(sScheme+sSUPPORTS_ARRAYS_SUFFIX)).booleanValue();
+  }
+} /* class SiardConnection */

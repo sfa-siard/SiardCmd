@@ -1,0 +1,5 @@
+Release Notes for SiardCmd 2.1
+==============================
+
+2.1.36
+First release of SiardCmd on GitHub.
