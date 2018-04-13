@@ -38,7 +38,6 @@ public class SiardConnection extends Properties
   private static final String sJDBCDRIVERS_PROPERTIES = "jdbcdrivers.properties";
   private static final String sTITLE_SUFFIX = "_title";
   private static final String sSAMPLE_SUFFIX = "_sample";
-  private static final String sSUPPORTS_ARRAYS_SUFFIX = "_supports_arrays";
   private static File getJdbcDriversPropertiesFile()
   {
     File fileDrivers = null;
@@ -70,27 +69,21 @@ public class SiardConnection extends Properties
     propDrivers.put(OracleDriver.sORACLE_SCHEME, OracleDriver.class.getName());
     propDrivers.put(OracleDriver.sORACLE_SCHEME+sTITLE_SUFFIX, "Oracle");
     propDrivers.put(OracleDriver.sORACLE_SCHEME+sSAMPLE_SUFFIX, "jdbc:oracle:thin:@dbserver.enterag.ch:1521:orcl");
-    propDrivers.put(OracleDriver.sORACLE_SCHEME+sSUPPORTS_ARRAYS_SUFFIX, "true");
     propDrivers.put(MsSqlDriver.sSQLSERVER_SCHEME, MsSqlDriver.class.getName());
     propDrivers.put(MsSqlDriver.sSQLSERVER_SCHEME+sTITLE_SUFFIX, "SQL Server");
     propDrivers.put(MsSqlDriver.sSQLSERVER_SCHEME+sSAMPLE_SUFFIX, "jdbc:sqlserver://dbserver.enterag.ch\\testdb:1433");
-    propDrivers.put(MsSqlDriver.sSQLSERVER_SCHEME+sSUPPORTS_ARRAYS_SUFFIX, "false");
     propDrivers.put(MySqlDriver.sMYSQL_SCHEME, MySqlDriver.class.getName());
     propDrivers.put(MySqlDriver.sMYSQL_SCHEME+sTITLE_SUFFIX, "SQL Server");
     propDrivers.put(MySqlDriver.sMYSQL_SCHEME+sSAMPLE_SUFFIX, "jdbc:mysql://dbserver.enterag.ch:3306/testdb");
-    propDrivers.put(MySqlDriver.sMYSQL_SCHEME+sSUPPORTS_ARRAYS_SUFFIX, "false");
     propDrivers.put(Db2Driver.sDB2_SCHEME, Db2Driver.class.getName());
     propDrivers.put(Db2Driver.sDB2_SCHEME+sTITLE_SUFFIX, "DB/2");
     propDrivers.put(Db2Driver.sDB2_SCHEME+sSAMPLE_SUFFIX, "jdbc:db2:dbserver.enterag.ch:50000/testdb");
-    propDrivers.put(Db2Driver.sDB2_SCHEME+sSUPPORTS_ARRAYS_SUFFIX, "false");
     propDrivers.put(AccessDriver.sACCESS_SCHEME, AccessDriver.class.getName());
     propDrivers.put(AccessDriver.sACCESS_SCHEME+sTITLE_SUFFIX, "Microsoft Access");
     propDrivers.put(AccessDriver.sACCESS_SCHEME+sSAMPLE_SUFFIX, "jdbc:access:D:\\Projekte\\SIARD2\\JdbcAccess\\testfiles\\dbfile.mdb");
-    propDrivers.put(AccessDriver.sACCESS_SCHEME+sSUPPORTS_ARRAYS_SUFFIX, "false");
     propDrivers.put(H2Driver.sH2_SCHEME, H2Driver.class.getName());
     propDrivers.put(H2Driver.sH2_SCHEME+sTITLE_SUFFIX, "H2 database");
     propDrivers.put(H2Driver.sH2_SCHEME+sSAMPLE_SUFFIX, "jdbc:h2:D:/Projekte/SIARD2/JdbcH2/data/prefixdbfile");
-    propDrivers.put(H2Driver.sH2_SCHEME+sSUPPORTS_ARRAYS_SUFFIX, "false");
     return propDrivers;
   } /* getJdbcDriversDefaultProperties */
 
@@ -202,7 +195,7 @@ public class SiardConnection extends Properties
     for (Enumeration<Object> enumKeys = keys(); enumKeys.hasMoreElements(); ) 
     {
       String sKey = (String)enumKeys.nextElement();
-      if ((!sKey.endsWith(sTITLE_SUFFIX)) && (!sKey.endsWith(sSAMPLE_SUFFIX)) && (!sKey.endsWith(sSUPPORTS_ARRAYS_SUFFIX)))
+      if ((!sKey.endsWith(sTITLE_SUFFIX)) && (!sKey.endsWith(sSAMPLE_SUFFIX)))
         listSchemes.add(sKey);
     }
     return listSchemes.toArray(new String[]{});
@@ -242,15 +235,4 @@ public class SiardConnection extends Properties
     return MessageFormat.format(getProperty(sScheme+sSAMPLE_SUFFIX),sHost,sFolder.replace("\\", "/"),sDatabase);
   } /* getSampleUrl */
   
-  /*------------------------------------------------------------------*/
-  /** supportsArrays returns true, if DBMS associated with the JDBC scheme
-   * supports SQL arrays on upload. 
-   * @param sScheme JDBC scheme.
-   * @return true, if DBMS associated with the JDBC scheme supports SQL arrays
-   *   on upload.
-   */
-  public boolean supportsArrays(String sScheme)
-  {
-    return Boolean.valueOf(getProperty(sScheme+sSUPPORTS_ARRAYS_SUFFIX)).booleanValue();
-  }
 } /* class SiardConnection */

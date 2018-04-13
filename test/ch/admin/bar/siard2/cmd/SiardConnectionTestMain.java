@@ -15,8 +15,7 @@ public class SiardConnectionTestMain
       String sScheme = asScheme[i];
       System.out.println(sScheme+": "+sc.getTitle(sScheme)+", "+
         sc.getDriverClass(sScheme)+", "+
-        sc.getSampleUrl(sScheme,"dbserver.enterag.ch","D:\\dbfolder","testdb")+", "+
-        String.valueOf(sc.supportsArrays(sScheme)));
+        sc.getSampleUrl(sScheme,"dbserver.enterag.ch","D:\\dbfolder","testdb"));
     }
   }
 

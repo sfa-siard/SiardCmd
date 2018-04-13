@@ -17,7 +17,6 @@ public class SiardConnectionTester {
       System.out.println("Scheme: "+sScheme);
       System.out.println("Title: "+sc.getTitle(sScheme));
       System.out.println("Sample URL: "+sc.getSampleUrl(sScheme,"dbserver.enterag.ch","D:\\dbfolder","testdb"));
-      System.out.println("Supports Arrays: "+sc.supportsArrays(sScheme));
     }
   }
 

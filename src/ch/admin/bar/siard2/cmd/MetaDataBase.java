@@ -81,17 +81,9 @@ public abstract class MetaDataBase
     rs.close();
     try
     {
-      String sProtocol = "jdbc:";
-      String sUrl = dmd.getURL();
-      if (sUrl.startsWith(sProtocol))
-      {
-        int iColon = sUrl.indexOf(":",sProtocol.length());
-        if (iColon >= 0)
-        {
-          String sScheme = sUrl.substring(sProtocol.length(),iColon);
-          _bSupportsArrays = SiardConnection.getSiardConnection().supportsArrays(sScheme);
-        }
-      }
+      Array array = _dmd.getConnection().createArrayOf("INTEGER", new Integer[]{1,2});
+      array.free();
+      _bSupportsArrays = true;
     }
     catch (SQLFeatureNotSupportedException sfnse) { _bSupportsArrays = false; }
   } /* constructor */
