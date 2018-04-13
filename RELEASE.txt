@@ -3,3 +3,9 @@ Release Notes for SiardCmd 2.1
 
 2.1.36
 First release of SiardCmd on GitHub.
+
+2.1.40
+.gitattributes added.
+In shell scripts CRLF changed to LF.
+Array support detection in MetaDataBase by call of Connection.createArray()
+Removed _supports_arrays from jdbcdrivers.properties.
