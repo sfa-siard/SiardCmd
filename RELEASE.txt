@@ -13,3 +13,6 @@ Removed _supports_arrays from jdbcdrivers.properties.
 2.1.43
 Forced Git to upload shell scripts without CRLF.
 Changed H2 tests to leave testfiles unchanged.
+
+2.1.45
+Shell scripts confusing From and To corrected.

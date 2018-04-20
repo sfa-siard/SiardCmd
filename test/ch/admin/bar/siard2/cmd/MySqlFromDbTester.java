@@ -28,6 +28,7 @@ public class MySqlFromDbTester extends BaseFromDbTester
     _sMYSQL_DBA_USER = cp.getDbaUser();
     _sMYSQL_DBA_PASSWORD = cp.getDbaPassword();
   }
+  private static final String _sMYSQL_EXT_LOBS = "tmp/lobs";
   private static final String _sMYSQL_SIARD_FILE = "tmp/sfdbmysql.siard";
   private static final String _sMYSQL_METADATA_FILE = "tmp/sfdbmysql.xml";
   private static final File _fileMYSQL_SIARD_FINAL = new File("testfiles/sfdbmysql.siard");
@@ -58,6 +59,7 @@ public class MySqlFromDbTester extends BaseFromDbTester
       connMySql.close();
       String[] args = new String[]{
         "-o",
+        "-x:"+_sMYSQL_EXT_LOBS,
         "-j:"+_sMYSQL_DB_URL,
         "-u:"+_sMYSQL_DB_USER,
         "-p:"+_sMYSQL_DB_PASSWORD,
