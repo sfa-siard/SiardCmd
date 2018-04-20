@@ -29,10 +29,14 @@ public class MySqlFromDbTester extends BaseFromDbTester
     _sMYSQL_DBA_PASSWORD = cp.getDbaPassword();
   }
   private static final File _fileMYSQL_EXT_LOBS = new File("testfiles/lobs");
-  private static final String _sMYSQL_TMP_LOBS = "tmp/lobs";
+  private static final File _fileMYSQL_TMP_LOBS = new File("tmp/lobs");
   private static final String _sMYSQL_SIARD_FILE = "tmp/sfdbmysql.siard";
   private static final String _sMYSQL_METADATA_FILE = "tmp/sfdbmysql.xml";
   private static final File _fileMYSQL_SIARD_FINAL = new File("testfiles/sfdbmysql.siard");
+  static
+  {
+    _fileMYSQL_TMP_LOBS.mkdirs();
+  }
   
   @Test
   public void testMySqlFromDb()
@@ -60,7 +64,7 @@ public class MySqlFromDbTester extends BaseFromDbTester
       connMySql.close();
       String[] args = new String[]{
         "-o",
-        "-x:"+_sMYSQL_TMP_LOBS,
+        "-x:"+_fileMYSQL_TMP_LOBS.getAbsolutePath(),
         "-j:"+_sMYSQL_DB_URL,
         "-u:"+_sMYSQL_DB_USER,
         "-p:"+_sMYSQL_DB_PASSWORD,
@@ -72,7 +76,7 @@ public class MySqlFromDbTester extends BaseFromDbTester
       if (!_fileMYSQL_SIARD_FINAL.exists())
       {
         FU.copy(new File(_sMYSQL_SIARD_FILE),_fileMYSQL_SIARD_FINAL);
-        FU.copyFiles(new File(_sMYSQL_TMP_LOBS), _fileMYSQL_EXT_LOBS, true);
+        FU.copyFiles(_fileMYSQL_TMP_LOBS, _fileMYSQL_EXT_LOBS, true);
       }
       System.out.println("---------------------------------------");
     }
