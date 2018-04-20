@@ -14,5 +14,7 @@ Removed _supports_arrays from jdbcdrivers.properties.
 Forced Git to upload shell scripts without CRLF.
 Changed H2 tests to leave testfiles unchanged.
 
-2.1.45
+2.1.49
 Shell scripts confusing From and To corrected.
+MySqlFromDbTester and MySqlToDbTester enhanced with external LOB storage.
+Blocking of -x switch removed.
