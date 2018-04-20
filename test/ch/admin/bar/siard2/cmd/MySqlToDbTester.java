@@ -1,15 +1,13 @@
 package ch.admin.bar.siard2.cmd;
 
+import java.io.*;
+import java.sql.*;
+
 import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.sql.SQLException;
-
-import org.junit.Test;
-
-import ch.admin.bar.siard2.jdbc.MySqlDriver;
-import ch.enterag.utils.EU;
-import ch.enterag.utils.base.ConnectionProperties;
+import org.junit.*;
+import ch.admin.bar.siard2.jdbc.*;
+import ch.enterag.utils.*;
+import ch.enterag.utils.base.*;
 
 public class MySqlToDbTester 
 {
@@ -31,6 +29,8 @@ public class MySqlToDbTester
   }
   private static final String _sMYSQL_SAMPLE_FILE = "testfiles/sample.siard";
   private static final String _sMYSQL_SIARD_FILE = "testfiles/sfdbmysql.siard";
+  private static final File _fileMYSQL_EXT_LOBS = new File("testfiles/lobs");
+  private static final String _sMYSQL_TMP_LOBS = "tmp/lobs";
 
   /* In JUnit testing getMainJar-relative addressing is not useful */
   static
@@ -45,6 +45,7 @@ public class MySqlToDbTester
     System.out.println("testMySqlToMySql");
     try
     {
+      FU.copyFiles(_fileMYSQL_EXT_LOBS, new File(_sMYSQL_TMP_LOBS), true);
       // now upload sample
       String[] args = new String[]{
         "-o",
