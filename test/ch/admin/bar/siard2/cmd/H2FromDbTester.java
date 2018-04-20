@@ -17,7 +17,7 @@ public class H2FromDbTester extends BaseFromDbTester
   private static final String _sH2_DB_PASSWORD;
   static
   {
-    _sH2_DB_URL = H2Driver.getUrl("testfiles/conn");
+    _sH2_DB_URL = H2Driver.getUrl("tmp/conn");
     _sH2_DB_USER = "sa";
     _sH2_DB_PASSWORD = "sapwd";
   }
@@ -31,6 +31,8 @@ public class H2FromDbTester extends BaseFromDbTester
     System.out.println("testH2FromDb");
     try 
     {
+      FU.copy(new File("testfiles/conn.h2.db"), new File("tmp/conn.h2.db"));
+      FU.copy(new File("testfiles/conn.trace.db"), new File("tmp/conn.trace.db"));
       /* create the databases */
       H2DataSource dsH2 = new H2DataSource();
       dsH2.setUrl(_sH2_DB_URL);

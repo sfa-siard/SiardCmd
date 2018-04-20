@@ -14,7 +14,7 @@ public class H2ToDbTester
   private static final String _sH2_DB_PASSWORD;
   static
   {
-    _sH2_DB_URL = H2Driver.getUrl("testfiles/conn");
+    _sH2_DB_URL = H2Driver.getUrl("tmp/conn");
     _sH2_DB_USER = "sa";
     _sH2_DB_PASSWORD = "sapwd";
   }
@@ -33,6 +33,8 @@ public class H2ToDbTester
     System.out.println("testH2ToH2");
     try
     {
+      FU.copy(new File("testfiles/conn.h2.db"), new File("tmp/conn.h2.db"));
+      FU.copy(new File("testfiles/conn.trace.db"), new File("tmp/conn.trace.db"));
       /* now upload sample */
       String[] args = new String[]{
         "-o",

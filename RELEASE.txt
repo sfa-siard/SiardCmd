@@ -9,3 +9,7 @@ First release of SiardCmd on GitHub.
 In shell scripts CRLF changed to LF.
 Array support detection in MetaDataBase by call of Connection.createArray()
 Removed _supports_arrays from jdbcdrivers.properties.
+
+2.1.43
+Forced Git to upload shell scripts without CRLF.
+Changed H2 tests to leave testfiles unchanged.
