@@ -123,6 +123,7 @@ Created    : 29.08.2016, Hartwig Thomas
     <delete dir="${dirbuildtests}"/>
     <delete dir="${dirtmp}"/>
     <delete dir="${dirdist}"/>
+    <delete dir="${dirtestfiles}/sfdbmysql.siard"/>
   </target>
   
   <!-- create build folders -->
