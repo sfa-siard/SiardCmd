@@ -64,7 +64,7 @@ public class MySqlFromDbTester extends BaseFromDbTester
       connMySql.close();
       String[] args = new String[]{
         "-o",
-        "-x:"+_fileMYSQL_TMP_LOBS.getAbsolutePath(),
+        "-x:"+_fileMYSQL_TMP_LOBS.getPath(),
         "-j:"+_sMYSQL_DB_URL,
         "-u:"+_sMYSQL_DB_USER,
         "-p:"+_sMYSQL_DB_PASSWORD,

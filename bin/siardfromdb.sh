@@ -95,7 +95,7 @@ execute()
   then
     "$java" $opts -cp "$execdir/$reljar"  "$class"
   else
-    "$java" $opts -cp "$execdir/$reljar"  "$class" "$args"
+    "$java" $opts -cp "$execdir/$reljar"  "$class" $args
   fi
   return $?
 } # execute
