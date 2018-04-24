@@ -212,6 +212,7 @@ public class SiardFromDb
       String sError = SiardConnection.getSiardConnection().loadDriver(_sJdbcUrl);
       if (sError != null)
       {
+        System.err.println("JDBC URL "+String.valueOf(_sJdbcUrl)+" is not valid!");
         System.err.println(sError);
         _iReturn = iRETURN_ERROR;
       }
