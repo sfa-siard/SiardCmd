@@ -18,3 +18,9 @@ Changed H2 tests to leave testfiles unchanged.
 Shell scripts confusing From and To corrected.
 MySqlFromDbTester and MySqlToDbTester enhanced with external LOB storage.
 Blocking of -x switch removed.
+
+2.1.53
+Shell scripts corrected: 
+* Missing /usr/bin/java handled correctly in javacheck
+* Backslash in SQL Server JDBC URL must now specified in quotes with double backslash: -j="jdbc:sqlserver://vmw10.enterag.ch\\testdb:1433"
+* build.xml changed to make .sh scripts executable on deploy and on unzip.

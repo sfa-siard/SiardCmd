@@ -644,9 +644,12 @@ Created    : 29.08.2016, Hartwig Thomas
       	<exclude name="${jarhamcrest}"/>
       	<exclude name="${jarjunit4}"/>
       </zipfileset>
-      <zipfileset dir="${dirbin}" prefix="${ant.project.name}">
-        <include name="**/*.*"/>
-      </zipfileset>
+        <zipfileset dir="${dirbin}" prefix="${zipfolder}">
+          <exclude name="**/*.sh"/>
+        </zipfileset>
+        <zipfileset filemode="755" dir="${dirbin}" prefix="${zipfolder}">
+          <include name="**/*.sh"/>
+        </zipfileset>
       <zipfileset dir="${dirdoc}" prefix="${ant.project.name}/${dirdoc}">
         <include name="**/*.*"/>
         <exclude name="developer/**/*.*"/>
