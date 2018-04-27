@@ -87,13 +87,24 @@ java -cp &lt;siardpath&gt;/lib/siardcmd.jar ch.admin.bar.siards.cmd.SiardFromDb 
                    <tr><td valign="top">&lt;lob folder&gt;</td><td>specifies the external folder name where the LOB (large object) cells content of the largest LOB column is to be stored. If this optional argument is omitted, all database content is stored inside the SIARD file.</td></tr>
                    <tr><td valign="top">&lt;mime type&gt;</td><td>gives the MIME type of the content of the externally stored LOB cells (influences choice of file extension).</td></tr>
                    <tr><td valign="top">&lt;export xml&gt;</td><td>specifies a storage location for the metadata XML resulting from the archival.</td></tr>
-                   <tr><td valign="top">&lt;JDBC URL&gt;</td><td>Specifies the JDBC URL of the database instance to be archived. E.g.<br/>
-                     for Microsoft Access: <em>jdbc:access:D:/dbfolder/testdb.accdb</em><br/>
-                     for DB/2: <em>jdbc:dbserver.enterag.ch:50000/testdb</em><br/>
-                     for H2 database: <em>jdbc:h2:D:/dbfolder/testdb</em><br/>
-                     for MySQL: <em>jdbc:mysql://dbserver.enterag.ch:3306/testdb</em><br/>
-                     for Oracle: <em>jdbc:oracle:thin:@dbserver.enterag.ch:1521:orcl</em><br/>
-                     for SQL Server: <em>jdbc:sqlserver://dbserver.enterag.ch\testdb:1433</em></td></tr>
+                   <tr><td valign="top">&lt;JDBC URL&gt;</td><td>Specifies the JDBC URL of the database instance to be archived. E.g.
+                     <dl>
+                       <dt>for <em>Microsoft Access</em></dt>
+                         <dd><em>jdbc:access:D:/dbfolder/testdb.accdb</em></dd>
+                       <dt>for <em>DB/2</em></dt>
+                         <dd><em>jdbc:dbserver.enterag.ch:50000/testdb</em></dd>
+                       <dt>for <em>H2 database</em></dt>
+                         <dd><em>jdbc:h2:D:/dbfolder/testdb</em></dd>
+                       <dt>for <em>MySQL</em></dt>
+                         <dd><em>jdbc:mysql://dbserver.enterag.ch:3306/testdb</em></dd>
+                       <dt>for <em>Oracle</em></dt>
+                         <dd><em>jdbc:oracle:thin:@dbserver.enterag.ch:1521:orcl</em></dd>
+                       <dt>for SQL Server</dt>
+                         <dd><em>jdbc:sqlserver://dbserver.enterag.ch\testdb:1433</em><br/>
+                           (in bash shell the latter must be quoted with duplicated backslash:<br/>
+                           <em>"jdbc:sqlserver://dbserver.enterag.ch\\testdb:1433"</em>)</dd>
+                     </dl>
+                   </td></tr>
                    <tr><td valign="top">&lt;database user&gt;</td><td>Database user for archiving. (N.B.: Make sure this user only has access to the data you want to archive. Avoid using database administrators with rights to everything.)</td></tr>
                    <tr><td valign="top">&lt;database password&gt;</td><td>Password for database user</td></tr>
                    <tr><td valign="top">&lt;siard file&gt;</td><td>Name of the SIARD file where the archived database is to be stored.</td></tr>
@@ -130,13 +141,24 @@ java -cp &lt;siardpath&gt;/lib/siardcmd.jar ch.admin.bar.siards.cmd.SiardToDb &l
                    <tr><td valign="top">-o (overwrite)</td><td>specifies that UDTs and tables in the target database may be overwritten with types and tables from the SIARD file.</td></tr>
                    <tr><td valign="top">&lt;query timeout&gt;</td><td>indicates the maximum waiting time for the reaction of the database to a query in seconds. The default value is 75. Enter 0 for an infinite timeout.</td></tr>
                    <tr><td valign="top">&lt;siard file&gt;</td><td>Name of the SIARD file where the archived database is stored.</td></tr>
-                   <tr><td valign="top">&lt;JDBC URL&gt;</td><td>Specifies the JDBC URL of the database instance where the archived database is to be loaded. E.g.<br/>
-                     for Microsoft Access: <em>jdbc:access:D:/dbfolder/testdb.accdb</em><br/>
-                     for DB/2: <em>jdbc:dbserver.enterag.ch:50000/testdb</em><br/>
-                     for H2 database: <em>jdbc:h2:D:/dbfolder/testdb</em><br/>
-                     for MySQL: <em>jdbc:mysql://dbserver.enterag.ch:3306/testdb</em><br/>
-                     for Oracle: <em>jdbc:oracle:thin:@dbserver.enterag.ch:1521:orcl</em><br/>
-                     for SQL Server: <em>jdbc:sqlserver://dbserver.enterag.ch\testdb:1433</em></td></tr>
+                   <tr><td valign="top">&lt;JDBC URL&gt;</td><td>Specifies the JDBC URL of the database instance where the archived database is to be loaded. E.g.
+                     <dl>
+	                     <dt>for <em>Microsoft Access</em></dt>
+	                       <dd><em>jdbc:access:D:/dbfolder/testdb.accdb</em></dd>
+	                     <dt>for <em>DB/2</em></dt>
+	                       <dd><em>jdbc:dbserver.enterag.ch:50000/testdb</em></dd>
+	                     <dt>for <em>H2 database</em></dt>
+	                       <dd><em>jdbc:h2:D:/dbfolder/testdb</em></dd>
+	                     <dt>for <em>MySQL</em></dt>
+	                       <dd><em>jdbc:mysql://dbserver.enterag.ch:3306/testdb</em></dd>
+	                     <dt>for <em>Oracle</em></dt>
+	                       <dd><em>jdbc:oracle:thin:@dbserver.enterag.ch:1521:orcl</em></dd>
+	                     <dt>for <em>SQL Server</em></dt>
+	                       <dd><em>jdbc:sqlserver://dbserver.enterag.ch\testdb:1433</em><br/>
+	                         (in bash shell the latter must be quoted with duplicated backslash:<br/>
+	                          <em>"jdbc:sqlserver://dbserver.enterag.ch\\testdb:1433"</em>)</dd>
+                     </dl>
+                   </td></tr>
                    <tr><td valign="top">&lt;database user&gt;</td><td>Database user for upload. (N.B.: Make sure this user has the right to create types and tables in the mapped schemas.)</td></tr>
                    <tr><td valign="top">&lt;database password&gt;</td><td>Password for database user</td></tr>
                    <tr><td valign="top">&lt;schema&gt;</td><td>Schema name in SIARD file</td></tr>

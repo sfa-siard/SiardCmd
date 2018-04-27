@@ -1210,6 +1210,8 @@ public class MetaDataFromDb
       MetaColumn mc = mt.createMetaColumn(sColumnName);
       getColumnData(rs,mc);
     }
+    if (mt.getMetaColumns() == 0)
+      throw new SQLException("Table "+mt.getName() + " has no columns!");
     rs.close();
   } /* getColumns */
 
