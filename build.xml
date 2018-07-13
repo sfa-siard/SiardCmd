@@ -15,8 +15,8 @@ Created    : 29.08.2016, Hartwig Thomas
   -->
   <property file="build.properties"/>
   <property name="debuglevel" value="source,lines,vars"/>
-  <property name="target" value="1.7"/>
-  <property name="source" value="1.7"/>
+  <property name="target" value="1.8"/>
+  <property name="source" value="1.8"/>
   <!-- the main folders of the project -->
   <property name="dirsrc" value="src"/>
   <property name="dirtest" value="test/"/>
@@ -38,10 +38,11 @@ Created    : 29.08.2016, Hartwig Thomas
   <property name="jarsqlparser" value="sqlparser.jar"/>
   <property name="cpsqlparser" value="${dirlib}/${jarsqlparser}"/> 
   <!-- JAXB jars -->
+  <property name="jaractivation" value="activation-1.1.1.jar"/>
   <property name="jarjaxbapi" value="jaxb-api.jar"/>
   <property name="jarjaxbcore" value="jaxb-core.jar"/>
   <property name="jarjaxbimpl" value="jaxb-impl.jar"/>
-  <property name="cpjaxb" value="${dirlib}/${jarjaxbapi};${dirlib}/${jarjaxbcore};${dirlib}/${jarjaxbimpl}"/> 
+  <property name="cpjaxb" value="${dirlib}/${jaractivation};${dirlib}/${jarjaxbapi};${dirlib}/${jarjaxbcore};${dirlib}/${jarjaxbimpl}"/> 
   <!-- zip64 jar -->
   <property name="jarzip64" value="zip64.jar"/>
   <property name="cpzip64" value="${dirlib}/${jarzip64}"/> 
@@ -164,7 +165,7 @@ Created    : 29.08.2016, Hartwig Thomas
           <and>
             <isset property="version"/>
             <isset property="revold"/>
-            <isset property="java7rtjar"/>
+            <isset property="java8rtjar"/>
           </and>
         </not>
       </condition>
@@ -303,7 +304,7 @@ Created    : 29.08.2016, Hartwig Thomas
     </touch>
     <javac debug="true" debuglevel="${debuglevel}"
       includeantruntime="false"
-      bootclasspath="${java7rtjar}"
+      bootclasspath="${java8rtjar}"
       source="${source}" 
       target="${target}"
       encoding="UTF-8"
@@ -342,7 +343,7 @@ Created    : 29.08.2016, Hartwig Thomas
 		<!-- build the tests -->
     <javac debug="true" debuglevel="${debuglevel}"
       includeantruntime="false"
-      bootclasspath="${java7rtjar}"
+      bootclasspath="${java8rtjar}"
       source="${source}" 
       target="${target}"
       encoding="UTF-8"

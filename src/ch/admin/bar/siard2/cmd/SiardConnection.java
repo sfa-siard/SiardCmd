@@ -71,7 +71,7 @@ public class SiardConnection extends Properties
     propDrivers.put(OracleDriver.sORACLE_SCHEME+sSAMPLE_SUFFIX, "jdbc:oracle:thin:@dbserver.enterag.ch:1521:orcl");
     propDrivers.put(MsSqlDriver.sSQLSERVER_SCHEME, MsSqlDriver.class.getName());
     propDrivers.put(MsSqlDriver.sSQLSERVER_SCHEME+sTITLE_SUFFIX, "SQL Server");
-    propDrivers.put(MsSqlDriver.sSQLSERVER_SCHEME+sSAMPLE_SUFFIX, "jdbc:sqlserver://dbserver.enterag.ch\\testdb:1433");
+    propDrivers.put(MsSqlDriver.sSQLSERVER_SCHEME+sSAMPLE_SUFFIX, "jdbc:sqlserver://dbserver.enterag.ch:1433;databaseName=testdb");
     propDrivers.put(MySqlDriver.sMYSQL_SCHEME, MySqlDriver.class.getName());
     propDrivers.put(MySqlDriver.sMYSQL_SCHEME+sTITLE_SUFFIX, "SQL Server");
     propDrivers.put(MySqlDriver.sMYSQL_SCHEME+sSAMPLE_SUFFIX, "jdbc:mysql://dbserver.enterag.ch:3306/testdb");

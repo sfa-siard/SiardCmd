@@ -11,7 +11,7 @@
 # return code (0 = OK, 4 = Warning, 8 = Error, 12 = fatal error
 rc=12
 # minimum JAVA version
-minjavaversion="1.7"
+minjavaversion="1.8"
 # jar file relative to script location
 reljar=lib/siardcmd.jar
 # logging properties relative to script location
@@ -20,26 +20,30 @@ rellogprop=etc/logging.properties
 class=ch.admin.bar.siard2.cmd.SiardFromDb
 
 #-----------------------------------------------------------------------
-# javackeck returns 1, if $java exists and has version $minjavaversion 
-# or higher
+# javackeck returns 1, if $java exists and has major version 
+# $minjavaversion or higher.
 #-----------------------------------------------------------------------
 javacheck()
 {
   ok=0
-  version=`$java -version 2>&1`
+  # N.B.: After "1.8..." comes "9..." - the leading "1." was dropped!
+  # drop "1." from minjavaversion
+  minjavaversion=${minjavaversion#1.}
+  # execute java -version with small memory requirement
+  # output must start with something like 'openjdk version "1.8.0_144"' or '9-Debian' or 'java version "10.0.1"'
+  # extract everything between the two quotes
+  version=`$java -Xms32M -Xmx32M -version 2>&1` | sed -e 's/.*version "\(.*\)"\(.*\)/\1/; 1q')
   if [ $? = 0 ]
   then
-    # must start with something like 'java version "1.7.0_23"'
-    start=`expr substr "$version" 1 12`
-    if [ "$start" = "java version" ];
+    # drop "1." from version
+    version=${version#1.}
+    # drop everything after the first "."
+    version=${version%%.*}
+    # numeric comparison
+    if [ "$version" \> "$minjavaversion" ];
     then
-      version=${version#*\"}
-      version=${version%%\"*}
-      if [ "$version" \> "$minjavaversion" ];
-      then
-        ok=1
-      fi  
-    fi
+      ok=1
+    fi  
   fi
   return $ok
 } # javacheck
@@ -106,7 +110,7 @@ execute()
 if [ "$1" != "-h" ];
 then
   args="$@"
-
+  # check https://stackoverflow.com/questions/7334754/correct-way-to-check-java-version-from-bash-script
   java=/usr/bin/java
   javacheck
   ok=$?

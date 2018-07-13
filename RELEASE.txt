@@ -1,23 +1,13 @@
-Release Notes for SiardCmd 2.1
+Release Notes for SiardCmd 2.2
 ==============================
 
-2.1.36
-First release of SiardCmd on GitHub.
+2.2.0
+Release for JAVA 10.
+Scripts adapted to JAVA 9 and 10.
+Error in constructing JDBC URLs for MsSql (confusion of "instance" with "database") fixed. 
 
-2.1.40
-.gitattributes added.
-In shell scripts CRLF changed to LF.
-Array support detection in MetaDataBase by call of Connection.createArray()
-Removed _supports_arrays from jdbcdrivers.properties.
-
-2.1.43
-Forced Git to upload shell scripts without CRLF.
-Changed H2 tests to leave testfiles unchanged.
-
-2.1.49
-Shell scripts confusing From and To corrected.
-MySqlFromDbTester and MySqlToDbTester enhanced with external LOB storage.
-Blocking of -x switch removed.
+2.1.56
+MS Access parsing improved.
 
 2.1.53
 Shell scripts corrected: 
@@ -25,5 +15,20 @@ Shell scripts corrected:
 * Backslash in SQL Server JDBC URL must now specified in quotes with double backslash: -j="jdbc:sqlserver://vmw10.enterag.ch\\testdb:1433"
 * build.xml changed to make .sh scripts executable on deploy and on unzip.
 
-2.1.56
-MS Access parsing improved.
+2.1.49
+Shell scripts confusing From and To corrected.
+MySqlFromDbTester and MySqlToDbTester enhanced with external LOB storage.
+Blocking of -x switch removed.
+
+2.1.43
+Forced Git to upload shell scripts without CRLF.
+Changed H2 tests to leave testfiles unchanged.
+
+2.1.40
+.gitattributes added.
+In shell scripts CRLF changed to LF.
+Array support detection in MetaDataBase by call of Connection.createArray()
+Removed _supports_arrays from jdbcdrivers.properties.
+
+2.1.36
+First release of SiardCmd on GitHub.
