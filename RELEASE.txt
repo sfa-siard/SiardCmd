@@ -1,7 +1,7 @@
 Release Notes for SiardCmd 2.2
 ==============================
 
-2.2.0
+2.1.58
 Release for JAVA 10.
 Scripts adapted to JAVA 9 and 10.
 Error in constructing JDBC URLs for MsSql (confusion of "instance" with "database") fixed. 

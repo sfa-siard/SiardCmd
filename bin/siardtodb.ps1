@@ -10,6 +10,7 @@ param (
 	[switch]$h = $false
 )
 
+$EXECUTABLE='java.exe'
 $MIN_JAVA_VERSION = [Version]'1.8'
 # logging properties relative to script location
 $REL_LOGGING_PROPERTIES = 'etc\logging.properties'
@@ -34,10 +35,10 @@ Function Help()
   Write-Host "JavaHome:"
   Write-Host "  First the registry under HKLM\SOFTWARE\JavaSoft"
   Write-Host "  is searched for CurrentVersion and for JavaHome"
-  Write-Host "  for locating the javaw.exe."
+  Write-Host "  for locating the $EXECUTABLE."
   Write-Host ""
-  Write-Host "  Then, if an environment variable JAVA_HOME exists,"
-  Write-Host "  it is used for locating the javaw.exe."
+  Write-Host "  If that fails and an environment variable JAVA_HOME exists,"
+  Write-Host "  that is used for locating the $EXECUTABLE."
   Write-Host ""
   Write-Host "JavaOpts:"
   Write-Host "  The environment variable JAVA_OPTS is used as a"
@@ -108,7 +109,7 @@ Function FindJava()
       #Write-Host 'javaHome: '+$javaHome
       if ($javaHome)
       {
-        $tryJavaExe = Join-Path $javaHome 'bin\javaw.exe'
+        $tryJavaExe = [io.path]::combine($javaHome,'bin',$EXECUTABLE)
       }
     }
     else
@@ -130,7 +131,7 @@ Function FindJava()
     $javaHome = $env:JAVA_HOME
     if ($javaHome)
     {
-      $tryJavaExe = (Join-Path $javaHome "bin\javaw.exe")
+      $tryJavaExe = [io.path]::combine($javaHome,'bin',$EXECUTABLE)
       if (Test-Path $tryJavaExe)
       {
         $javaExe = $tryJavaExe
@@ -170,7 +171,7 @@ else
   }
   else
   {
-    Write-Host "No valid javaw.exe could be found." 
+    Write-Host "No valid $EXECUTABLE could be found." 
     return 8
   }
 }

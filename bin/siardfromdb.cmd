@@ -1,6 +1,6 @@
 @echo off
 rem ====================================================================
-rem  siardfromdb executes ch.admin.bar.siard2.cmd.SiardFromDb in lib/SiardCmd.jar. 
+rem  siardfromdb executes ch.admin.bar.siard2.cmd.SiardFromDb in lib/siardcmd.jar. 
 rem  Application: Siard2
 rem  Platform   : Win32
 rem --------------------------------------------------------------------
@@ -156,7 +156,7 @@ goto exit
 rem --------------------------------------------------------------------
 rem error message for missing %executable%
 rem --------------------------------------------------------------------
-@echo No valid javaw.exe with version greater or equal %minversion% could be found.
+@echo No valid %executable% with version greater or equal %minversion% could be found.
 @echo "Install the JAVA JRE or indicate correct path on the command line.  "
 
 :help
@@ -175,10 +175,10 @@ rem we need the quotes for protecting the angular brackets
 @echo "Javahome:                                                           "
 @echo "  First the registry under HKLM\SOFTWARE\JavaSoft                   "
 @echo "  is searched for CurrentVersion and for JavaHome                   "
-@echo "  for locating the javaw.exe.                                       "
+@echo "  for locating the %executable%.                                    "
 @echo "                                                                    "
-@echo "  Then, if an environment variable JAVA_HOME exists,                "
-@echo "  it is used for locating the javaw.exe.                            "
+@echo "  If that fails and an environment variable JAVA_HOME exists,       "
+@echo "  that is used for locating the %executable%.                       "
 @echo "                                                                    "
 @echo "Javaopts:                                                           "
 @echo "  The environment variable JAVA_OPTS is used as a                   "
