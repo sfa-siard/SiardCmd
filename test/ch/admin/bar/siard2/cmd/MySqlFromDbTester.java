@@ -33,6 +33,7 @@ public class MySqlFromDbTester extends BaseFromDbTester
   private static final String _sMYSQL_SIARD_FILE = "tmp/sfdbmysql.siard";
   private static final String _sMYSQL_METADATA_FILE = "tmp/sfdbmysql.xml";
   private static final File _fileMYSQL_SIARD_FINAL = new File("testfiles/sfdbmysql.siard");
+  private static final String _sFLAC_MIME_TYPE = "audio/flac";
   static
   {
     _fileMYSQL_TMP_LOBS.mkdirs();
@@ -65,6 +66,7 @@ public class MySqlFromDbTester extends BaseFromDbTester
       String[] args = new String[]{
         "-o",
         "-x:"+_fileMYSQL_TMP_LOBS.getPath(),
+        "-m:"+_sFLAC_MIME_TYPE,
         "-j:"+_sMYSQL_DB_URL,
         "-u:"+_sMYSQL_DB_USER,
         "-p:"+_sMYSQL_DB_PASSWORD,

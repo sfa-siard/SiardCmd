@@ -30,7 +30,7 @@
 	<classpathentry kind="lib" path="lib/jdbch2.jar"/>
 	<classpathentry kind="lib" path="lib/jdbcmssql-test.jar"/>
 	<classpathentry kind="lib" path="lib/jdbcmssql.jar"/>
-	<classpathentry kind="lib" path="lib/jdbcmysql-test.jar"/>
+	<classpathentry kind="lib" path="lib/jdbcmysql-test.jar" sourcepath="/JdbcMySql/test"/>
 	<classpathentry kind="lib" path="lib/jdbcmysql.jar"/>
 	<classpathentry kind="lib" path="lib/jdbcoracle-test.jar" sourcepath="/JdbcOracle/test"/>
 	<classpathentry kind="lib" path="lib/jdbcoracle.jar" sourcepath="/JdbcOracle/src"/>
