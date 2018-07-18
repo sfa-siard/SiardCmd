@@ -92,19 +92,25 @@ public class BaseFromDbTester
     conn.commit();
   } /* dropTables */
   
-  protected void clearDatabase(Connection conn, String sDefaultSchema, String sDbSchema, String sSqlSchema)
+  protected void clearDatabase(Connection conn, String sDefaultSchema, String sDbSchema, String sSqlSchema, String sBlobSchema)
       throws SQLException
     {
       conn.setAutoCommit(false);
       dropTables(conn,sDefaultSchema,"VIEW");
       dropTables(conn,sDefaultSchema,"TABLE");
+      dropTypes(conn,sDefaultSchema);
       dropTables(conn,sDbSchema,"VIEW");
       dropTables(conn,sDbSchema,"TABLE");
+      dropTypes(conn,sDbSchema);
       dropTables(conn,sSqlSchema,"VIEW");
       dropTables(conn,sSqlSchema,"TABLE");
-      dropTypes(conn,sDefaultSchema);
-      dropTypes(conn,sDbSchema);
       dropTypes(conn,sSqlSchema);
+      dropTables(conn,sBlobSchema,"VIEW");
+      if (sBlobSchema != null)
+      {
+        dropTables(conn,sBlobSchema,"TABLE");
+        dropTypes(conn,sBlobSchema);
+      }
     } /* clearDatabase */
 
 }

@@ -169,6 +169,210 @@ java -cp &lt;siardpath&gt;/lib/siardcmd.jar ch.admin.bar.siard2.cmd.SiardToDb &l
                   <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
                 </p>
                 
+                <h3>External Storage of Large Objects</h3>
+                <p>Usually a single LOB column from a single table contains the LOBs that
+                  are to be stored externally. If the folder for storing these LOBs is given on the command-line
+                  with the -x option, the LOB column with the largest amount of data (SUM(ORACLE_LENGTH(lobcolumn))) 
+                  is detected automatically by <em>SiardCmd</em> as the LOB column to be exported. If a MIME type
+                  was given, the LOBs will be stored with an extension appropriate for that MIME type. 
+                 </p>
+                 <p>When a command like</p>
+                 <pre>siardfromdb.cmd -o -x:tmp/lobs -j:jdbc:mysql://localhost:3306/testschema -u:testuser -p:testpwd -s:tmp/sfdbmysql.siard -e:tmp/sfdbmysql.xml</pre>
+                 <p>is entered, <em>SiardCmd</em> will report the detected LOB column with a message like</p>
+                 <pre>LOBs in database column "CCLOB_2M" in table "tsqlsimple" in schema "testsqlschema" will be stored externally in folder "D:\Projekte\SIARD2\SiardCmd\tmp\lobs"</pre>
+                 <p>The given folder for external storage must exist. <em>SiardCmd</em> stores it the SIARD meta data
+                   as a relative URI as can be seen in the <em>sfdbmysql.xml</em> which is exported with the -e option above:   
+                   <pre>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;siardArchive
+ xmlns="http://www.bar.admin.ch/xmlns/siard/2/metadata.xsd"
+ version="2.1"&gt;
+ ...
+ &lt;schemas&gt;
+  &lt;schema&gt;
+   &lt;name&gt;testsqlschema&lt;/name&gt;
+   &lt;folder&gt;schema1&lt;/folder&gt;
+   &lt;tables&gt;
+     ...
+    &lt;table&gt;
+     &lt;name&gt;tsqlsimple&lt;/name&gt;
+       ...
+      &lt;column&gt;
+       &lt;name&gt;CCLOB_2M&lt;/name&gt;
+       <strong>&lt;lobFolder&gt;../lobs/&lt;/lobFolder&gt;</strong>
+       &lt;type&gt;CLOB(16777215)&lt;/type&gt;
+       &lt;typeOriginal&gt;mediumtext&lt;/typeOriginal&gt;
+       &lt;description&gt;&lt;/description&gt;
+      &lt;/column&gt;
+      ...
+    &lt;/table&gt;
+    ...
+   &lt;/tables&gt;
+  &lt;/schema&gt;
+ &lt;/schemas&gt;
+&lt;/siardArchive&gt;</pre>
+                   <p>This makes it possible, to relocate the SIARD file and its LOBs as long
+                   as they retain their original relative position.</p> 
+                
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
+                <h3>More Control over Exported LOBs</h3>
+                <p>More control over exported LOBs is sometimes desirable when</p>
+                <ul>
+                  <li>the LOB column to be exported is not the largest,</li>
+                  <li>more than one LOB column is to be exported, or</li>
+                  <li>different MIME types for different LOB columns are to be applied</li>
+                </ul>
+                <p>In that case the meta data of the database must be exported first.
+                  In the exported meta data the desired <em>lobFolder</em>/<em>mimeType</em> values must be entered manually.
+                  Then it can be used as a "template" file for the download using the -i option.</p>
+                 <p>First the meta data are exported using a command like</p>
+                 <pre>siardfromdb.cmd -o -j:jdbc:mysql://localhost:3306/testschema -u:testuser -p:testpwd -e:tmp/mysqlblob.xml</pre>
+                 <p>This exports a <em>mysqlblob.xml</em> like</p>
+                 <pre>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;siardArchive xmlns="http://www.bar.admin.ch/xmlns/siard/2/metadata.xsd" version="2.1"&gt;
+ &lt;dbname&gt;(...)&lt;/dbname&gt;
+ &lt;dataOwner&gt;(...)&lt;/dataOwner&gt;
+ &lt;dataOriginTimespan&gt;(...)&lt;/dataOriginTimespan&gt;
+ &lt;producerApplication&gt;SiardFromDb 2.1.57 Swiss Federal Archives, Berne, Switzerland, 2008-2016&lt;/producerApplication&gt;
+ &lt;archivalDate&gt;2018-07-18Z&lt;/archivalDate&gt;
+ &lt;clientMachine&gt;vmw10.enterag.ch&lt;/clientMachine&gt;
+ &lt;databaseProduct&gt;MySQL 5.6.34-log&lt;/databaseProduct&gt;
+ &lt;connection&gt;jdbc:mysql://localhost:3306/testschema?verifyServerCertificate=false&amp;useSSL=false&amp;requireSSL=false&lt;/connection&gt;
+ &lt;databaseUser&gt;testuser@localhost&lt;/databaseUser&gt;
+ &lt;schemas&gt;
+  &lt;schema&gt;
+   &lt;name&gt;testblobschema&lt;/name&gt;
+   &lt;folder&gt;schema0&lt;/folder&gt;
+   &lt;tables&gt;
+    &lt;table&gt;
+     &lt;name&gt;tblobsimple&lt;/name&gt;
+     &lt;folder&gt;table0&lt;/folder&gt;
+     &lt;columns&gt;
+      &lt;column&gt;
+       &lt;name&gt;CINT&lt;/name&gt;
+       &lt;type&gt;INTEGER&lt;/type&gt;
+       &lt;typeOriginal&gt;int&lt;/typeOriginal&gt;
+       &lt;nullable&gt;false&lt;/nullable&gt;
+       &lt;defaultValue&gt;0&lt;/defaultValue&gt;
+       &lt;description&gt;&lt;/description&gt;
+      &lt;/column&gt;
+      &lt;column&gt;
+       &lt;name&gt;CPNG&lt;/name&gt;
+       &lt;type&gt;BLOB(2G)&lt;/type&gt;
+       &lt;typeOriginal&gt;longblob&lt;/typeOriginal&gt;
+       &lt;description&gt;&lt;/description&gt;
+      &lt;/column&gt;
+      &lt;column&gt;
+       &lt;name&gt;CFLAC&lt;/name&gt;
+       &lt;type&gt;BLOB(2G)&lt;/type&gt;
+       &lt;typeOriginal&gt;longblob&lt;/typeOriginal&gt;
+       &lt;description&gt;&lt;/description&gt;
+      &lt;/column&gt;
+     &lt;/columns&gt;
+     &lt;primaryKey&gt;
+      &lt;name&gt;PRIMARY&lt;/name&gt;
+      &lt;column&gt;CINT&lt;/column&gt;
+     &lt;/primaryKey&gt;
+     &lt;rows&gt;2&lt;/rows&gt;
+    &lt;/table&gt;
+   &lt;/tables&gt;
+  &lt;/schema&gt;
+ &lt;/schemas&gt;
+ &lt;users&gt;
+  &lt;user&gt;
+   &lt;name&gt;testuser@localhost&lt;/name&gt;
+  &lt;/user&gt;
+ &lt;/users&gt;
+&lt;/siardArchive&gt;</pre>
+                <p>In this file the desired lobFolder and mimeType entries must be added like this:</p>
+                <pre>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;siardArchive
+ xmlns="http://www.bar.admin.ch/xmlns/siard/2/metadata.xsd"
+ version="2.1"&gt;
+ &lt;dbname&gt;(...)&lt;/dbname&gt;
+ &lt;dataOwner&gt;(...)&lt;/dataOwner&gt;
+ &lt;dataOriginTimespan&gt;(...)&lt;/dataOriginTimespan&gt;
+ <strong>&lt;lobFolder&gt;../lobs/&lt;/lobFolder&gt;</strong>
+ &lt;producerApplication&gt;SiardFromDb 2.1.57 Swiss Federal Archives, Berne, Switzerland, 2008-2016&lt;/producerApplication&gt;
+ &lt;archivalDate&gt;2018-07-18Z&lt;/archivalDate&gt;
+ &lt;clientMachine&gt;vmw10.enterag.ch&lt;/clientMachine&gt;
+ &lt;databaseProduct&gt;MySQL 5.6.34-log&lt;/databaseProduct&gt;
+ &lt;connection&gt;jdbc:mysql://localhost:3306/testschema?verifyServerCertificate=false&amp;useSSL=false&amp;requireSSL=false&lt;/connection&gt;
+ &lt;databaseUser&gt;testuser@localhost&lt;/databaseUser&gt;
+ &lt;schemas&gt;
+  &lt;schema&gt;
+   &lt;name&gt;testblobschema&lt;/name&gt;
+   &lt;folder&gt;schema0&lt;/folder&gt;
+   &lt;tables&gt;
+    &lt;table&gt;
+     &lt;name&gt;tblobsimple&lt;/name&gt;
+     &lt;folder&gt;table0&lt;/folder&gt;
+     &lt;columns&gt;
+      &lt;column&gt;
+       &lt;name&gt;CINT&lt;/name&gt;
+       &lt;type&gt;INTEGER&lt;/type&gt;
+       &lt;typeOriginal&gt;int&lt;/typeOriginal&gt;
+       &lt;nullable&gt;false&lt;/nullable&gt;
+       &lt;defaultValue&gt;0&lt;/defaultValue&gt;
+       &lt;description&gt;&lt;/description&gt;
+      &lt;/column&gt;
+      &lt;column&gt;
+       &lt;name&gt;CPNG&lt;/name&gt;
+       <strong>&lt;lobFolder&gt;png/&lt;/lobFolder&gt;</strong>
+       &lt;type&gt;BLOB(2G)&lt;/type&gt;
+       <strong>&lt;mimeType&gt;image/png&lt;/mimeType&gt;</strong>
+       &lt;typeOriginal&gt;longblob&lt;/typeOriginal&gt;
+       &lt;description&gt;&lt;/description&gt;
+      &lt;/column&gt;
+      &lt;column&gt;
+       &lt;name&gt;CFLAC&lt;/name&gt;
+       <strong>&lt;lobFolder&gt;flac/&lt;/lobFolder&gt;</strong>
+       &lt;type&gt;BLOB(2G)&lt;/type&gt;
+       <strong>&lt;mimeType&gt;audio/flac&lt;/mimeType&gt;</strong>
+       &lt;typeOriginal&gt;longblob&lt;/typeOriginal&gt;
+       &lt;description&gt;&lt;/description&gt;
+      &lt;/column&gt;
+     &lt;/columns&gt;
+     &lt;primaryKey&gt;
+      &lt;name&gt;PRIMARY&lt;/name&gt;
+      &lt;column&gt;CINT&lt;/column&gt;
+     &lt;/primaryKey&gt;
+     &lt;rows&gt;2&lt;/rows&gt;
+    &lt;/table&gt;
+   &lt;/tables&gt;
+  &lt;/schema&gt;
+ &lt;/schemas&gt;
+ &lt;users&gt;
+  &lt;user&gt;
+   &lt;name&gt;testuser@localhost&lt;/name&gt;
+  &lt;/user&gt;
+ &lt;/users&gt;
+&lt;/siardArchive&gt;</pre>
+
+                <p>In the example we use relative LOB folder URIs.
+                  The value "../lobs/" in the <em>siardArchive</em> element
+                  indicates, that the LOBs are to be stored in the folder "lobs/"
+                  in the folder where the SIARD file is stored.
+                  The value "png/" in the <em>column</em> element with the name CPNG
+                  indicates, that the LOBs in this column are to be stored in the
+                  "png/" subfolder of the "lobs/" folder. Similarly the LOBs
+                  in the CFLAC column are to be stored in the "flac/" subfolder of
+                  the global "lobs/" folder.</p>
+                <p>The MIME type <em>image/png</em> indicates that the file extension <em>.png</em>
+                  is suitable for the LOBs in the CPNG column. The MIME type <em>audio/flac</em>
+                  indicates that the file extension <em>.flac</em> applies to the LOBs in the CFLAC column.</p>
+                 <p>After these preparations the database can be downloaded with the command:</p>
+                 <pre>siardfromdb.cmd -o -i:tmp/mysqlblob.xml -j:jdbc:mysql://localhost:3306/testschema -u:testuser -p:testpwd -s:tmp/sfdbmysql.siard</pre>
+                 <p>This stores a small SIARD file referencing the BLOBs in the subfolders
+                   <em>lobs/png</em> and <em>lobs/flac</em> of its parent folder <em>tmp</em>:</p>
+                 <img src="../assets/img/blobs.png" alt="directory listing with BLOBs"/>
+                
+                <p class="pull-right">
+                  <small><a href="#" class="icon icon--before icon--power hidden-print">Top of page</a></small>
+                </p>
+                
                 <h3>No GUI for <em>SiardCmd</em></h3>
                 <p><em>SiardCmd</em> implements command-line utilities for
                   downloading and uploading relational databases in SIARD Format 2.1

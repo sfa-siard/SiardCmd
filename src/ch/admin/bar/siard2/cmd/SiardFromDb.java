@@ -66,6 +66,7 @@ public class SiardFromDb
   private int _iLoginTimeoutSeconds = SiardConnection.iDEFAULT_LOGIN_TIMEOUT_SECONDS;
   private int _iQueryTimeoutSeconds = SiardConnection.iDEFAULT_QUERY_TIMEOUT_SECONDS;
   private File _fileImportXml = null;
+  private File _fileExternalLobFolder = null;
   private URI _uriExternalLobFolder = null;
   private String _sMimeType = null;
   private String _sJdbcUrl = null;
@@ -166,12 +167,22 @@ public class SiardFromDb
     /* analyze the parameters */
     if (_iReturn == iRETURN_OK)
     {
+      if (sSiardFile != null)
+        _fileSiard = new File(sSiardFile);
+      if (sExportXml != null)
+        _fileExportXml = new File(sExportXml);
+      
+      if ((sSiardFile == null) && (sExportXml == null))
+      {
+        System.out.println("SIARD file and/or export meta data XML must be given!");
+        _iReturn = iRETURN_ERROR;
+      }
       if (sLoginTimeoutSeconds != null)
       {
         try { _iLoginTimeoutSeconds = Integer.parseInt(sLoginTimeoutSeconds); }
         catch(NumberFormatException nfe) 
         { 
-          System.err.println("Invalid login timeout: "+sLoginTimeoutSeconds+"!");
+          System.out.println("Invalid login timeout: "+sLoginTimeoutSeconds+"!");
           _iReturn = iRETURN_ERROR;
         }
       }
@@ -180,7 +191,7 @@ public class SiardFromDb
         try { _iQueryTimeoutSeconds = Integer.parseInt(sQueryTimeoutSeconds); }
         catch(NumberFormatException nfe) 
         { 
-          System.err.println("Invalid query timeout: "+sQueryTimeoutSeconds+"!");
+          System.out.println("Invalid query timeout: "+sQueryTimeoutSeconds+"!");
           _iReturn = iRETURN_ERROR;
         }
       }
@@ -189,52 +200,55 @@ public class SiardFromDb
         _fileImportXml = new File(sImportXml);
         if (!(_fileImportXml.isFile() && _fileImportXml.exists()))
         {
-          System.err.println("File import XML "+_fileImportXml.getAbsolutePath() + " does not exist!");
+          System.out.println("File import XML "+_fileImportXml.getAbsolutePath() + " does not exist!");
           _iReturn = iRETURN_ERROR;
         }
       }
       if (sExternalLobFolder != null)
       {
-        File fileExternalLobFolder = new File(sExternalLobFolder);
-        if (!(fileExternalLobFolder.exists() && fileExternalLobFolder.isDirectory()))
+        _fileExternalLobFolder = new File(sExternalLobFolder);
+        if (!(_fileExternalLobFolder.exists() && _fileExternalLobFolder.isDirectory()))
         {
-          System.err.println("External LOB folder  "+fileExternalLobFolder.getAbsolutePath() + " does not exist!");
+          System.out.println("External LOB folder  "+_fileExternalLobFolder.getAbsolutePath() + " does not exist!");
           _iReturn = iRETURN_ERROR;
         }
         else
         {
-          FU.deleteFiles(fileExternalLobFolder);
-          fileExternalLobFolder.mkdirs();
-          _uriExternalLobFolder = FU.toUri(fileExternalLobFolder);
+          if (FU.deleteFiles(_fileExternalLobFolder))
+          {
+            /* relativize it from SIARD file's parent folder */
+            File fileRelative = _fileSiard.getParentFile().getAbsoluteFile().toPath().relativize(_fileExternalLobFolder.getAbsoluteFile().toPath()).toFile();
+            /* prepend a ../ for exiting the SIARD file and append a / to indicate that it is a folder */
+            try { _uriExternalLobFolder =  new URI("../"+fileRelative.toString()+"/"); }
+            catch (URISyntaxException use) 
+            {
+              System.out.println("External LOB folder  "+_fileExternalLobFolder.getAbsolutePath() + " could not be relativized!");
+              _iReturn = iRETURN_ERROR;
+            }
+          }
+          else
+          {
+            System.out.println("Files in external LOB folder  "+_fileExternalLobFolder.getAbsolutePath() + " could not be deleted!");
+            _iReturn = iRETURN_ERROR;
+          }
         }
         
       }
       String sError = SiardConnection.getSiardConnection().loadDriver(_sJdbcUrl);
       if (sError != null)
       {
-        System.err.println("JDBC URL "+String.valueOf(_sJdbcUrl)+" is not valid!");
-        System.err.println(sError);
+        System.out.println("JDBC URL "+String.valueOf(_sJdbcUrl)+" is not valid!");
+        System.out.println(sError);
         _iReturn = iRETURN_ERROR;
       }
       if (_sDatabaseUser == null)
       {
-        System.err.println("Database user must be given!");
+        System.out.println("Database user must be given!");
         _iReturn = iRETURN_ERROR;
       }
       if (_sDatabasePassword == null)
       {
-        System.err.println("Database password must be given!");
-        _iReturn = iRETURN_ERROR;
-      }
-      if (sSiardFile != null)
-        _fileSiard = new File(sSiardFile);
-        
-      if (sExportXml != null)
-        _fileExportXml = new File(sExportXml);
-      
-      if ((sSiardFile == null) && (sExportXml == null))
-      {
-        System.err.println("SIARD file and/or export meta data XML must be given!");
+        System.out.println("Database password must be given!");
         _iReturn = iRETURN_ERROR;
       }
     }
@@ -318,6 +332,12 @@ public class SiardFromDb
 	            fileSiard.delete();
 	          }
 	          _archive.create(fileSiard);
+	          if (_fileImportXml != null)
+	          {
+	            FileInputStream fis = new FileInputStream(_fileImportXml);
+	            _archive.importMetaDataTemplate(fis);
+	            fis.close();
+	          }
 	          /* get meta data from DB */
 	          MetaDataFromDb mdfd = MetaDataFromDb.newInstance(_conn.getMetaData(), _archive.getMetaData());
 	          mdfd.setQueryTimeout(_iQueryTimeoutSeconds);
@@ -328,12 +348,24 @@ public class SiardFromDb
 	            MetaColumn mcMaxLob = mdfd.getMaxLobColumn();
 	            if (mcMaxLob != null)
 	            {
+	              String sColumnName = mcMaxLob.getName();
+	              MetaTable mtLob = mcMaxLob.getParentMetaTable();
+	              String sTableName = mtLob.getName();
+	              MetaSchema msLob = mtLob.getParentMetaSchema();
+	              String sSchemaName = msLob.getName();
+	              String sMessage = "LOBs in database column \""+sColumnName+"\" in table \""+sTableName+"\" in schema \""+sSchemaName+
+                 "\" will be stored externally in folder \""+_fileExternalLobFolder.getAbsolutePath().toString()+"\"";
 	              mcMaxLob.setLobFolder(_uriExternalLobFolder);
 	              if (_sMimeType != null)
+	              {
 	                mcMaxLob.setMimeType(_sMimeType);
+	                sMessage = sMessage + " with MIME type "+mcMaxLob.getMimeType();
+	              }
+	              System.out.println();
+	              System.out.println(sMessage);
 	            }
 	            else
-	              System.err.println("No LOB column found to be externalized!");
+	              System.out.println("No LOB column found to be externalized!");
 	          }
 	          /* export meta data XML from DB */
 	          if (_fileExportXml != null)
@@ -358,10 +390,10 @@ public class SiardFromDb
 	          _conn.close();
 	        }
 	        else
-	          System.err.println("Connection to "+_conn.getMetaData().getURL().toString()+" failed!");
+	          System.out.println("Connection to "+_conn.getMetaData().getURL().toString()+" failed!");
 	      }
 	      else
-	        System.err.println("Connection to "+_sJdbcUrl+" not supported ("+sError+")!");
+	        System.out.println("Connection to "+_sJdbcUrl+" not supported ("+sError+")!");
 	    }
 	    else
 	    {
@@ -370,8 +402,8 @@ public class SiardFromDb
 	        sMessage = sMessage + " or "+_fileExportXml.getAbsolutePath()+" exist already!";
 	      else
 	        sMessage = sMessage + " exists already!";
-        System.err.println(sMessage);
-        System.err.println("Backup and delete it or use option -o for overwriting it.");
+        System.out.println(sMessage);
+        System.out.println("Backup and delete it or use option -o for overwriting it.");
 	      _iReturn = iRETURN_WARNING;
 	    }
 	  }
@@ -404,13 +436,13 @@ public class SiardFromDb
 		catch (Exception e)
 		{
 		  _il.exception(e);
-		  System.err.println(EU.getExceptionMessage(e));
+		  System.out.println(EU.getExceptionMessage(e));
 			iReturn = iRETURN_ERROR;
 		}
 		catch (Error e)
 		{
       _il.error(e);
-      System.err.println(EU.getErrorMessage(e));
+      System.out.println(EU.getErrorMessage(e));
 			iReturn = iRETURN_FATAL;
 		}
     System.exit(iReturn);

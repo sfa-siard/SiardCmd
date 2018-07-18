@@ -33,6 +33,30 @@ java8rtjar=C:/Program Files/Java/jdk1.8.0_144/jre/lib/rt.jar
 git=/usr/bin/git
 #git=C:/Program Files/Git/bin/git.exe
 
+#-----------------------------------------------------------------------
+# BLOB sample files (same number of PNGs and FLACs, at most 10 per type)
+blobpng0=D:/SFPD/18/000001/18-000001A.png
+blobpng1=D:/SFPD/18/000001/18-000001B.png
+blobpng2=D:/SFPD/18/000002/18-000002A.png
+blobpng3=D:/SFPD/18/000002/18-000002B.png
+blobpng4=D:/SFPD/18/000003/18-000003A.png
+blobpng5=D:/SFPD/18/000003/18-000003B.png
+#blobpng6=D:/SFPD/18/000004/18-000004A.png
+#blobpng7=D:/SFPD/18/000004/18-000004B.png
+#blobpng8=D:/SFPD/18/000005/18-000005A.png
+#blobpng9=D:/SFPD/18/000005/18-000005B.png
+
+blobflac0=D:/SFPD/18/000001/18-000001A.flac
+blobflac1=D:/SFPD/18/000001/18-000001B.flac
+blobflac2=D:/SFPD/18/000002/18-000002A.flac
+blobflac3=D:/SFPD/18/000002/18-000002B.flac
+blobflac4=D:/SFPD/18/000003/18-000003A.flac
+blobflac5=D:/SFPD/18/000003/18-000003B.flac
+#blobflac6=D:/SFPD/18/000004/18-000004A.flac
+#blobflac7=D:/SFPD/18/000004/18-000004B.flac
+#blobflac8=D:/SFPD/18/000005/18-000005A.flac
+#blobflac9=D:/SFPD/18/000005/18-000005B.flac
+
 # ----------------------------------------------------------------------
 # db connection properties for db2
 # if dbuserdb2 is undefined, no tests with DB/2 databases will be run by build 

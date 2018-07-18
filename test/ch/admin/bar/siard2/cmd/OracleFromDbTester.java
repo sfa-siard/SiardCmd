@@ -44,7 +44,8 @@ public class OracleFromDbTester extends BaseFromDbTester
       clearDatabase(connOracle,
         _sORACLE_DB_USER,
         TestOracleDatabase._sTEST_SCHEMA, 
-        ch.admin.bar.siard2.oracle.TestSqlDatabase._sTEST_SCHEMA);
+        ch.admin.bar.siard2.oracle.TestSqlDatabase._sTEST_SCHEMA,
+        null);
       /* drop and create the test database */
       System.out.println("Create TestSqlDatabase");
       new ch.admin.bar.siard2.oracle.TestSqlDatabase(connOracle);

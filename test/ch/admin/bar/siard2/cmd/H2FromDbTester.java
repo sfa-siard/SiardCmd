@@ -43,7 +43,8 @@ public class H2FromDbTester extends BaseFromDbTester
       clearDatabase(connH2,
         "PUBLIC",
         TestH2Database._sTEST_SCHEMA, 
-        ch.admin.bar.siard2.h2.TestSqlDatabase._sTEST_SCHEMA);
+        ch.admin.bar.siard2.h2.TestSqlDatabase._sTEST_SCHEMA,
+        null);
       System.out.println("Create TestSqlDatabase");
       new ch.admin.bar.siard2.h2.TestSqlDatabase(connH2);
       System.out.println("Create TestH2Database");

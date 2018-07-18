@@ -47,7 +47,8 @@ public class Db2FromDbTester extends BaseFromDbTester
       clearDatabase(connDb2,
         _sDB2_DB_USER, // in DB/2 the default schema is the same as the DB user.
         TestDb2Database._sTEST_SCHEMA, 
-        ch.admin.bar.siard2.db2.TestSqlDatabase._sTEST_SCHEMA);
+        ch.admin.bar.siard2.db2.TestSqlDatabase._sTEST_SCHEMA,
+        null);
       System.out.println("Create TestSqlDatabase");
       new ch.admin.bar.siard2.db2.TestSqlDatabase(connDb2,_sDB2_DB_USER);
       System.out.println("Create TestMySqlDatabase");

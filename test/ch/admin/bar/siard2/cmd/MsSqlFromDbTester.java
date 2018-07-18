@@ -42,7 +42,8 @@ public class MsSqlFromDbTester extends BaseFromDbTester
       clearDatabase(connMsSql,
         "dbo",
         TestMsSqlDatabase._sTEST_SCHEMA, 
-        ch.admin.bar.siard2.mssql.TestSqlDatabase._sTEST_SCHEMA);
+        ch.admin.bar.siard2.mssql.TestSqlDatabase._sTEST_SCHEMA,
+        null);
       System.out.println("Create TestSqlDatabase");
       new ch.admin.bar.siard2.mssql.TestSqlDatabase(connMsSql);
       System.out.println("Create TestMsSqlDatabase");
