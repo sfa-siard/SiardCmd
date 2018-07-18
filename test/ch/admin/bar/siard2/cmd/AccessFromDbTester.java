@@ -39,7 +39,14 @@ public class AccessFromDbTester extends BaseFromDbTester
     try
     {
       FU.copy(_fileTEST_EMPTY_DATABASE,_fileTEST_ACCESS_DATABASE);
-      if (Execute.isOsWindows())
+      /* The JDBC-ODBC bridge could still be used until JAVA 8 using
+       * an extract from the JAVA 7 run-time library and the JdbcOdbc.dll.
+       * Now that is blocked by the split packages prohibition.
+       * So we use the test database originally created under JAVA 8.
+       * If we ever want more controlled features in the test database 
+       * we shall be in trouble ... (have to use JAVA 7 or 8!)
+       */
+      if (Execute.isOsWindows() && Execute.isJavaVersionLessThan("9"))
         new TestAccessDatabase(_fileTEST_ACCESS_DATABASE);
       else
         FU.copy(_fileTEST_ACCESS_SOURCE, _fileTEST_ACCESS_DATABASE);
