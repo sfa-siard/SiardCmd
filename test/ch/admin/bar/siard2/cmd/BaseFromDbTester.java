@@ -105,9 +105,9 @@ public class BaseFromDbTester
       dropTables(conn,sSqlSchema,"VIEW");
       dropTables(conn,sSqlSchema,"TABLE");
       dropTypes(conn,sSqlSchema);
-      dropTables(conn,sBlobSchema,"VIEW");
       if (sBlobSchema != null)
       {
+        dropTables(conn,sBlobSchema,"VIEW");
         dropTables(conn,sBlobSchema,"TABLE");
         dropTypes(conn,sBlobSchema);
       }
