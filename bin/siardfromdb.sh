@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #=======================================================================
 # siardfromdb executes ch.admin.bar.siard2.cmd.SiardFromDb in lib/siardcmd.jar. 
 # Application: Siard2
@@ -20,6 +20,25 @@ rellogprop=etc/logging.properties
 class=ch.admin.bar.siard2.cmd.SiardFromDb
 
 #-----------------------------------------------------------------------
+# javafind searches for java executable. If one is found, 1 is returned
+# and the variable java is set to the full path. Otherwise 0 is returned.
+#-----------------------------------------------------------------------
+javafind()
+{
+  found=0
+  java=$(type -p java)
+  if [ -n "$java" ] 
+  then
+    found=1
+  elif [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]
+  then
+    $java="$JAVA_HOME/bin/java"
+    found=1
+  fi  
+  return $found 
+} # javafind
+
+#-----------------------------------------------------------------------
 # javackeck returns 1, if $java exists and has major version 
 # $minjavaversion or higher.
 #-----------------------------------------------------------------------
@@ -30,17 +49,18 @@ javacheck()
   # drop "1." from minjavaversion
   minjavaversion=${minjavaversion#1.}
   # execute java -version with small memory requirement
-  # output must start with something like 'openjdk version "1.8.0_144"' or '9-Debian' or 'java version "10.0.1"'
-  # extract everything between the two quotes
-  version=`$java -Xms32M -Xmx32M -version 2>&1` | sed -e 's/.*version "\(.*\)"\(.*\)/\1/; 1q')
-  if [ $? = 0 ]
+  version=`$java -Xms32M -Xmx32M -version 2>&1`
+  # output must start with something like 'openjdk version "1.8.0_144"' or 'java version "10.0.1"'
+  reQuoted='version "([^"]+)"'
+  if [[ $version =~ $reQuoted ]]
   then
+    version=${BASH_REMATCH[1]}
     # drop "1." from version
     version=${version#1.}
-    # drop everything after the first "."
+    # drop everything after the first "." (for numerical comparison)
     version=${version%%.*}
     # numeric comparison
-    if [ "$version" \> "$minjavaversion" ];
+    if [ $version -ge $minjavaversion ]
     then
       ok=1
     fi  
@@ -62,9 +82,8 @@ help()
   echo "  <args>      see documentation of SiardFromDb"
   echo ""
   echo "JavaHome:"
-  echo "  In order to find a suitable java executable, \"java\" is first"
-  echo "  tried, then all PATH folders, then JAVA_HOME and finally the"
-  echo "  whole file system is searched."
+  echo "  In order to find a suitable java executable, the PATH is first"
+  echo " searched for \"java\", then JAVA_HOME."
   echo ""
   echo "JavaOpts:"
   echo "  The environment variable JAVA_OPTS is used as a"
@@ -81,8 +100,8 @@ help()
 #-----------------------------------------------------------------------
 error()
 {
-  echo 'No valid java executable could be found!                            '
-  echo 'Install the JAVA JRE or indicate correct location using JAVA_HOME!  '
+  echo "No valid java executable with version equal or greater than $minjavaversion could be found!"
+  echo "Install the JAVA JRE or indicate correct location using JAVA_HOME!"
   return 8
 } # error
 
@@ -92,9 +111,9 @@ error()
 execute()
 {
   execdir="$0"
-  execdir=${execdir%/siardfromdb.sh}
+  execdir=${execdir%/*}
   opts="-Xmx1024m -Djava.util.logging.config.file=\"$execdir/$rellogprop\" $JAVA_OPTS"
-  echo "$java" $opts -cp "$execdir/$reljar"  "$class" "$args"
+  #echo "$java" $opts -cp "$execdir/$reljar"  "$class" "$args"
   if [ ${#args} -eq 0 ];
   then
     "$java" $opts -cp "$execdir/$reljar"  "$class"
@@ -110,69 +129,24 @@ execute()
 if [ "$1" != "-h" ];
 then
   args="$@"
-  # check https://stackoverflow.com/questions/7334754/correct-way-to-check-java-version-from-bash-script
-  java=/usr/bin/java
-  javacheck
+  javafind
   ok=$?
-
-  # try PATH
-  if [ $ok -eq 0 ];
-  then
-    echo "trying PATH ..."
-    ifssaved="$IFS"
-    IFS=:
-    for dir in $PATH
-    do
-      if [ $ok -eq 0 ];
-      then
-        java="$dir/java"
-        javacheck
-        ok=$?
-      fi
-    done
-    IFS="$ifssaved"
-  fi
-  
-  # then try JAVA_HOME
-  if [ $ok -eq 0 ];
-  then
-    echo "trying JAVA_HOME ..."  
-    java="$JAVA_HOME/bin/java"
-    javacheck
-    ok=$?
-  fi
-  
-  # finally try file system
-  if [ $ok -eq 0 ];
-  then
-    echo "searching in file system ..."
-    ifssaved="$IFS"
-    IFS="
-"
-    for f in `find / -path */bin/java -print 2>/dev/null`
-    do
-      if [ $ok -eq 0 ];
-      then
-        java="$f"
-        javacheck
-        ok=$?
-      fi
-    done
-    IFS="$ifssaved"    
-  fi
-  
-  # if a suitable java executable was found then execute it
   if [ $ok -ne 0 ];
   then
-    execute
+    javacheck
+    ok=$?
+    # if a suitable java executable was found then execute it
+    if [ $ok -ne 0 ];
+    then
+      execute
+    else
+      error
+    fi
   else
     error
-  fi
-  rc=$?
-  
+  fi  
 else
   help
-  rc=$?
 fi
-
+rc=$?
 exit $rc
