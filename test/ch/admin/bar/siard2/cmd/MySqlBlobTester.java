@@ -95,7 +95,7 @@ public class MySqlBlobTester extends BaseFromDbTester
     catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
     catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
     catch(ClassNotFoundException cnfe) { fail(EU.getExceptionMessage(cnfe)); }
-  } /* testMySqlFromDb */
+  } /* testMySqlBlobXmlFromDb */
   
   
   @Test
@@ -124,6 +124,6 @@ public class MySqlBlobTester extends BaseFromDbTester
     catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
     catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
     catch(ClassNotFoundException cnfe) { fail(EU.getExceptionMessage(cnfe)); }
-  } /* testMySqlFromDb */
+  } /* testMySqlBlobsFromDb */
   
 }

@@ -180,7 +180,8 @@ java -cp &lt;siardpath&gt;/lib/siardcmd.jar ch.admin.bar.siard2.cmd.SiardToDb &l
                  <pre>siardfromdb.cmd -o -x:tmp/lobs -j:jdbc:mysql://localhost:3306/testschema -u:testuser -p:testpwd -s:tmp/sfdbmysql.siard -e:tmp/sfdbmysql.xml</pre>
                  <p>is entered, <em>SiardCmd</em> will report the detected LOB column with a message like</p>
                  <pre>LOBs in database column "CCLOB_2M" in table "tsqlsimple" in schema "testsqlschema" will be stored externally in folder "D:\Projekte\SIARD2\SiardCmd\tmp\lobs"</pre>
-                 <p>The given folder for external storage must exist. <em>SiardCmd</em> stores it the SIARD meta data
+                 <p>The given folder for external storage must exist. Existing LOB files in it will be overwritten.
+                 <em>SiardCmd</em> stores it the SIARD meta data
                    as a relative URI as can be seen in the <em>sfdbmysql.xml</em> which is exported with the -e option above:   
                    <pre>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
 &lt;siardArchive
