@@ -2,17 +2,10 @@ package ch.admin.bar.siard2.cmd;
 
 import static org.junit.Assert.*;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import ch.enterag.sqlparser.identifier.QualifiedId;
-import ch.enterag.utils.jdbc.BaseDatabaseMetaData;
+import java.sql.*;
+import java.util.*;
+import ch.enterag.sqlparser.identifier.*;
+import ch.enterag.utils.jdbc.*;
 
 public class BaseFromDbTester 
 {
@@ -27,9 +20,9 @@ public class BaseFromDbTester
   private void dropTypes(Connection conn, String sSchema)
     throws SQLException
   {
-    BaseDatabaseMetaData dmd = (BaseDatabaseMetaData)conn.getMetaData(); 
+    DatabaseMetaData dmd = conn.getMetaData(); 
     ResultSet rsTypes = dmd.getUDTs(null, 
-      dmd.toPattern(sSchema), "%", 
+      ((BaseDatabaseMetaData)dmd).toPattern(sSchema), "%", 
       new int[] {Types.DISTINCT,Types.STRUCT});
     Set<QualifiedId> setTypes = new HashSet<QualifiedId>();
     while (rsTypes.next())
@@ -72,9 +65,9 @@ public class BaseFromDbTester
     throws SQLException
   {
     Statement stmt = conn.createStatement();
-    BaseDatabaseMetaData dmd = (BaseDatabaseMetaData)conn.getMetaData(); 
+    DatabaseMetaData dmd = conn.getMetaData();
     ResultSet rsTables = dmd.getTables(null, 
-      dmd.toPattern(sSchema), "%", 
+      ((BaseDatabaseMetaData)dmd).toPattern(sSchema), "%", 
       new String[] {sType});
     while (rsTables.next())
     {

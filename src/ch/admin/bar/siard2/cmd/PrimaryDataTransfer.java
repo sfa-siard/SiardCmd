@@ -50,12 +50,8 @@ public class PrimaryDataTransfer
     _il.enter(mt.getName());
     /* schema mapping is null on download */
     TableMapping tm = null;
-    int iConcurrency = ResultSet.CONCUR_READ_ONLY;
     if (sm != null)
-    {
       tm = sm.getTableMapping(mt.getName());
-      iConcurrency = ResultSet.CONCUR_UPDATABLE;
-    }
     /* create query */
     StringBuilder sbSql = new StringBuilder("SELECT\r\n");
     List<List<String>> llColumnNames = mt.getColumnNames(supportsArrays(),supportsUdts());
@@ -87,7 +83,7 @@ public class PrimaryDataTransfer
     sbSql.append("\r\n FROM "+qiTable.format());
     /* execute query */
     _il.event(sbSql.toString());
-    Statement stmt = _conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,iConcurrency);
+    Statement stmt = _conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_UPDATABLE);
     stmt.setQueryTimeout(_iQueryTimeoutSeconds);
     ResultSet rs = stmt.executeQuery(sbSql.toString());
     _il.exit(rs);
