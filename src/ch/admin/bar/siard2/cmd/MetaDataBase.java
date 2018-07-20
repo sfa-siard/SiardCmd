@@ -9,7 +9,7 @@ import ch.admin.bar.siard2.api.*;
 
 public abstract class MetaDataBase
 {
-  protected BaseDatabaseMetaData _dmd = null;
+  protected DatabaseMetaData _dmd = null;
   protected MetaData _md = null;
   protected int _iQueryTimeoutSeconds = 30;
   public void setQueryTimeout(int iQueryTimeoutSeconds) { _iQueryTimeoutSeconds = iQueryTimeoutSeconds; }

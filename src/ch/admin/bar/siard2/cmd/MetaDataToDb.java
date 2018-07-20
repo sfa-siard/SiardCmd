@@ -13,6 +13,7 @@ import java.sql.*;
 import java.text.*;
 import java.util.*;
 import java.util.regex.*;
+import ch.enterag.utils.jdbc.*;
 import ch.enterag.utils.background.*;
 import ch.enterag.utils.logging.*;
 import ch.enterag.sqlparser.*;
@@ -181,8 +182,8 @@ public class MetaDataToDb
   {
     boolean bExists = false;
     ResultSet rs = _dmd.getUDTs(null, 
-      _dmd.toPattern(sMangledSchema), 
-      _dmd.toPattern(sMangledType), 
+      ((BaseDatabaseMetaData)_dmd).toPattern(sMangledSchema), 
+      ((BaseDatabaseMetaData)_dmd).toPattern(sMangledType), 
       new int[]{ Types.STRUCT, Types.DISTINCT });
     while (rs.next())
       bExists = true;
@@ -384,8 +385,8 @@ public class MetaDataToDb
       tm.setMappedTableName(qiTable.getName());
     }
     ResultSet rsColumns = _dmd.getColumns(null, 
-      _dmd.toPattern(qiTable.getSchema()), 
-      _dmd.toPattern(qiTable.getName()),
+      ((BaseDatabaseMetaData)_dmd).toPattern(qiTable.getSchema()), 
+      ((BaseDatabaseMetaData)_dmd).toPattern(qiTable.getName()),
       "%");
     while (rsColumns.next())
     {
@@ -441,8 +442,8 @@ public class MetaDataToDb
   {
     boolean bExists = false;
     ResultSet rs = _dmd.getTables(null, 
-      _dmd.toPattern(sMangledSchema), 
-      _dmd.toPattern(sMangledTable), 
+      ((BaseDatabaseMetaData)_dmd).toPattern(sMangledSchema), 
+      ((BaseDatabaseMetaData)_dmd).toPattern(sMangledTable), 
       new String[]{"TABLE"});
     if (rs.next())
       bExists = true;
@@ -494,7 +495,7 @@ public class MetaDataToDb
     throws SQLException
   {
     boolean bExists = false;
-    ResultSet rs = _dmd.getSchemas(null, _dmd.toPattern(sMangledSchema));
+    ResultSet rs = _dmd.getSchemas(null, ((BaseDatabaseMetaData)_dmd).toPattern(sMangledSchema));
     if (rs.next())
       bExists = true;
     rs.close();
@@ -617,8 +618,8 @@ public class MetaDataToDb
     TypeMapping tm = sm.getTypeMapping(mt.getName());
     int iPosition = 0;
     ResultSet rs = _dmd.getAttributes(null, 
-      _dmd.toPattern(sm.getMappedSchemaName()), 
-      _dmd.toPattern(tm.getMappedTypeName()), "%");
+      ((BaseDatabaseMetaData)_dmd).toPattern(sm.getMappedSchemaName()), 
+      ((BaseDatabaseMetaData)_dmd).toPattern(tm.getMappedTypeName()), "%");
     while (bMatches && rs.next())
     {
       iPosition++;
@@ -733,8 +734,8 @@ public class MetaDataToDb
     if (cat == CategoryType.DISTINCT)
       iDataType = Types.DISTINCT;
     ResultSet rs = _dmd.getUDTs(null, 
-      _dmd.toPattern(sm.getMappedSchemaName()), 
-      _dmd.toPattern(tm.getMappedTypeName()), null);
+      ((BaseDatabaseMetaData)_dmd).toPattern(sm.getMappedSchemaName()), 
+      ((BaseDatabaseMetaData)_dmd).toPattern(tm.getMappedTypeName()), null);
     while (rs.next())
     {
       /* the type only needs to be dropped if its base type 

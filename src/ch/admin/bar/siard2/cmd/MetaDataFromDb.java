@@ -276,8 +276,8 @@ public class MetaDataFromDb
     int iPosition = 0;
     CategoryType cat = mt.getCategoryType();
     ResultSet rs = _dmd.getAttributes(null, 
-      _dmd.toPattern(mt.getParentMetaSchema().getName()), 
-      _dmd.toPattern(mt.getName()), "%");
+      ((BaseDatabaseMetaData)_dmd).toPattern(mt.getParentMetaSchema().getName()), 
+      ((BaseDatabaseMetaData)_dmd).toPattern(mt.getName()), "%");
     while (rs.next())
     {
       iPosition++;
@@ -395,8 +395,8 @@ public class MetaDataFromDb
         System.out.println("  Type: "+qiType.format());
         mt = ms.createMetaType(qiType.getName());
         ResultSet rs = _dmd.getUDTs(null, 
-          _dmd.toPattern(qiType.getSchema()), 
-          _dmd.toPattern(qiType.getName()), 
+          ((BaseDatabaseMetaData)_dmd).toPattern(qiType.getSchema()), 
+          ((BaseDatabaseMetaData)_dmd).toPattern(qiType.getName()), 
           new int[]{ Types.DISTINCT, Types.STRUCT });
         rs.next();
         if (qiType.getName().equals(rs.getString("TYPE_NAME")) &&
@@ -440,8 +440,8 @@ public class MetaDataFromDb
     throws IOException, SQLException
   {
     ResultSet rs = _dmd.getColumns(null, 
-      _dmd.toPattern(mv.getParentMetaSchema().getName()), 
-      _dmd.toPattern(mv.getName()), "%");
+      ((BaseDatabaseMetaData)_dmd).toPattern(mv.getParentMetaSchema().getName()), 
+      ((BaseDatabaseMetaData)_dmd).toPattern(mv.getName()), "%");
     while(rs.next())
     {
       String sTableSchema = rs.getString("TABLE_SCHEM");
@@ -467,8 +467,8 @@ public class MetaDataFromDb
     throws IOException, SQLException
   {
     ResultSet rs = _dmd.getProcedureColumns(null, 
-      _dmd.toPattern(mr.getParentMetaSchema().getName()),
-      _dmd.toPattern(mr.getName()), "%");
+      ((BaseDatabaseMetaData)_dmd).toPattern(mr.getParentMetaSchema().getName()),
+      ((BaseDatabaseMetaData)_dmd).toPattern(mr.getName()), "%");
     while(rs.next())
     {
       String sProcedureSchema = rs.getString("PROCEDURE_SCHEM");
@@ -573,8 +573,8 @@ public class MetaDataFromDb
   {
     
     ResultSet rs = _dmd.getFunctionColumns(null, 
-      _dmd.toPattern(mr.getParentMetaSchema().getName()),
-      _dmd.toPattern(mr.getName()), "%");
+      ((BaseDatabaseMetaData)_dmd).toPattern(mr.getParentMetaSchema().getName()),
+      ((BaseDatabaseMetaData)_dmd).toPattern(mr.getName()), "%");
     while(rs.next())
     {
       String sFunctionSchema = rs.getString("FUNCTION_SCHEM");
@@ -874,7 +874,7 @@ public class MetaDataFromDb
       {
         MetaTable mt = ms.getMetaTable(iTable);
         ResultSet rs = _dmd.getTablePrivileges(null, 
-          _dmd.toPattern(ms.getName()), _dmd.toPattern(mt.getName()));
+          ((BaseDatabaseMetaData)_dmd).toPattern(ms.getName()), ((BaseDatabaseMetaData)_dmd).toPattern(mt.getName()));
         while (rs.next())
         {
           String sTableSchema = rs.getString("TABLE_SCHEM");
@@ -901,7 +901,7 @@ public class MetaDataFromDb
   private void getViews(MetaSchema ms)
     throws IOException, SQLException
   {
-    ResultSet rs = _dmd.getTables(null, _dmd.toPattern(ms.getName()), "%", new String[]{"VIEW"});
+    ResultSet rs = _dmd.getTables(null, ((BaseDatabaseMetaData)_dmd).toPattern(ms.getName()), "%", new String[]{"VIEW"});
     while (rs.next())
     {
       String sTableSchema = rs.getString("TABLE_SCHEM");
@@ -936,7 +936,7 @@ public class MetaDataFromDb
   private void getRoutines(MetaSchema ms)
     throws IOException, SQLException
   {
-    ResultSet rs = _dmd.getProcedures(null, _dmd.toPattern(ms.getName()), "%");
+    ResultSet rs = _dmd.getProcedures(null, ((BaseDatabaseMetaData)_dmd).toPattern(ms.getName()), "%");
     while (rs.next())
     {
       String sProcedureSchema = rs.getString("PROCEDURE_SCHEM");
@@ -958,7 +958,7 @@ public class MetaDataFromDb
     rs.close();
     try
     {
-      rs = _dmd.getFunctions(null, _dmd.toPattern(ms.getName()), "%");
+      rs = _dmd.getFunctions(null, ((BaseDatabaseMetaData)_dmd).toPattern(ms.getName()), "%");
       while (rs.next())
       {
         String sFunctionSchema = rs.getString("FUNCTION_SCHEM");
@@ -1196,8 +1196,8 @@ public class MetaDataFromDb
     throws IOException, SQLException
   {
     ResultSet rs = _dmd.getColumns(null, 
-      _dmd.toPattern(mt.getParentMetaSchema().getName()), 
-      _dmd.toPattern(mt.getName()), "%");
+      ((BaseDatabaseMetaData)_dmd).toPattern(mt.getParentMetaSchema().getName()), 
+      ((BaseDatabaseMetaData)_dmd).toPattern(mt.getName()), "%");
     while(rs.next())
     {
       String sTableSchema = rs.getString("TABLE_SCHEM");
