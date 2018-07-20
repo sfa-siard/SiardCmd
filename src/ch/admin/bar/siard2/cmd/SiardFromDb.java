@@ -214,21 +214,13 @@ public class SiardFromDb
         }
         else
         {
-          if (FU.deleteFiles(_fileExternalLobFolder))
+          /* relativize it from SIARD file's parent folder */
+          File fileRelative = _fileSiard.getParentFile().getAbsoluteFile().toPath().relativize(_fileExternalLobFolder.getAbsoluteFile().toPath()).toFile();
+          /* prepend a ../ for exiting the SIARD file and append a / to indicate that it is a folder */
+          try { _uriExternalLobFolder =  new URI("../"+fileRelative.toString()+"/"); }
+          catch (URISyntaxException use) 
           {
-            /* relativize it from SIARD file's parent folder */
-            File fileRelative = _fileSiard.getParentFile().getAbsoluteFile().toPath().relativize(_fileExternalLobFolder.getAbsoluteFile().toPath()).toFile();
-            /* prepend a ../ for exiting the SIARD file and append a / to indicate that it is a folder */
-            try { _uriExternalLobFolder =  new URI("../"+fileRelative.toString()+"/"); }
-            catch (URISyntaxException use) 
-            {
-              System.out.println("External LOB folder  "+_fileExternalLobFolder.getAbsolutePath() + " could not be relativized!");
-              _iReturn = iRETURN_ERROR;
-            }
-          }
-          else
-          {
-            System.out.println("Files in external LOB folder  "+_fileExternalLobFolder.getAbsolutePath() + " could not be deleted!");
+            System.out.println("External LOB folder  "+_fileExternalLobFolder.getAbsolutePath() + " could not be relativized!");
             _iReturn = iRETURN_ERROR;
           }
         }
