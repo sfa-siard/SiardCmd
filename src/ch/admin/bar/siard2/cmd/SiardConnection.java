@@ -235,4 +235,12 @@ public class SiardConnection extends Properties
     return MessageFormat.format(getProperty(sScheme+sSAMPLE_SUFFIX),sHost,sFolder.replace("\\", "/"),sDatabase);
   } /* getSampleUrl */
   
+  public boolean isLocal(String sScheme)
+  {
+  	boolean bLocal = false;
+  	if (getProperty(sScheme+sSAMPLE_SUFFIX).indexOf("{0}") < 0)
+  		bLocal = true;
+  	return bLocal;
+  }
+  
 } /* class SiardConnection */
