@@ -152,7 +152,7 @@ else
   $javaExe = FindJava
   if ($javaExe)
   {
-    # logging properties and siardgui jar
+    # logging properties and jar
     # are relative to script location (not to working directory!)
     $scriptName = $MyInvocation.InvocationName
     #Write-Host 'scriptName: '+$scriptName
@@ -162,7 +162,7 @@ else
     #Write-Host 'execDir: '+$execDir
     $logProp = (Join-Path $execDir $REL_LOGGING_PROPERTIES)
     #Write-Host 'logProp: '+$logProp
-    $opts = $('-Djava.util.logging.config.file=' + $logprop)
+    $opts = $('-Djava.util.logging.config.file=' + $logProp)
     #Write-Host 'opts: '+$opts
     $jarFile = (Join-Path $execDir $REL_JAR_FILE)
     #Write-Host 'jarFile: '+$jarFile

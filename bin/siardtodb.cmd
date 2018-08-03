@@ -166,7 +166,7 @@ rem --------------------------------------------------------------------
 rem we need the quotes for protecting the angular brackets
 @echo "Calling syntax                                                      "
 @echo "  siardtodb.cmd [-h] | <args>                                 "
-@echo "executes %class% in %jar%.         "
+@echo "executes %class% in %jar% using %logprop% for logging."
 @echo "                                                                    "
 @echo "Parameters:                                                         "
 @echo "  -h        displays usage information                              "

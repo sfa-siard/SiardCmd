@@ -165,8 +165,8 @@ rem help for calling syntax
 rem --------------------------------------------------------------------
 rem we need the quotes for protecting the angular brackets
 @echo "Calling syntax"
-@echo "  siardfromdb.cmd [-h] | <args>                               "
-@echo "executes ch.admin.bar.siard2.cmd.SiardFromDb in packages\SiardCmd.jar.       "
+@echo "  siardfromdb.cmd [-h] | <args>                                     "
+@echo "executes %class% in %jar% using %logprop% for logging."
 @echo "                                                                    "
 @echo "Parameters:                                                         "
 @echo "  -h        displays usage information                              "
