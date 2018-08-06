@@ -24,7 +24,7 @@
 	<classpathentry kind="lib" path="lib/jdbcaccess-test.jar" sourcepath="/JdbcAccess/test"/>
 	<classpathentry kind="lib" path="lib/jdbcaccess.jar" sourcepath="/JdbcAccess/src"/>
 	<classpathentry kind="lib" path="lib/jdbcbase-test.jar"/>
-	<classpathentry kind="lib" path="lib/jdbcbase.jar"/>
+	<classpathentry kind="lib" path="lib/jdbcbase.jar" sourcepath="/JdbcBase/src"/>
 	<classpathentry kind="lib" path="lib/jdbcdb2-test.jar"/>
 	<classpathentry kind="lib" path="lib/jdbcdb2.jar"/>
 	<classpathentry kind="lib" path="lib/jdbch2-test.jar"/>
