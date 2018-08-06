@@ -75,7 +75,7 @@ public class AccessFromDbTester extends BaseFromDbTester
     System.out.println("testBug456");
     try
     {
-      FU.copy(new File("D:\\Projekte\\SIARD2\\Bugs\\456\\spatz\\spatz.accdb"),_fileTEST_ACCESS_DATABASE);
+      FU.copy(new File(":\\Projekte\\SIARD2\\Bugs\\456\\spatz\\spatz.accdb"),_fileTEST_ACCESS_DATABASE);
       String[] args = new String[]{
         "-o",
         "-j:"+_sACCESS_DB_URL,
