@@ -399,9 +399,13 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     RecordDispenser rd = table.openRecords();
     ResultSet rs = openTable(table,sm);
     Statement stmt = rs.getStatement();
+    Connection conn = stmt.getConnection();
     Set<Object>setResources = new HashSet<Object>();
     long lRecord = 0;
     Record record = null;
+    StopWatch sw = StopWatch.getInstance();
+  	sw.start();
+  	long lBytesStart = rd.getByteCount();
     while ((lRecord < mt.getRows()) && (!cancelRequested())) 
     {
       record = rd.get();
@@ -422,16 +426,21 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       lRecord++;
       if ((lRecord % lCOMMIT_RECORDS) == 0)
       {
-        // conn.commit();
-        System.out.println("    Record "+String.valueOf(lRecord));
+      	// resultset HOLD_CURSORS_OVER_COMMIT ?
+      	// conn.commit();
+        System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rd.getByteCount()-lBytesStart,sw.stop())+" kB/s");
+      	lBytesStart = rd.getByteCount();
+      	sw.start();
       }
       incUploaded();
     }
+    System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rd.getByteCount()-lBytesStart,sw.stop())+" kB/s");
+    System.out.println("    Total: "+sw.formatLong(lRecord)+" records ("+sw.formatLong(rd.getByteCount())+" bytes in "+sw.formatMs()+" ms");
     if (!rs.isClosed())
       rs.close();
     if (!stmt.isClosed())
       stmt.close();
-    // conn.commit();
+  	conn.commit();
     rd.close();
     _il.exit();
   } /* putTable */
