@@ -399,7 +399,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     RecordDispenser rd = table.openRecords();
     ResultSet rs = openTable(table,sm);
     Statement stmt = rs.getStatement();
-    Connection conn = stmt.getConnection();
     Set<Object>setResources = new HashSet<Object>();
     long lRecord = 0;
     Record record = null;
@@ -426,8 +425,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       lRecord++;
       if ((lRecord % lCOMMIT_RECORDS) == 0)
       {
-      	// resultset HOLD_CURSORS_OVER_COMMIT ?
-      	// conn.commit();
         System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rd.getByteCount()-lBytesStart,sw.stop())+" kB/s");
       	lBytesStart = rd.getByteCount();
       	sw.start();
@@ -440,7 +437,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       rs.close();
     if (!stmt.isClosed())
       stmt.close();
-  	conn.commit();
     rd.close();
     _il.exit();
   } /* putTable */
