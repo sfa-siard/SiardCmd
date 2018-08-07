@@ -34,6 +34,9 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
   private long _lRecordsDownloaded = -1;
   private long _lRecordsTotal = -1;
   private long _lRecordsPercent = -1;
+  private StopWatch _swGetCell = null;
+  private StopWatch _swGetValue = null;
+  private StopWatch _swSetValue = null;
 
   /*------------------------------------------------------------------*/
   /** increment the number or records downloaded, issuing a notification,
@@ -157,6 +160,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       throw new IOException("Invalid number of result columns found!");
     for (int iCell = 0; iCell < record.getCells(); iCell++)
     {
+    	_swGetCell.start();
       int iPosition = iCell+1;
       Cell cell = record.getCell(iCell);
       MetaColumn mc = cell.getMetaColumn();
@@ -173,6 +177,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
         else
           iDataType = Types.STRUCT;
       }
+      _swGetCell.stop();
+      _swGetValue.start();
       Object oValue = null;
       switch (iDataType)
       {
@@ -250,7 +256,10 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       } /* switch */
       if (rs.wasNull())
         oValue = null;
+      _swGetValue.stop();
+      _swSetValue.start();
       setValue(cell,oValue);
+      _swSetValue.stop();
     } /* loop over values */
   } /* getRecord */
 
@@ -265,6 +274,9 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
     throws IOException, SQLException
   {
     _il.enter(table.getMetaTable().getName());
+    _swGetCell = StopWatch.getInstance();
+    _swGetValue = StopWatch.getInstance();
+    _swSetValue = StopWatch.getInstance();
     QualifiedId qiTable = new QualifiedId(null,
       table.getParentSchema().getMetaSchema().getName(),
       table.getMetaTable().getName());
@@ -302,6 +314,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
     System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rr.getByteCount()-lBytesStart,sw.stop())+" kB/s)");
     System.out.println("    Total: "+sw.formatLong(lRecord)+" records ("+sw.formatLong(rr.getByteCount())+" bytes in "+sw.formatMs()+" ms");
     System.out.println("    Create: "+swCreate.formatMs()+" ms, Get: "+swGet.formatMs()+" ms, Put: "+swPut.formatMs()+" ms");
+    System.out.println("    Get Cell: "+_swGetCell.formatMs()+" ms, Get Value: "+_swGetValue.formatMs()+" ms, Set Value: "+_swSetValue.formatMs()+" ms");
     if (!rs.isClosed())
       rs.close();
     if (!stmt.isClosed())
