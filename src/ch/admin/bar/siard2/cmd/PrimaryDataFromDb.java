@@ -273,25 +273,35 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
     RecordRetainer rr = table.createRecords();
     ResultSet rs = openTable(table, null);
     Statement stmt = rs.getStatement();
+    StopWatch swCreate = StopWatch.getInstance();
+    StopWatch swGet = StopWatch.getInstance();
+    StopWatch swPut = StopWatch.getInstance();
     StopWatch sw = StopWatch.getInstance();
   	sw.start();
   	long lBytesStart = rr.getByteCount();
     while(rs.next() && (!cancelRequested()))
     {
+    	swCreate.start();
       Record record = rr.create();
+      swCreate.stop();
+      swGet.start();
       getRecord(rs,record);
+      swGet.stop();
+      swPut.start();
       rr.put(record);
+      swPut.stop();
       lRecord++;
       if ((lRecord % _lREPORT_RECORDS) == 0)
       {
-        System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rr.getByteCount()-lBytesStart,sw.stop())+" kB/s");
+        System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rr.getByteCount()-lBytesStart,sw.stop())+" kB/s)");
       	lBytesStart = rr.getByteCount();
       	sw.start();
       }
       incDownloaded();
     }
-    System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rr.getByteCount()-lBytesStart,sw.stop())+" kB/s");
+    System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rr.getByteCount()-lBytesStart,sw.stop())+" kB/s)");
     System.out.println("    Total: "+sw.formatLong(lRecord)+" records ("+sw.formatLong(rr.getByteCount())+" bytes in "+sw.formatMs()+" ms");
+    System.out.println("    Create: "+swCreate.formatMs()+" ms, Get: "+swGet.formatMs()+" ms, Put: "+swPut.formatMs()+" ms");
     if (!rs.isClosed())
       rs.close();
     if (!stmt.isClosed())
