@@ -68,14 +68,14 @@ public class AccessFromDbTester extends BaseFromDbTester
     catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
     catch(ClassNotFoundException cnfe) { fail(EU.getExceptionMessage(cnfe)); }
   } /* testAccessFromDb */
-/*
+
   @Test
   public void testBug456()
   {
     System.out.println("testBug456");
     try
     {
-      FU.copy(new File("/Volumes/home/Temp/456/spatz/spatz.accdb"),_fileTEST_ACCESS_DATABASE);
+      FU.copy(new File("D:\\Projekte\\SIARD2\\Bugs\\456\\spatz\\spatz.accdb"),_fileTEST_ACCESS_DATABASE);
       String[] args = new String[]{
         "-o",
         "-j:"+_sACCESS_DB_URL,
@@ -91,6 +91,5 @@ public class AccessFromDbTester extends BaseFromDbTester
     catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
     catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
     catch(ClassNotFoundException cnfe) { fail(EU.getExceptionMessage(cnfe)); }
-  }  testAccessFromDb 
-*/
+  } 
 }

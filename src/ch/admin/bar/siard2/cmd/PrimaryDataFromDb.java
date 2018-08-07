@@ -12,6 +12,8 @@ import java.io.*;
 import java.math.*;
 import java.sql.*;
 import javax.xml.datatype.*;
+
+import ch.enterag.utils.StopWatch;
 import ch.enterag.utils.background.*;
 import ch.enterag.utils.logging.*;
 import ch.enterag.utils.database.*;
@@ -270,6 +272,9 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
     long lRecord = 0;
     RecordRetainer rr = table.createRecords();
     ResultSet rs = openTable(table, null);
+    StopWatch sw = StopWatch.getInstance();
+  	sw.start();
+  	long lByteStart = rr.getByteCount();
     while(rs.next() && (!cancelRequested()))
     {
       Record record = rr.create();
@@ -277,7 +282,11 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       rr.put(record);
       lRecord++;
       if ((lRecord % _lREPORT_RECORDS) == 0)
-        System.out.println("    Record "+String.valueOf(lRecord));
+      {
+        System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rr.getByteCount()-lByteStart,sw.stop())+" kB/s");
+      	lByteStart = rr.getByteCount();
+      	sw.start();
+      }
       incDownloaded();
     }
     rs.close();
