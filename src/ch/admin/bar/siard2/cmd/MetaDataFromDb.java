@@ -911,18 +911,26 @@ public class MetaDataFromDb
       QualifiedId qiView = new QualifiedId(null,sTableSchema,sViewName);
       System.out.println("  View: "+qiView.format());
       MetaView mv = ms.createMetaView(sViewName);
-      String sTableType = rs.getString("TABLE_TYPE");
-      if (!sTableType.equals("VIEW"))
-        throw new IOException("Invalid table type for view found!");
-      String sRemarks = rs.getString("REMARKS");
-      if (sRemarks != null)
-        mv.setDescription(sRemarks);
-      String sQueryText = null;
-      try { sQueryText = rs.getString(BaseDatabaseMetaData._sQUERY_TEXT); }
-      catch(SQLException se) {}
-      if (sQueryText != null)
-        mv.setQueryOriginal(sQueryText);
-      getColumns(mv);
+      try
+      {
+	      String sTableType = rs.getString("TABLE_TYPE");
+	      if (!sTableType.equals("VIEW"))
+	        throw new IOException("Invalid table type for view found!");
+	      String sRemarks = rs.getString("REMARKS");
+	      if (sRemarks != null)
+	        mv.setDescription(sRemarks);
+	      String sQueryText = null;
+	      try { sQueryText = rs.getString(BaseDatabaseMetaData._sQUERY_TEXT); }
+	      catch(SQLException se) {}
+	      if (sQueryText != null)
+	        mv.setQueryOriginal(sQueryText);
+        getColumns(mv);
+      }
+      catch (SQLException se) 
+      {
+      	System.err.println("View "+qiView.format()+" could not be archived ("+EU.getExceptionMessage(se)+")!");
+      	ms.removeMetaView(mv);
+    	}
     }
     rs.close();
   } /* getViews */
