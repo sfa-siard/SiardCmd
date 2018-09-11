@@ -376,7 +376,7 @@ Created    : 29.08.2016, Hartwig Thomas
   <!-- run access tests -->
   <property name="classaccesstestsuite" value="ch.admin.bar.siard2.cmd._AccessTestSuite"/>
   <property name="fileaccesstests" value="access-tests"/>
-  <target name="tests-access" depends="tests"  if="${dbuseraccess}">
+  <target name="tests-access" depends="tests"  if="dbuseraccess">
     <echo message="${ant.project.name}: test-access run"/>
     <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
       <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
@@ -409,7 +409,7 @@ Created    : 29.08.2016, Hartwig Thomas
   <!-- run DB/2 tests -->
   <property name="classdb2testsuite" value="ch.admin.bar.siard2.cmd._Db2TestSuite"/>
   <property name="filedb2tests" value="db2-tests"/>
-  <target name="tests-db2" depends="tests" if="${dbuserdb2}">
+  <target name="tests-db2" depends="tests" if="dbuserdb2">
     <echo message="${ant.project.name}: test-db2 run"/>
     <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
       <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
@@ -441,7 +441,7 @@ Created    : 29.08.2016, Hartwig Thomas
   <!-- run H2 tests -->
   <property name="classh2testsuite" value="ch.admin.bar.siard2.cmd._H2TestSuite"/>
   <property name="fileh2tests" value="h2-tests"/>
-  <target name="tests-h2" depends="tests"  if="${dbuserh2}">
+  <target name="tests-h2" depends="tests"  if="dbuserh2">
     <echo message="${ant.project.name}: test-h2 run"/>
     <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
       <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
@@ -474,7 +474,7 @@ Created    : 29.08.2016, Hartwig Thomas
   <!-- run SQL Server tests -->
   <property name="classmssqltestsuite" value="ch.admin.bar.siard2.cmd._MsSqlTestSuite"/>
   <property name="filemssqltests" value="mssql-tests"/>
-  <target name="tests-mssql" depends="tests" if="${dbusermssql}">
+  <target name="tests-mssql" depends="tests" if="dbusermssql">
     <echo message="${ant.project.name}: test-mssql run"/>
     <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
       <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
@@ -506,7 +506,7 @@ Created    : 29.08.2016, Hartwig Thomas
   <!-- run MySQL tests -->
   <property name="classmysqltestsuite" value="ch.admin.bar.siard2.cmd._MySqlTestSuite"/>
   <property name="filemysqltests" value="mysql-tests"/>
-  <target name="tests-mysql" depends="tests"  if="${dbusermysql}">
+  <target name="tests-mysql" depends="tests"  if="dbusermysql">
     <echo message="${ant.project.name}: test-mysql run"/>
     <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
       <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
@@ -539,7 +539,7 @@ Created    : 29.08.2016, Hartwig Thomas
   <!-- run Oracle tests -->
   <property name="classoracletestsuite" value="ch.admin.bar.siard2.cmd._OracleTestSuite"/>
   <property name="fileoracletests" value="oracle-tests"/>
-  <target name="tests-oracle" depends="tests"  if="${dbuseroracle}">
+  <target name="tests-oracle" depends="tests"  if="dbuseroracle">
     <echo message="${ant.project.name}: test-oracle run"/>
     <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
       <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
