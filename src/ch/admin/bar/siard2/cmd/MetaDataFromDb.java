@@ -1316,9 +1316,12 @@ public class MetaDataFromDb
   private void logDownload()
     throws IOException, SQLException
   {
-    _md.setDataOwner(MetaData.sPLACE_HOLDER);
-    _md.setDataOriginTimespan(MetaData.sPLACE_HOLDER);
-    _md.setDbName(MetaData.sPLACE_HOLDER);
+  	if (_md.getDataOwner() == null)
+      _md.setDataOwner(MetaData.sPLACE_HOLDER);
+  	if (_md.getDataOriginTimespan() == null)
+      _md.setDataOriginTimespan(MetaData.sPLACE_HOLDER);
+  	if (_md.getDbName() == null)
+      _md.setDbName(MetaData.sPLACE_HOLDER);
     ProgramInfo pi = ProgramInfo.getProgramInfo();
     _md.setProducerApplication(pi.getProgram()+" "+pi.getVersion()+" "+pi.getCopyright());
     /* client machine: here */
