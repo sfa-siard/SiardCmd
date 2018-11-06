@@ -13,13 +13,13 @@ import java.math.*;
 import java.sql.*;
 import javax.xml.datatype.*;
 
-import ch.enterag.utils.StopWatch;
+import ch.enterag.utils.*;
 import ch.enterag.utils.background.*;
 import ch.enterag.utils.logging.*;
 import ch.enterag.utils.database.*;
 import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.api.generated.CategoryType;
+import ch.admin.bar.siard2.api.generated.*;
 
 /*====================================================================*/
 /** Transfers primary data from databases to SIARD files.
@@ -312,9 +312,9 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       incDownloaded();
     }
     System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rr.getByteCount()-lBytesStart,sw.stop())+" kB/s)");
-    System.out.println("    Total: "+sw.formatLong(lRecord)+" records ("+sw.formatLong(rr.getByteCount())+" bytes in "+sw.formatMs()+" ms");
-    //System.out.println("    Create: "+swCreate.formatMs()+" ms, Get: "+swGet.formatMs()+" ms, Put: "+swPut.formatMs()+" ms");
-    //System.out.println("    Get Cell: "+_swGetCell.formatMs()+" ms, Get Value: "+_swGetValue.formatMs()+" ms, Set Value: "+_swSetValue.formatMs()+" ms");
+    System.out.println("    Total: "+sw.formatLong(lRecord)+" records ("+sw.formatLong(rr.getByteCount())+" bytes in "+sw.formatMs()+" ms)");
+    // System.out.println("    Create: "+swCreate.formatMs()+" ms, Get: "+swGet.formatMs()+" ms, Put: "+swPut.formatMs()+" ms");
+    // System.out.println("    Get Cell: "+_swGetCell.formatMs()+" ms, Get Value: "+_swGetValue.formatMs()+" ms, Set Value: "+_swSetValue.formatMs()+" ms");
     if (!rs.isClosed())
       rs.close();
     if (!stmt.isClosed())

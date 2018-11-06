@@ -35,6 +35,7 @@ public class MetaDataFromDb
   /** logger */  
   private static IndentLogger _il = IndentLogger.getIndentLogger(MetaDataFromDb.class.getName());
   static final Pattern _patARRAY_CONSTRUCTOR = Pattern.compile("^\\s*(.*?)\\s+ARRAY\\s*\\[\\s*(\\d+)\\s*\\]$");
+  private boolean _bMaxLobNeeded = false;
   private MetaColumn _mcMaxLob = null;
   public MetaColumn getMaxLobColumn() { return _mcMaxLob; }
   private long _lMaxLobSize = -1;
@@ -1007,24 +1008,27 @@ public class MetaDataFromDb
     /* query rows and LOB sizes */
     int iLobs = 0;
     String sQuery = "SELECT COUNT(*) AS RECORDS";
-    for (int iColumn = 0; iColumn < mt.getMetaColumns(); iColumn++)
+    if (_bMaxLobNeeded)
     {
-      MetaColumn mc = mt.getMetaColumn(iColumn);
-      int iPreType = mc.getPreType();
-      if ((mc.getCardinality() < 0)
-          && ((iPreType == Types.CLOB) 
-          || (iPreType == Types.NCLOB)
-          || (iPreType == Types.BLOB)
-//        ||  (iPreType == Types.SQLXML) || // DB/2 stores XML as a hierarchical object tree ... 
-          ))
-      {
-        if (!mc.getTypeOriginal().equals("\"LONG\"")) // Oracle idiocy
-        {
-          sQuery = sQuery + ",\r\n SUM(OCTET_LENGTH("+SqlLiterals.formatId(mc.getName())+"))" +
-            " AS " + SqlLiterals.formatId(mc.getName()+"_SIZE");
-          iLobs++;
-        }
-      }
+	    for (int iColumn = 0; iColumn < mt.getMetaColumns(); iColumn++)
+	    {
+	      MetaColumn mc = mt.getMetaColumn(iColumn);
+	      int iPreType = mc.getPreType();
+	      if ((mc.getCardinality() < 0)
+	          && ((iPreType == Types.CLOB) 
+	          || (iPreType == Types.NCLOB)
+	          || (iPreType == Types.BLOB)
+	//        ||  (iPreType == Types.SQLXML) || // DB/2 stores XML as a hierarchical object tree ... 
+	          ))
+	      {
+	        if (!mc.getTypeOriginal().equals("\"LONG\"")) // Oracle idiocy
+	        {
+	          sQuery = sQuery + ",\r\n SUM(OCTET_LENGTH("+SqlLiterals.formatId(mc.getName())+"))" +
+	            " AS " + SqlLiterals.formatId(mc.getName()+"_SIZE");
+	          iLobs++;
+	        }
+	      }
+	    }
     }
     QualifiedId qiTable = new QualifiedId(null,mt.getParentMetaSchema().getName(),mt.getName());
     sQuery = sQuery + "\r\nFROM "+qiTable.format();
@@ -1036,19 +1040,22 @@ public class MetaDataFromDb
     {
       long lRows = rsSizes.getLong("RECORDS");
       mt.setRows(lRows);
-      for (int iLob = 0; iLob < iLobs; iLob++)
+      if (_bMaxLobNeeded)
       {
-        String sLobName = rsmd.getColumnLabel(iLob+2);
-        long lLobSize = rsSizes.getLong(sLobName);
-        if (_lMaxLobSize < lLobSize)
-        {
-          _lMaxLobSize = lLobSize;
-          _mcMaxLob = mt.getMetaColumn(sLobName.substring(0,sLobName.length()-"_SIZE".length())); 
-        }
+	      for (int iLob = 0; iLob < iLobs; iLob++)
+	      {
+	        String sLobName = rsmd.getColumnLabel(iLob+2);
+	        long lLobSize = rsSizes.getLong(sLobName);
+	        if (_lMaxLobSize < lLobSize)
+	        {
+	          _lMaxLobSize = lLobSize;
+	          _mcMaxLob = mt.getMetaColumn(sLobName.substring(0,sLobName.length()-"_SIZE".length())); 
+	        }
+	      }
       }
     }
     else
-      throw new IOException("Sizes of table "+mt.getName()+" could not be determined!");
+      throw new IOException("Size of table "+mt.getName()+" could not be determined!");
     rsSizes.close();
     stmtSizes.close();
   } /* getRows */
@@ -1316,9 +1323,12 @@ public class MetaDataFromDb
   private void logDownload()
     throws IOException, SQLException
   {
-    _md.setDataOwner(MetaData.sPLACE_HOLDER);
-    _md.setDataOriginTimespan(MetaData.sPLACE_HOLDER);
-    _md.setDbName(MetaData.sPLACE_HOLDER);
+  	if (_md.getDataOwner() == null)
+      _md.setDataOwner(MetaData.sPLACE_HOLDER);
+  	if (_md.getDataOriginTimespan() == null)
+      _md.setDataOriginTimespan(MetaData.sPLACE_HOLDER);
+  	if (_md.getDbName() == null)
+      _md.setDbName(MetaData.sPLACE_HOLDER);
     ProgramInfo pi = ProgramInfo.getProgramInfo();
     _md.setProducerApplication(pi.getProgram()+" "+pi.getVersion()+" "+pi.getCopyright());
     /* client machine: here */
@@ -1344,13 +1354,14 @@ public class MetaDataFromDb
    * @throws IOException if an I/O error occurred.
    * @throws SQLException if a database error occurred.
    */
-  public void download(boolean bViewsAsTables, Progress progress)
+  public void download(boolean bViewsAsTables, boolean bMaxLobNeeded, Progress progress)
     throws IOException, SQLException
   {
     _il.enter();
     System.out.println("Meta Data");
     _progress = progress;
     _bViewsAsTables = bViewsAsTables;
+    _bMaxLobNeeded = bMaxLobNeeded;
     /* global meta data */
     logDownload();
     /* get tables (and Types and relevant schemas) */
