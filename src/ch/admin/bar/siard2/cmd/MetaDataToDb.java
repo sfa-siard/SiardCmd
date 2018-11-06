@@ -51,7 +51,7 @@ public class MetaDataToDb
       int iPercent = (int)((100*_iTablesCreated)/_iTables);
       _progress.notifyProgress(iPercent);
     }
-  } /* incTablesAnalyzed */
+  } /* incTablesCreated */
   
   /*------------------------------------------------------------------*/
   /** check if cancel was requested.
