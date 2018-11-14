@@ -57,6 +57,7 @@ public class OracleBugTester extends BaseFromDbTester
       connOracle.close();
       String[] args = new String[]{
         "-o",
+        "-v",
         "-j:"+_sORACLE_DB_URL,
         "-u:"+_sORACLE_DB_USER,
         "-p:"+_sORACLE_DB_PASSWORD,
