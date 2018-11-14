@@ -1275,16 +1275,16 @@ public class MetaDataFromDb
     throws IOException, SQLException
   {
     /* first count the tables for progress */
-    ResultSet rs = _dmd.getTables(null, "%", "%", new String[]{"TABLE"});
+    String[] asTypes = new String[]{"TABLE"};
+    if (_bViewsAsTables)
+      asTypes = new String[]{"TABLE","VIEW"};
+    ResultSet rs = _dmd.getTables(null, "%", "%", asTypes);
     _iTables = 0;
     while (rs.next())
       _iTables++;
     rs.close();
     _iTablesPercent = (_iTables+99)/100;
     _iTablesAnalyzed = 0;
-    String[] asTypes = new String[]{"TABLE"};
-    if (_bViewsAsTables)
-      asTypes = new String[]{"TABLE","VIEW"};
     rs = _dmd.getTables(null, "%", "%", asTypes);
     while ((rs.next()) && (!cancelRequested()))
     {
