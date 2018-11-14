@@ -43,7 +43,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
   private void incUploaded()
   {
     _lRecordsUploaded++;
-    if ((_progress != null) && ((_lRecordsUploaded % _lRecordsPercent) == 0))
+    if ((_progress != null) && (_lRecordsTotal > 0) && ((_lRecordsUploaded % _lRecordsPercent) == 0))
     {
       int iPercent = (int)((100*_lRecordsUploaded)/_lRecordsTotal);
       _progress.notifyProgress(iPercent);

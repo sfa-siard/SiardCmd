@@ -227,7 +227,7 @@ public class MetaDataFromDb
   private void incTablesAnalyzed()
   {
     _iTablesAnalyzed++;
-    if ((_progress != null) && ((_iTablesAnalyzed % _iTablesPercent) == 0))
+    if ((_progress != null) && (_iTables > 0) && ((_iTablesAnalyzed % _iTablesPercent) == 0))
     {
       int iPercent = (int)((100*_iTablesAnalyzed)/_iTables);
       _progress.notifyProgress(iPercent);

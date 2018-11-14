@@ -46,7 +46,7 @@ public class MetaDataToDb
   private void incTablesCreated()
   {
     _iTablesCreated++;
-    if ((_progress != null) && ((_iTablesCreated % _iTablesPercent) == 0))
+    if ((_progress != null) && (_iTables > 0) && ((_iTablesCreated % _iTablesPercent) == 0))
     {
       int iPercent = (int)((100*_iTablesCreated)/_iTables);
       _progress.notifyProgress(iPercent);
