@@ -520,7 +520,7 @@ public class MetaDataToDb
       try 
       { 
         stmt.executeUpdate(sSql);
-        // stmt.getConnection().commit();
+        stmt.getConnection().commit();
       }
       catch(SQLException se) 
       { 
@@ -572,7 +572,7 @@ public class MetaDataToDb
     }
     if (cancelRequested())
       throw new IOException("Upload of meta data cancelled!");
-    // _dmd.getConnection().commit();
+    _dmd.getConnection().commit();
     _il.exit();
   } /* upload */
   

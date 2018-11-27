@@ -457,6 +457,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     {
       Table table = schema.getTable(iTable);
       putTable(table,sm);
+      _conn.commit();
     }
     _il.exit();
   } /* putSchema */
@@ -496,7 +497,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     if (cancelRequested())
       throw new IOException("\r\nUpload of primary data cancelled!");
     System.out.println("\r\nUpload terminated successfully.");
-    // _conn.commit();
+    _conn.commit();
     _il.exit();
   } /* upload */
   
