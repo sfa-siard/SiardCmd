@@ -425,6 +425,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       lRecord++;
       if ((lRecord % lCOMMIT_RECORDS) == 0)
       {
+      	_conn.commit();
         System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rd.getByteCount()-lBytesStart,sw.stop())+" kB/s)");
       	lBytesStart = rd.getByteCount();
       	sw.start();
@@ -438,6 +439,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     if (!stmt.isClosed())
       stmt.close();
     rd.close();
+    _conn.commit();
     _il.exit();
   } /* putTable */
   
@@ -457,8 +459,8 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     {
       Table table = schema.getTable(iTable);
       putTable(table,sm);
-      _conn.commit();
     }
+    _conn.commit();
     _il.exit();
   } /* putSchema */
 
