@@ -260,7 +260,7 @@ public class SiardToDb
         if ((_conn != null) && (!_conn.isClosed()))
         {
           System.out.println("Connected to "+_conn.getMetaData().getURL().toString());
-          _conn.setAutoCommit(true);
+          _conn.setAutoCommit(false);
           /* create types and tables */
           MetaData md = _archive.getMetaData();
           MetaDataToDb mdtd = MetaDataToDb.newInstance(_conn.getMetaData(),md,_mapSchemas);

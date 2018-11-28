@@ -803,6 +803,7 @@ public class MetaDataToDb
     throws IOException, SQLException
   {
     super(dmd,md);
+    dmd.getConnection().setAutoCommit(false);
     _iMaxTableNameLength = _dmd.getMaxTableNameLength();
     _iMaxColumnNameLength = _dmd.getMaxColumnNameLength();
     _am = ArchiveMapping.newInstance(supportsArrays(), supportsUdts(), 

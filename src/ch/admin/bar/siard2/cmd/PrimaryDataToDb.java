@@ -511,11 +511,14 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
    * @param bSupportsArrays true, if database supports Arrays.
    * @param bSupportsDistincts true, if database supports DISTINCTs.
    * @param bSupportsUdts true, if database supports UDTs.
+   * @throws SQLException if a database error occurred.
    */
   private PrimaryDataToDb(Connection conn, Archive archive,
     ArchiveMapping am, boolean bSupportsArrays, boolean bSupportsDistincts, boolean bSupportsUdts)
+    throws SQLException
   {
     super(conn,archive,am,bSupportsArrays,bSupportsDistincts,bSupportsUdts);
+    conn.setAutoCommit(false);
   } /* constructor PrimaryDataTransfer */
 
   /*------------------------------------------------------------------*/
@@ -527,9 +530,11 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
    * @param bSupportsDistincts true, if database supports DISTINCTs.
    * @param bSupportsUdts true, if database supports UDTs.
    * @return new instance of PrimaryDataTransfer.
+   * @throws SQLException if a database error occurred.
    */
   public static PrimaryDataToDb newInstance(Connection conn, Archive archive,
     ArchiveMapping am, boolean bSupportsArrays, boolean bSupportsDistincts, boolean bSupportsUdts)
+    throws SQLException
   {
     return new PrimaryDataToDb(conn, archive, am, bSupportsArrays, bSupportsDistincts, bSupportsUdts);
   } /* newInstance */
