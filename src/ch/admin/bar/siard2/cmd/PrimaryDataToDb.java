@@ -425,7 +425,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       lRecord++;
       if ((lRecord % lCOMMIT_RECORDS) == 0)
       {
-      	_conn.commit();
         System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rd.getByteCount()-lBytesStart,sw.stop())+" kB/s)");
       	lBytesStart = rd.getByteCount();
       	sw.start();
