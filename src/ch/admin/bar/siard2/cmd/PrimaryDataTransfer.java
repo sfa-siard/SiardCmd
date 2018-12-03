@@ -83,7 +83,8 @@ public class PrimaryDataTransfer
     sbSql.append("\r\n FROM "+qiTable.format());
     /* execute query */
     _il.event(sbSql.toString());
-    Statement stmt = _conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_UPDATABLE);
+    _conn.setHoldability(ResultSet.HOLD_CURSORS_OVER_COMMIT);
+    Statement stmt = _conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_UPDATABLE,ResultSet.HOLD_CURSORS_OVER_COMMIT);
     stmt.setQueryTimeout(_iQueryTimeoutSeconds);
     ResultSet rs = stmt.executeQuery(sbSql.toString());
     _il.exit(rs);

@@ -45,7 +45,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
   private void incDownloaded()
   {
     _lRecordsDownloaded++;
-    if ((_progress != null) && ((_lRecordsDownloaded % _lRecordsPercent) == 0))
+    if ((_progress != null) && (_lRecordsTotal > 0) && ((_lRecordsDownloaded % _lRecordsPercent) == 0))
     {
       int iPercent = (int)((100*_lRecordsDownloaded)/_lRecordsTotal);
       _progress.notifyProgress(iPercent);

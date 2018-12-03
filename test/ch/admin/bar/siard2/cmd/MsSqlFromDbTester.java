@@ -19,7 +19,7 @@ public class MsSqlFromDbTester extends BaseFromDbTester
   static
   {
     ConnectionProperties cp = new ConnectionProperties("mssql");
-    _sMSSQL_DB_URL = MsSqlDriver.getUrl(cp.getHost()+"\\"+cp.getCatalog()+":"+cp.getPort());
+    _sMSSQL_DB_URL = MsSqlDriver.getUrl(cp.getHost()+":"+cp.getPort()+";databaseName="+cp.getCatalog());
     _sMSSQL_DB_USER = cp.getUser();
     _sMSSQL_DB_PASSWORD = cp.getPassword();
   }

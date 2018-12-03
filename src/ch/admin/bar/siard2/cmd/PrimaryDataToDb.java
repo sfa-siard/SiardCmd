@@ -43,7 +43,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
   private void incUploaded()
   {
     _lRecordsUploaded++;
-    if ((_progress != null) && ((_lRecordsUploaded % _lRecordsPercent) == 0))
+    if ((_progress != null) && (_lRecordsTotal > 0) && ((_lRecordsUploaded % _lRecordsPercent) == 0))
     {
       int iPercent = (int)((100*_lRecordsUploaded)/_lRecordsTotal);
       _progress.notifyProgress(iPercent);
@@ -432,12 +432,13 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       incUploaded();
     }
     System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rd.getByteCount()-lBytesStart,sw.stop())+" kB/s)");
-    System.out.println("    Total: "+sw.formatLong(lRecord)+" records ("+sw.formatLong(rd.getByteCount())+" bytes in "+sw.formatMs()+" ms");
+    System.out.println("    Total: "+sw.formatLong(lRecord)+" records ("+sw.formatLong(rd.getByteCount())+" bytes in "+sw.formatMs()+" ms)");
     if (!rs.isClosed())
       rs.close();
     if (!stmt.isClosed())
       stmt.close();
     rd.close();
+    _conn.commit();
     _il.exit();
   } /* putTable */
   
@@ -458,6 +459,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       Table table = schema.getTable(iTable);
       putTable(table,sm);
     }
+    _conn.commit();
     _il.exit();
   } /* putSchema */
 
@@ -496,7 +498,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     if (cancelRequested())
       throw new IOException("\r\nUpload of primary data cancelled!");
     System.out.println("\r\nUpload terminated successfully.");
-    // _conn.commit();
+    _conn.commit();
     _il.exit();
   } /* upload */
   
@@ -508,11 +510,14 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
    * @param bSupportsArrays true, if database supports Arrays.
    * @param bSupportsDistincts true, if database supports DISTINCTs.
    * @param bSupportsUdts true, if database supports UDTs.
+   * @throws SQLException if a database error occurred.
    */
   private PrimaryDataToDb(Connection conn, Archive archive,
     ArchiveMapping am, boolean bSupportsArrays, boolean bSupportsDistincts, boolean bSupportsUdts)
+    throws SQLException
   {
     super(conn,archive,am,bSupportsArrays,bSupportsDistincts,bSupportsUdts);
+    conn.setAutoCommit(false);
   } /* constructor PrimaryDataTransfer */
 
   /*------------------------------------------------------------------*/
@@ -524,9 +529,11 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
    * @param bSupportsDistincts true, if database supports DISTINCTs.
    * @param bSupportsUdts true, if database supports UDTs.
    * @return new instance of PrimaryDataTransfer.
+   * @throws SQLException if a database error occurred.
    */
   public static PrimaryDataToDb newInstance(Connection conn, Archive archive,
     ArchiveMapping am, boolean bSupportsArrays, boolean bSupportsDistincts, boolean bSupportsUdts)
+    throws SQLException
   {
     return new PrimaryDataToDb(conn, archive, am, bSupportsArrays, bSupportsDistincts, bSupportsUdts);
   } /* newInstance */

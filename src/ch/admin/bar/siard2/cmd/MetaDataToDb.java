@@ -46,7 +46,7 @@ public class MetaDataToDb
   private void incTablesCreated()
   {
     _iTablesCreated++;
-    if ((_progress != null) && ((_iTablesCreated % _iTablesPercent) == 0))
+    if ((_progress != null) && (_iTables > 0) && ((_iTablesCreated % _iTablesPercent) == 0))
     {
       int iPercent = (int)((100*_iTablesCreated)/_iTables);
       _progress.notifyProgress(iPercent);
@@ -520,7 +520,7 @@ public class MetaDataToDb
       try 
       { 
         stmt.executeUpdate(sSql);
-        // stmt.getConnection().commit();
+        stmt.getConnection().commit();
       }
       catch(SQLException se) 
       { 
@@ -572,7 +572,7 @@ public class MetaDataToDb
     }
     if (cancelRequested())
       throw new IOException("Upload of meta data cancelled!");
-    // _dmd.getConnection().commit();
+    _dmd.getConnection().commit();
     _il.exit();
   } /* upload */
   
@@ -803,6 +803,7 @@ public class MetaDataToDb
     throws IOException, SQLException
   {
     super(dmd,md);
+    dmd.getConnection().setAutoCommit(false);
     _iMaxTableNameLength = _dmd.getMaxTableNameLength();
     _iMaxColumnNameLength = _dmd.getMaxColumnNameLength();
     _am = ArchiveMapping.newInstance(supportsArrays(), supportsUdts(), 
