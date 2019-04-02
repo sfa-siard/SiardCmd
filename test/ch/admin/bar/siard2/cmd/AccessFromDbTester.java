@@ -91,5 +91,31 @@ public class AccessFromDbTester extends BaseFromDbTester
 //    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
 //    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
 //    catch(ClassNotFoundException cnfe) { fail(EU.getExceptionMessage(cnfe)); }
-//  } 
+//  }
+  
+//@Test
+//public void testBug20190123()
+//{
+//  System.out.println("testBug20190123");
+//  try
+//  {
+//    FU.copy(new File("D:\\Projekte\\SIARD2\\Bugs\\20190123\\simpleDB\\simpleDB.accdb"),_fileTEST_ACCESS_DATABASE);
+//    String[] args = new String[]{
+//      "-o",
+//      "-j:"+_sACCESS_DB_URL,
+//      "-u:"+_sACCESS_DB_USER,
+//      "-p:"+_sACCESS_DB_PASSWORD,
+//      "-e:"+_sACCESS_METADATA_FILE,
+//      "-s:"+_sACCESS_SIARD_FILE
+//    };
+//    SiardFromDb sfdb = new SiardFromDb(args);
+//    assertEquals("SiardFromDb failed!",0, sfdb.getReturn());
+//    System.out.println("---------------------------------------");
+//  }
+//  catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
+//  catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
+//  catch(ClassNotFoundException cnfe) { fail(EU.getExceptionMessage(cnfe)); }
+//}
+  
+  
 }
