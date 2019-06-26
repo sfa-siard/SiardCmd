@@ -1,6 +1,9 @@
 Release Notes for SiardCmd 2.2
 ==============================
 
+2.1.??
+Corrected originalQuery for VIEWs. 
+
 2.1.103
 External storage of LOBs enhanced in code and manual.
 
