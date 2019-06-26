@@ -894,6 +894,22 @@ public class MetaDataFromDb
   } /* getPrivileges */
 
   /*------------------------------------------------------------------*/
+  /** strip view definitions of "create view ..." or "alter view ..." portion.
+   * @param sViewDefinition view definition.
+   * @return SELECT statement of viwe definition.
+   */
+  private String getQuery(String sViewDefinition)
+  {
+  	// split on "AS SELECT" removing "CREATE VIEW " or "ALTER VIEW" part
+  	// complex "AS (...) UNION (...)" cannot be handles satisfactorily.
+  	String sQuery = sViewDefinition;
+		String[] asParts = sQuery.split("(A|a)(S|s)\\s+(\\-\\-[^\\n]*\\s+)?(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)");
+  	if (asParts.length > 1)
+  		sQuery = "SELECT"+asParts[1];
+  	return sQuery;
+  } /* getQuery */
+  
+  /*------------------------------------------------------------------*/
   /** get all views in a schema.
    * @param ms schema meta data.
    * @throws IOException if an I/O error occurred.
@@ -921,7 +937,7 @@ public class MetaDataFromDb
 	      if (sRemarks != null)
 	        mv.setDescription(sRemarks);
 	      String sQueryText = null;
-	      try { sQueryText = rs.getString(BaseDatabaseMetaData._sQUERY_TEXT); }
+	      try { sQueryText = getQuery(rs.getString(BaseDatabaseMetaData._sQUERY_TEXT)); }
 	      catch(SQLException se) {}
 	      if (sQueryText != null)
 	        mv.setQueryOriginal(sQueryText);
