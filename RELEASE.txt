@@ -1,8 +1,9 @@
-Release Notes for SiardCmd 2.2
+Release Notes for SiardCmd 2.1
 ==============================
 
-2.1.??
-Corrected originalQuery for VIEWs. 
+2.1.123
+Corrected validation error (Issue 8).
+Added originalQuery for VIEWs on download (Issue 9). 
 
 2.1.103
 External storage of LOBs enhanced in code and manual.
