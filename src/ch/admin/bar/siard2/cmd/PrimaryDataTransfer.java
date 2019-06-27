@@ -39,7 +39,7 @@ public class PrimaryDataTransfer
   /*------------------------------------------------------------------*/
   /** issue a SELECT query for all fields of the table.
    * @param table table.
-   * @param sm mapping of names in schema.
+   * @param sm mapping of names in schema (null for read-only).
    * @throws IOException if an I/O error occurred.
    * @throws SQLException if a database error occurred.
    */
@@ -83,8 +83,18 @@ public class PrimaryDataTransfer
     sbSql.append("\r\n FROM "+qiTable.format());
     /* execute query */
     _il.event(sbSql.toString());
-    _conn.setHoldability(ResultSet.HOLD_CURSORS_OVER_COMMIT);
-    Statement stmt = _conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_UPDATABLE,ResultSet.HOLD_CURSORS_OVER_COMMIT);
+    
+    int iHoldability = ResultSet.HOLD_CURSORS_OVER_COMMIT;
+    if (sm == null)
+    	iHoldability = ResultSet.HOLD_CURSORS_OVER_COMMIT;
+    int iConcurrency = ResultSet.CONCUR_UPDATABLE;
+    if (sm == null)
+    	iConcurrency = ResultSet.CONCUR_READ_ONLY;
+    int iType = ResultSet.TYPE_FORWARD_ONLY;
+    if (sm == null)
+    	iType = ResultSet.TYPE_FORWARD_ONLY;
+    _conn.setHoldability(iHoldability);
+    Statement stmt = _conn.createStatement(iType,iConcurrency,iHoldability);
     stmt.setQueryTimeout(_iQueryTimeoutSeconds);
     ResultSet rs = stmt.executeQuery(sbSql.toString());
     _il.exit(rs);

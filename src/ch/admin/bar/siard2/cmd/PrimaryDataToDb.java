@@ -432,7 +432,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       incUploaded();
     }
     System.out.println("    Record "+String.valueOf(lRecord)+" ("+sw.formatRate(rd.getByteCount()-lBytesStart,sw.stop())+" kB/s)");
-    System.out.println("    Total: "+sw.formatLong(lRecord)+" records ("+sw.formatLong(rd.getByteCount())+" bytes in "+sw.formatMs()+" ms)");
+    System.out.println("    Total: "+StopWatch.formatLong(lRecord)+" records ("+StopWatch.formatLong(rd.getByteCount())+" bytes in "+sw.formatMs()+" ms)");
     if (!rs.isClosed())
       rs.close();
     if (!stmt.isClosed())

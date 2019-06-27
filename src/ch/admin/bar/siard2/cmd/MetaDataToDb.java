@@ -14,6 +14,7 @@ import java.text.*;
 import java.util.*;
 import java.util.regex.*;
 import ch.enterag.utils.jdbc.*;
+import ch.enterag.utils.EU;
 import ch.enterag.utils.background.*;
 import ch.enterag.utils.logging.*;
 import ch.enterag.sqlparser.*;
@@ -476,10 +477,11 @@ public class MetaDataToDb
           /* CASCADE must always drop! */
           String sSql = "DROP TABLE "+qiTable.format() +" CASCADE";
           _il.event(sSql);
-          stmt.executeUpdate(sSql); 
+          stmt.executeUpdate(sSql);
+          System.out.println("  Dropped: "+qiTable.format());
         }
       }
-      catch(SQLException se) { } // could not drop this time but maybe next
+      catch(SQLException se) { System.out.println("  Could not drop "+tm.getMappedTableName()+" "+EU.getExceptionMessage(se)); } // could not drop this time but maybe next
       finally{ stmt.close(); }
     }
     _il.exit();

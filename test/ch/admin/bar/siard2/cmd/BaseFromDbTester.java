@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.sql.*;
 import java.util.*;
 import ch.enterag.sqlparser.identifier.*;
+import ch.enterag.utils.EU;
 import ch.enterag.utils.jdbc.*;
 
 public class BaseFromDbTester 
@@ -48,9 +49,9 @@ public class BaseFromDbTester
             iterType.remove();
           }
           else
-            fail("Type "+qiType.format()+" NOT dropped!");
+          	fail("Type "+qiType.format()+" NOT dropped!");
         }
-        catch(SQLException se) {}
+        catch(SQLException se) { System.out.println("Type "+qiType.format()+" NOT dropped ("+EU.getExceptionMessage(se)+")!"); }
       }
       if (iSize == setTypes.size())
         throw new SQLException("Types "+setTypes.toString()+" could not be dropped!");
@@ -91,12 +92,12 @@ public class BaseFromDbTester
       conn.setAutoCommit(false);
       dropTables(conn,sDefaultSchema,"VIEW");
       dropTables(conn,sDefaultSchema,"TABLE");
-      dropTypes(conn,sDefaultSchema);
       dropTables(conn,sDbSchema,"VIEW");
       dropTables(conn,sDbSchema,"TABLE");
-      dropTypes(conn,sDbSchema);
       dropTables(conn,sSqlSchema,"VIEW");
       dropTables(conn,sSqlSchema,"TABLE");
+      dropTypes(conn,sDefaultSchema);
+      dropTypes(conn,sDbSchema);
       dropTypes(conn,sSqlSchema);
       if (sBlobSchema != null)
       {
