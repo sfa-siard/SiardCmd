@@ -14,9 +14,16 @@ public class SiardConnectionTester {
     for (int i = 0; i < asScheme.length; i++)
     {
       String sScheme = asScheme[i];
-      System.out.println("Scheme: "+sScheme);
+      System.out.println("\nScheme: "+sScheme);
       System.out.println("Title: "+sc.getTitle(sScheme));
-      System.out.println("Sample URL: "+sc.getSampleUrl(sScheme,"dbserver.enterag.ch","D:\\dbfolder","testdb"));
+      int iOptions = sc.getOptions(sScheme);
+      if (iOptions > 1)
+      {
+	      for (int iOption = 0; iOption < iOptions; iOption++)
+	        System.out.println("Sample URL("+sc.getOption(sScheme,iOption)+"): "+sc.getSampleUrl(sScheme,"dbserver.enterag.ch","D:\\dbfolder","testdb",iOption));
+      }
+      else
+        System.out.println("Sample URL: "+sc.getSampleUrl(sScheme,"dbserver.enterag.ch","D:\\dbfolder","testdb"));
     }
   }
 
