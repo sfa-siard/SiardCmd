@@ -3,6 +3,7 @@ Release Notes for SiardCmd 2.1
 
 2.1.126
 Corrected NullPointerException for linked tables in MS Access (Issue 10).
+Changed jdbc.properties for accommodating SID/Service for Oracle.
 
 2.1.123
 Corrected validation error (Issue 8).
