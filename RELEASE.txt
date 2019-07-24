@@ -1,6 +1,9 @@
 Release Notes for SiardCmd 2.1
 ==============================
 
+2.1.126
+Corrected NullPointerException for linked tables in MS Access (Issue 10).
+
 2.1.123
 Corrected validation error (Issue 8).
 Added originalQuery for VIEWs on download (Issue 9). 

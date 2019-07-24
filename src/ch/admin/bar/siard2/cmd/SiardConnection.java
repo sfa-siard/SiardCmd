@@ -38,6 +38,7 @@ public class SiardConnection extends Properties
   private static final String sJDBCDRIVERS_PROPERTIES = "jdbcdrivers.properties";
   private static final String sTITLE_SUFFIX = "_title";
   private static final String sSAMPLE_SUFFIX = "_sample";
+  private static final String sOPTION_SUFFIX = "_option";
   private static File getJdbcDriversPropertiesFile()
   {
     File fileDrivers = null;
@@ -195,7 +196,7 @@ public class SiardConnection extends Properties
     for (Enumeration<Object> enumKeys = keys(); enumKeys.hasMoreElements(); ) 
     {
       String sKey = (String)enumKeys.nextElement();
-      if ((!sKey.endsWith(sTITLE_SUFFIX)) && (!sKey.endsWith(sSAMPLE_SUFFIX)))
+      if ((!sKey.endsWith(sTITLE_SUFFIX)) && (!sKey.endsWith(sSAMPLE_SUFFIX)) && (!sKey.endsWith(sOPTION_SUFFIX)))
         listSchemes.add(sKey);
     }
     return listSchemes.toArray(new String[]{});
@@ -222,6 +223,47 @@ public class SiardConnection extends Properties
   } /* getTitle */
   
   /*--------------------------------------------------------------------*/
+  /** getOptions returns the number of sample JDBC URLs for the JDBC scheme.
+   * @param sScheme JDBC scheme.
+   * @return number of sample JDBC URLs for the JDBC scheme.
+   */
+  public int getOptions(String sScheme)
+  {
+    return getProperty(sScheme+sSAMPLE_SUFFIX).split("\\|").length;
+  } /* getOptions */
+  
+  /*--------------------------------------------------------------------*/
+  /** getSampleUrl returns a sample JDBC URL for the JDBC scheme.
+   * Either host or folder must not be null.
+   * @param sScheme JDBC scheme.
+   * @param sHost host name.
+   * @param sFolder folder name.
+   * @param sDatabase database name.
+   * @param iOption index of sample URL (separated by "|")
+   * @return sample JDBC URL for the JDBC scheme.
+   */
+  public String getSampleUrl(String sScheme, String sHost, String sFolder, String sDatabase, int iOption)
+  {
+  	String sSampleUrl = getProperty(sScheme+sSAMPLE_SUFFIX);
+  	sSampleUrl = sSampleUrl.split("\\|")[iOption];
+    return MessageFormat.format(sSampleUrl,sHost,sFolder.replace("\\", "/"),sDatabase);
+  } /* getSampleUrl */
+  
+  /*--------------------------------------------------------------------*/
+  /** getOption returns a name for the sample JDBC URL for the JDBC scheme 
+   * with this option index.
+   * @param sScheme JDBC scheme.
+   * @param iOption index of sample URL (separated by "|")
+   * @return name for sample JDBC URL for the JDBC scheme.
+   */
+  public String getOption(String sScheme, int iOption)
+  {
+  	String sOption = getProperty(sScheme+sOPTION_SUFFIX);
+  	sOption = sOption.split("\\|")[iOption];
+    return sOption;
+  } /* getOption */
+  
+  /*--------------------------------------------------------------------*/
   /** getSampleUrl returns a sample JDBC URL for the JDBC scheme.
    * Either host or folder must not be null.
    * @param sScheme JDBC scheme.
@@ -232,7 +274,7 @@ public class SiardConnection extends Properties
    */
   public String getSampleUrl(String sScheme, String sHost, String sFolder, String sDatabase)
   {
-    return MessageFormat.format(getProperty(sScheme+sSAMPLE_SUFFIX),sHost,sFolder.replace("\\", "/"),sDatabase);
+    return getSampleUrl(sScheme,sHost,sFolder,sDatabase,0);
   } /* getSampleUrl */
   
   public boolean isLocal(String sScheme)
