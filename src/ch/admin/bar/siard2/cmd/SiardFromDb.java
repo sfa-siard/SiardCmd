@@ -376,6 +376,11 @@ public class SiardFromDb
             else
               fileSiard.deleteOnExit();
 	          /* close SIARD archive */
+	          /***
+	          FileOutputStream fosXml = new FileOutputStream("D:\\Projekte\\SIARD2\\SiardCmd\\tmp\\export.xml"); 
+	          _archive.exportMetaData(fosXml);
+	          fosXml.close();
+	          ***/
 	          _archive.close();
 	          /* close connection */
 	          _conn.rollback();
