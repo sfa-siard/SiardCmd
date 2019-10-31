@@ -1,6 +1,9 @@
 Release Notes for SiardCmd 2.1
 ==============================
 
+2.1.130
+Integration of Postgres driver
+
 2.1.128
 Corrected NullPointerException for views based on of views MS Access (Issue 10).
 
