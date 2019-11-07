@@ -6,7 +6,7 @@
 	<classpathentry kind="lib" path="lib/activation-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-8.0.11.jar"/>
 	<classpathentry kind="lib" path="lib/jdbcpostgres-test.jar"/>
-	<classpathentry kind="lib" path="lib/jdbcpostgres.jar"/>
+	<classpathentry kind="lib" path="lib/jdbcpostgres.jar" sourcepath="/JdbcPostgres/src"/>
 	<classpathentry kind="lib" path="lib/json-simple-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql-42.2.5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>

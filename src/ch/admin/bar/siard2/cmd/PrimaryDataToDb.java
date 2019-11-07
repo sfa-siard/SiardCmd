@@ -265,7 +265,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
             o = value.getBoolean();
             break;
           case Types.SMALLINT:
-            o = value.getInt();
+            o = value.getLong();
             break;
           case Types.INTEGER:
             o = value.getLong();

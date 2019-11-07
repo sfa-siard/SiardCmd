@@ -6,8 +6,8 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ 
-	PostgresFromDbTester.class
-	// PostgresToDbTester.class
+	PostgresFromDbTester.class,
+	PostgresToDbTester.class
 })
 public class _PostgresTestSuite {
 
