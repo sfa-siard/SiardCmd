@@ -9,6 +9,7 @@ Created    : 01.09.2016, Hartwig Thomas, Enter AG, Rüti ZH
 package ch.admin.bar.siard2.cmd;
 
 import java.io.*;
+import java.math.*;
 import java.sql.*;
 import java.util.*;
 
@@ -270,7 +271,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
             o = value.getLong();
             break;
           case Types.BIGINT:
-            o = value.getBigInteger();
+            o = new BigDecimal(value.getBigInteger());
             break;
           case Types.DECIMAL:
           case Types.NUMERIC:
