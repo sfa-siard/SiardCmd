@@ -42,7 +42,7 @@ public class PostgresFromDbTester extends BaseFromDbTester
       dsPostgres.setPassword(_sPOSTGRES_DBA_PASSWORD);
       PostgresConnection connPostgres = (PostgresConnection)dsPostgres.getConnection();
       clearDatabase(connPostgres,
-        _sPOSTGRES_DB_USER,
+        "testschema",
         TestPostgresDatabase._sTEST_SCHEMA, 
         ch.admin.bar.siard2.postgres.TestSqlDatabase._sTEST_SCHEMA,
         null);

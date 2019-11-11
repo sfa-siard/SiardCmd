@@ -42,7 +42,9 @@ public class PostgresToDbTester extends BaseFromDbTester
         "-j:"+_sPOSTGRES_DB_URL,
         "-u:"+_sPOSTGRES_DBA_USER,
         "-p:"+_sPOSTGRES_DBA_PASSWORD,
-        "-s:"+_sPOSTGRES_SIARD_FILE
+        "-s:"+_sPOSTGRES_SIARD_FILE,
+        "pg_catalog", "testschema",
+        "testpgschema", "testschema"
       };
       SiardToDb stdb = new SiardToDb(args);
       assertEquals("SiardToDb failed!",0, stdb.getReturn());

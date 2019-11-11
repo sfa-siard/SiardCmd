@@ -51,7 +51,11 @@ public class BaseFromDbTester
           else
           	fail("Type "+qiType.format()+" NOT dropped!");
         }
-        catch(SQLException se) { System.out.println("Type "+qiType.format()+" NOT dropped ("+EU.getExceptionMessage(se)+")!"); }
+        catch(SQLException se) 
+        {
+        	System.out.println("Type "+qiType.format()+" NOT dropped ("+EU.getExceptionMessage(se)+")!");
+        	conn.rollback();
+        }
       }
       if (iSize == setTypes.size())
         throw new SQLException("Types "+setTypes.toString()+" could not be dropped!");
