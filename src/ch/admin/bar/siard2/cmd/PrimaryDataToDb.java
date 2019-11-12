@@ -210,7 +210,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
    * @param value Cell or Field instance.
    * @param conn database connection.
    * @param setResources set of resources that need to be freed after insert.
-   * @return JAVA object of appriate type.
+   * @return JAVA object of appropriate type.
    * @throws IOException if an I/O error occurred.
    * @throws SQLException if a database error occurred.
    */
@@ -265,7 +265,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
             o = value.getBoolean();
             break;
           case Types.SMALLINT:
-            o = value.getInt();
+            o = value.getLong();
             break;
           case Types.INTEGER:
             o = value.getLong();

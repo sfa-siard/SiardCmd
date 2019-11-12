@@ -92,6 +92,12 @@ Created    : 29.08.2016, Hartwig Thomas
   <property name="jarjdbcmssqltest" value="jdbcmssql-test.jar"/>
   <property name="cpjdbcmssql" value="${dirlib}/${jarjdbcmssql};${dirlib}/${jarmssqljdbc}"/>
   <property name="cpjdbcmssql-test" value="${dirlib}/${jarjdbcmssqltest}"/>
+  <!-- jdbcmysql jars -->
+  <property name="jarmysqljdbc" value="mysql-connector-java-8.0.11.jar"/>
+  <property name="jarjdbcmysql" value="jdbcmysql.jar"/>
+  <property name="jarjdbcmysqltest" value="jdbcmysql-test.jar"/>
+  <property name="cpjdbcmysql" value="${dirlib}/${jarjdbcmysql};${dirlib}/${jarmysqljdbc}"/>
+  <property name="cpjdbcmysql-test" value="${dirlib}/${jarjdbcmysqltest}"/>
   <!-- jdbcoracle jars -->
   <property name="jarojdbc" value="ojdbc6.jar"/>
   <property name="jarxdb" value="xdb6.jar"/>
@@ -100,12 +106,13 @@ Created    : 29.08.2016, Hartwig Thomas
   <property name="jarjdbcoracletest" value="jdbcoracle-test.jar"/>
   <property name="cpjdbcoracle" value="${dirlib}/${jarjdbcoracle};${dirlib}/${jarojdbc};${dirlib}/${jarxdb};${dirlib}/${jarxmlparser}"/> 
   <property name="cpjdbcoracle-test" value="${dirlib}/${jarjdbcoracletest}"/>
-  <!-- jdbcmysql jars -->
-  <property name="jarmysqljdbc" value="mysql-connector-java-8.0.11.jar"/>
-  <property name="jarjdbcmysql" value="jdbcmysql.jar"/>
-  <property name="jarjdbcmysqltest" value="jdbcmysql-test.jar"/>
-  <property name="cpjdbcmysql" value="${dirlib}/${jarjdbcmysql};${dirlib}/${jarmysqljdbc}"/>
-  <property name="cpjdbcmysql-test" value="${dirlib}/${jarjdbcmysqltest}"/>
+  <!-- jdbcpostgres jars -->
+  <property name="jarpostgresjdbc" value="postgresql-42.2.5.jar"/>
+  <property name="jarjson" value="json-simple-1.1.1.jar"/>
+  <property name="jarjdbcpostgres" value="jdbcpostgres.jar"/>
+  <property name="jarjdbcpostgrestest" value="jdbcpostgres-test.jar"/>
+  <property name="cpjdbcpostgres" value="${dirlib}/${jarjdbcpostgres};${dirlib}/${jarpostgresjdbc}"/>
+  <property name="cpjdbcpostgres-test" value="${dirlib}/${jarjdbcpostgrestest};${dirlib}/${jarjson}"/>
   <!-- siardapi -->
   <property name="jarsiardapi" value="siardapi.jar"/>
   <property name="cpsiardapi" value="${dirlib}/${jarsiardapi}"/> 
@@ -224,6 +231,9 @@ Created    : 29.08.2016, Hartwig Thomas
     <!-- TODO: get most recently released version of jdbcoracle.jar -->
     <copy file="../JdbcOracle/dist/jdbcoracle.jar" todir="${dirlib}" failonerror="false"/>
     <copy file="../JdbcOracle/dist/jdbcoracle-test.jar" todir="${dirlib}" failonerror="false"/>
+    <!-- TODO: get most recently released version of jdbcpostgres.jar -->
+    <copy file="../JdbcPostgres/dist/jdbcpostgres.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcPostgres/dist/jdbcpostgres-test.jar" todir="${dirlib}" failonerror="false"/>
     <!-- stage all changes -->
     <echo message="${ant.project.name}: git add -A"/>
     <exec executable="${git}" output="${fileadd}" failonerror="true">
@@ -313,10 +323,11 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${cpsiardapi}"/>
         <pathelement path="${cpjdbcaccess}"/>
         <pathelement path="${cpjdbcdb2}"/>
+        <pathelement path="${cpjdbch2}"/>
+        <pathelement path="${cpjdbcmssql}"/>
         <pathelement path="${cpjdbcmysql}"/>
         <pathelement path="${cpjdbcoracle}"/>
-        <pathelement path="${cpjdbcmssql}"/>
-        <pathelement path="${cpjdbch2}"/>
+        <pathelement path="${cpjdbcpostgres}"/>
         <pathelement path="${cpjdbcbase}"/>
         <pathelement path="${cpenterutils}"/>
       </classpath>
@@ -366,12 +377,48 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${cpjdbcmysql-test}"/>
         <pathelement path="${cpjdbcoracle}"/>
         <pathelement path="${cpjdbcoracle-test}"/>
+        <pathelement path="${cpjdbcpostgres}"/>
+        <pathelement path="${cpjdbcpostgres-test}"/>
         <pathelement path="${cpsiardapi}"/>
         <pathelement path="${cpsunjdbc}"/>
         <pathelement path="${cpjunit}"/>
   		</classpath>
     </javac>
   </target>
+  
+  <echo message="before postgres test: ${dbuserpostgres}"/>
+  <!-- run Postgres tests -->
+  <property name="classpostgrestestsuite" value="ch.admin.bar.siard2.cmd._PostgresTestSuite"/>
+  <property name="filepostgrestests" value="postgres-tests"/>
+  <target name="tests-postgres" depends="tests"  if="dbuserpostgres">
+    <echo message="${ant.project.name}: test-postgres run"/>
+    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+      <formatter type="plain"/>
+      <classpath>
+        <pathelement path="${dirbuildtests}"/>
+        <pathelement path="${dirdist}/${jarfile}"/>
+        <pathelement path="${cpantlr}"/>
+        <pathelement path="${cpenterutils}"/>
+        <pathelement path="${sqlparser}"/>
+        <pathelement path="${cpjdbcbase}"/>
+        <pathelement path="${cpjdbcbase-test}"/>
+        <pathelement path="${cpjdbcpostgres}"/>
+        <pathelement path="${cpjdbcpostgres-test}"/>
+        <pathelement path="${cpjaxb}"/>
+        <pathelement path="${cpzip64}"/>
+        <pathelement path="${cpwoodstox}"/>
+        <pathelement path="${cpmsv}"/>
+        <pathelement path="${cpsiardapi}"/>
+        <pathelement path="${cpjunit}"/>
+      </classpath>
+      <test 
+      name="${classpostgrestestsuite}"
+      outfile="${filepostgrestests}"
+      todir="${dirtmp}"/>
+    </junit>
+  </target>
+  <echo message="before postgres test"/>
   
   <!-- run access tests -->
   <property name="classaccesstestsuite" value="ch.admin.bar.siard2.cmd._AccessTestSuite"/>
@@ -633,7 +680,7 @@ Created    : 29.08.2016, Hartwig Thomas
   </target>
   
   <!-- create the ZIP file with binaries for Windows and LINUX -->
-  <target name="zip" depends="tests-access,tests-db2,tests-h2,tests-mssql,tests-mysql,tests-oracle,tests-aw,tests-oe">
+  <target name="zip" depends="tests-access,tests-db2,tests-h2,tests-mssql,tests-mysql,tests-oracle,tests-postgres,tests-aw,tests-oe">
     <echo message="${ant.project.name}: zip"/>
     <zip zipfile="${dirdist}/${ant.project.name}-${version}.${revision}.zip">
     	

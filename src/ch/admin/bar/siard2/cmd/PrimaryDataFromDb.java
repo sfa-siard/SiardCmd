@@ -75,6 +75,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
         value.setBytes((byte[])oValue);
       else if (oValue instanceof Boolean)
         value.setBoolean(((Boolean)oValue).booleanValue());
+      else if (oValue instanceof Short)
+      	value.setShort(((Short)oValue).shortValue());
       else if (oValue instanceof Integer)
         value.setInt(((Integer)oValue).intValue());
       else if (oValue instanceof Long)

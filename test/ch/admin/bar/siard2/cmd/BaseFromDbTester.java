@@ -51,7 +51,11 @@ public class BaseFromDbTester
           else
           	fail("Type "+qiType.format()+" NOT dropped!");
         }
-        catch(SQLException se) { System.out.println("Type "+qiType.format()+" NOT dropped ("+EU.getExceptionMessage(se)+")!"); }
+        catch(SQLException se) 
+        {
+        	System.out.println("Type "+qiType.format()+" NOT dropped ("+EU.getExceptionMessage(se)+")!");
+        	conn.rollback();
+        }
       }
       if (iSize == setTypes.size())
         throw new SQLException("Types "+setTypes.toString()+" could not be dropped!");
@@ -62,7 +66,7 @@ public class BaseFromDbTester
   } /* dropTypes */
   
   /*------------------------------------------------------------------*/
-  private void dropTables(Connection conn, String sSchema, String sType)
+  protected void dropTables(Connection conn, String sSchema, String sType)
     throws SQLException
   {
     Statement stmt = conn.createStatement();

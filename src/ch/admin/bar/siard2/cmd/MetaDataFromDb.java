@@ -384,8 +384,11 @@ public class MetaDataFromDb
       QualifiedId qiType = new QualifiedId(sTypeName);
       String sTypeSchema = qiType.getSchema();
       if (sTypeSchema == null)
+      {
         sTypeSchema = sDefaultSchema;
-      qiType.setSchema(sTypeSchema);
+        qiType.setSchema(sTypeSchema);
+        qiType.setName(sTypeName);
+      }
       Schema schema = _md.getArchive().getSchema(qiType.getSchema());
       if (schema == null)
         schema = _md.getArchive().createSchema(qiType.getSchema());
@@ -487,7 +490,9 @@ public class MetaDataFromDb
       int iScale = rs.getInt("SCALE");
       if ((iDataType == Types.DISTINCT) ||
         (iDataType == Types.STRUCT))
+      {
         mt = createType(sTypeName,mr.getParentMetaSchema().getName(),(int)lPrecision,iScale);
+      }
       String sRemarks = rs.getString("REMARKS");
       int iOrdinalPosition = rs.getInt("ORDINAL_POSITION");
       String sSpecificName = rs.getString("SPECIFIC_NAME");

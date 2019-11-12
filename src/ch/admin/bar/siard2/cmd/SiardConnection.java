@@ -67,6 +67,9 @@ public class SiardConnection extends Properties
   private static Properties getJdbcDriversDefaultProperties()
   {
     Properties propDrivers = new Properties();
+    propDrivers.put(PostgresDriver.sPOSTGRES_SCHEME, PostgresDriver.class.getName());
+    propDrivers.put(PostgresDriver.sPOSTGRES_SCHEME+sTITLE_SUFFIX, "PostgreSQL");
+    propDrivers.put(PostgresDriver.sPOSTGRES_SCHEME+sSAMPLE_SUFFIX, "jdbc:postgresql://dbserver.enterag.ch:5432/testdb");
     propDrivers.put(OracleDriver.sORACLE_SCHEME, OracleDriver.class.getName());
     propDrivers.put(OracleDriver.sORACLE_SCHEME+sTITLE_SUFFIX, "Oracle");
     propDrivers.put(OracleDriver.sORACLE_SCHEME+sSAMPLE_SUFFIX, "jdbc:oracle:thin:@dbserver.enterag.ch:1521:orcl");

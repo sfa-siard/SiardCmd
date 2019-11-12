@@ -561,13 +561,43 @@ public class MetaDataToDb
       MetaSchema ms = _md.getMetaSchema(iSchema);
       SchemaMapping sm = _am.getSchemaMapping(ms.getName());
       createSchema(ms,sm);
+    }
+    for (int iSchema = 0; (iSchema < _md.getMetaSchemas()) && (!cancelRequested()); iSchema++)
+    {
+      MetaSchema ms = _md.getMetaSchema(iSchema);
+      SchemaMapping sm = _am.getSchemaMapping(ms.getName());
       if (existsSchema(sm.getMappedSchemaName()))
-      {
         dropTables(ms,sm);
+      else
+        throw new SQLException("Schema \""+sm.getMappedSchemaName()+"\" could not be created! "+
+          "Map \""+ms.getName()+"\" to existing schema.");
+    }
+    for (int iSchema = 0; (iSchema < _md.getMetaSchemas()) && (!cancelRequested()); iSchema++)
+    {
+      MetaSchema ms = _md.getMetaSchema(iSchema);
+      SchemaMapping sm = _am.getSchemaMapping(ms.getName());
+      if (existsSchema(sm.getMappedSchemaName()))
         dropTypes(ms,sm);
+      else
+        throw new SQLException("Schema \""+sm.getMappedSchemaName()+"\" could not be created! "+
+          "Map \""+ms.getName()+"\" to existing schema.");
+    }
+    for (int iSchema = 0; (iSchema < _md.getMetaSchemas()) && (!cancelRequested()); iSchema++)
+    {
+      MetaSchema ms = _md.getMetaSchema(iSchema);
+      SchemaMapping sm = _am.getSchemaMapping(ms.getName());
+      if (existsSchema(sm.getMappedSchemaName()))
         createTypes(ms,sm);
+      else
+        throw new SQLException("Schema \""+sm.getMappedSchemaName()+"\" could not be created! "+
+          "Map \""+ms.getName()+"\" to existing schema.");
+    }
+    for (int iSchema = 0; (iSchema < _md.getMetaSchemas()) && (!cancelRequested()); iSchema++)
+    {
+      MetaSchema ms = _md.getMetaSchema(iSchema);
+      SchemaMapping sm = _am.getSchemaMapping(ms.getName());
+      if (existsSchema(sm.getMappedSchemaName()))
         createTables(ms,sm);
-      }
       else
         throw new SQLException("Schema \""+sm.getMappedSchemaName()+"\" could not be created! "+
           "Map \""+ms.getName()+"\" to existing schema.");
