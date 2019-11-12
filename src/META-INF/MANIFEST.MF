@@ -4,7 +4,7 @@ Specification-Title: SIARD CMD
 Specification-Version: 2.1
 Specification-Vendor: Swiss Federal Archives, Berne, Switzerland
 Implementation-Title: SIARD CMD
-Implementation-Version: 2.1.141
+Implementation-Version: 2.1.142
 Implementation-Vendor: Swiss Federal Archives, Berne, Switzerland
 Built-Date: 11. Nov 2019
 Class-Path: siardapi.jar

@@ -46,6 +46,7 @@ public class PostgresFromDbTester extends BaseFromDbTester
         TestPostgresDatabase._sTEST_SCHEMA, 
         ch.admin.bar.siard2.postgres.TestSqlDatabase._sTEST_SCHEMA,
         null);
+      dropTables(connPostgres,"public","TABLE");
       /* drop and create the test database */
       System.out.println("Create TestSqlDatabase");
       new ch.admin.bar.siard2.postgres.TestSqlDatabase(connPostgres,_sPOSTGRES_DB_USER);

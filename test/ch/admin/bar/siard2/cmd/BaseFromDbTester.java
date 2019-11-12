@@ -66,7 +66,7 @@ public class BaseFromDbTester
   } /* dropTypes */
   
   /*------------------------------------------------------------------*/
-  private void dropTables(Connection conn, String sSchema, String sType)
+  protected void dropTables(Connection conn, String sSchema, String sType)
     throws SQLException
   {
     Statement stmt = conn.createStatement();
