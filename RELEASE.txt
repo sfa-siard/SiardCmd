@@ -1,6 +1,9 @@
 Release Notes for SiardCmd 2.1
 ==============================
 
+2.1.147
+Fully tested Postgres integration
+
 2.1.130
 Integration of Postgres driver
 
