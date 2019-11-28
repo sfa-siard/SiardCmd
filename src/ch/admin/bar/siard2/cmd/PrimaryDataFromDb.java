@@ -299,7 +299,41 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       Record record = rr.create();
       swCreate.stop();
       swGet.start();
+      /***
+      if (qiTable.getName().equals("Products") && (lRecord >=4) && (lRecord <= 5))
+      {
+        Cell cell = record.getCell(0);
+        MetaColumn mc = cell.getMetaColumn();
+        System.out.println("start: "+String.valueOf(mc.getMetaFields()));
+      }
+      ***/
       getRecord(rs,record);
+      /***
+      if (qiTable.getName().equals("Products") && (lRecord >=4) && (lRecord <= 5))
+      {
+      	for (int iCell = 0; iCell < record.getCells(); iCell++)
+      	{
+      		Cell cell = record.getCell(iCell);
+      		MetaColumn mc = cell.getMetaColumn();
+    			Object oCell = cell.getObject();
+      		if (mc.getCardinality() > 0)
+      		{
+      			System.out.println(String.valueOf(iCell)+": "+mc.getName()+" "+String.valueOf(oCell)+": "+((oCell == null)?"null":oCell.getClass().getName())+" "+mc.getCardinality());
+      			for (int iElement = 0; iElement < cell.getElements(); iElement++)
+      			{
+      				Field field = cell.getElement(iElement);
+      				Object oField = field.getObject();
+      				System.out.println("  "+String.valueOf(iElement)+" "+String.valueOf(oField));
+      			}
+      		}
+      		else
+      			System.out.println(String.valueOf(iCell)+": "+mc.getName()+" "+String.valueOf(oCell)+": "+((oCell == null)?"null":oCell.getClass().getName()));
+      	}
+    		Cell cell = record.getCell(0);
+        MetaColumn mc = cell.getMetaColumn();
+        System.out.println("stop: "+String.valueOf(mc.getMetaFields()));
+      }
+      ***/
       swGet.stop();
       swPut.start();
       rr.put(record);
