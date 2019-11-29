@@ -100,6 +100,7 @@ public class PostgresToDbTester extends BaseFromDbTester
         "-u:"+_sPOSTGRES_DB_USER,
         "-p:"+_sPOSTGRES_DB_PASSWORD,
         "-s:"+_sPOSTGRES_SAMPLE_FILE,
+        "pg_catalog", "testschema",
         "SampleSchema", "testschema"
       };
       SiardToDb stdb = new SiardToDb(args);

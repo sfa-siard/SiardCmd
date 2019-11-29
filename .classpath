@@ -25,7 +25,6 @@
 	<classpathentry kind="lib" path="lib/jaxb-api.jar"/>
 	<classpathentry kind="lib" path="lib/jaxb-core.jar"/>
 	<classpathentry kind="lib" path="lib/jaxb-impl.jar"/>
-	<classpathentry kind="lib" path="lib/jdbcaccess-test.jar" sourcepath="/JdbcAccess/test"/>
 	<classpathentry kind="lib" path="lib/jdbcaccess.jar" sourcepath="/JdbcAccess/src"/>
 	<classpathentry kind="lib" path="lib/jdbcbase-test.jar"/>
 	<classpathentry kind="lib" path="lib/jdbcbase.jar" sourcepath="/JdbcBase/src"/>

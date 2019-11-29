@@ -123,6 +123,16 @@ Copyright  : Enter AG, Joweid Zentrum 1, 8036 Rüti ZH, Switzerland, 2018
                   of the test databases. The "normal" user is then used in
                   the download and upload tests of <em>SiardCmd</em>.</p>
                   
+                <p>For running the PostgreSQL tests it is necessary to be able to reach a running
+                  Postgres instance. For this instance a "normal" user (<em>dbuserpostgres</em>)
+                  as well as a DBA (database administrator) user <em>dbauserpostgres</em>
+                  must have been created. The DBA user is used in the tests
+                  for creating the test databases (using <em>TestPostgresDatabase</em> 
+                  and <em>TestSqlDatabase</em> in package <em>ch.admin.bar.siard2.postgres</em>) 
+                  and granting privileges to the "normal" user for all parts
+                  of the test databases. The "normal" user is then used in
+                  the download and upload tests of <em>SiardCmd</em>.</p>
+                  
                 <p>For running the Oracle tests it is necessary to be able to reach a running
                   Oracle instance. For this instance a "normal" user (<em>dbuseroracle</em>)
                   as well as a DBA (database administrator) user <em>dbauseroracle</em>

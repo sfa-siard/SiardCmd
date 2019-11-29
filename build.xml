@@ -68,12 +68,10 @@ Created    : 29.08.2016, Hartwig Thomas
   <property name="cpjts" value="${dirlib}/${jarjts}"/>
   <!-- jdbcaccess jars -->
   <property name="jarjdbcaccess" value="jdbcaccess.jar"/>
-  <property name="jarjdbcaccesstest" value="jdbcaccess-test.jar"/>
   <property name="jarjackcess" value="jackcess-2.1.6a.jar"/>
   <property name="jarcommonslang" value="commons-lang-2.6.jar"/>
   <property name="jarcommonslogging" value="commons-logging-1.1.3.jar"/>
   <property name="cpjdbcaccess" value="${dirlib}/${jarjdbcaccess};${dirlib}/${jarjackcess};${dirlib}/${jarcommonslang};${dirlib}/${jarcommonslogging}"/>
-  <property name="cpjdbcaccess-test" value="${dirlib}/${jarjdbcaccesstest}"/>
   <!-- jdbcdb2 jars -->
   <property name="jarjdbcdb2" value="jdbcdb2.jar"/>
   <property name="jarjdbcdb2test" value="jdbcdb2-test.jar"/>
@@ -366,7 +364,6 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${cpjdbcbase}"/>
         <pathelement path="${cpjdbcbase-test}"/>
         <pathelement path="${cpjdbcaccess}"/>
-        <pathelement path="${cpjdbcaccess-test}"/>
         <pathelement path="${cpjdbcdb2}"/>
         <pathelement path="${cpjdbcdb2-test}"/>
         <pathelement path="${cpjdbch2}"/>
@@ -437,7 +434,6 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${cpjdbcbase}"/>
         <pathelement path="${cpjdbcbase-test}"/>
         <pathelement path="${cpjdbcaccess}"/>
-        <pathelement path="${cpjdbcaccess-test}"/>
         <pathelement path="${cpjaxb}"/>
         <pathelement path="${cpzip64}"/>
         <pathelement path="${cpwoodstox}"/>

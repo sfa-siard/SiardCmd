@@ -1,6 +1,13 @@
 Release Notes for SiardCmd 2.1
 ==============================
 
+2.1.157
+Corrected Oracle driver.
+
+2.1.150
+Upgrade of MS Access. Can now download from Nordwind. 
+A full MS Access expression parser is still missing. 
+
 2.1.147
 Fully tested Postgres integration
 
