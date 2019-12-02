@@ -2,7 +2,7 @@ Release Notes for SiardCmd 2.1
 ==============================
 
 2.1.167
-Fixed problem with domains/types in schema public having an SQL keyword as name.
+Fixed problem with Postgres domains/types in schema public having an SQL keyword as name.
 (DVD Retail database added as test.)
 
 2.1.157
