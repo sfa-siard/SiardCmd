@@ -10,7 +10,7 @@ import ch.admin.bar.siard2.postgres.*;
 import ch.enterag.utils.*;
 import ch.enterag.utils.base.*;
 
-public class PostgresDvdRentalTester extends BaseFromDbTester
+public class DvdRentalTester extends BaseFromDbTester
 {
   private static final String _sPOSTGRES_DB_URL;
   private static final String _sPOSTGRES_DB_USER;
@@ -19,10 +19,10 @@ public class PostgresDvdRentalTester extends BaseFromDbTester
   private static final String _sPOSTGRES_DBA_PASSWORD;
   static
   {
-    ConnectionProperties cp = new ConnectionProperties("postgres");
-    _sPOSTGRES_DB_URL = PostgresDriver.getUrl(cp.getHost() + ":" + cp.getPort() + "/dvd_rental");
-    _sPOSTGRES_DB_USER = "buguser";
-    _sPOSTGRES_DB_PASSWORD = "bugpwd";
+    ConnectionProperties cp = new ConnectionProperties("nw");
+    _sPOSTGRES_DB_URL = PostgresDriver.getUrl(cp.getHost() + ":" + cp.getPort() + "/" + cp.getCatalog());
+    _sPOSTGRES_DB_USER = cp.getUser();
+    _sPOSTGRES_DB_PASSWORD = cp.getPassword();
     _sPOSTGRES_DBA_USER = cp.getDbaUser();
     _sPOSTGRES_DBA_PASSWORD = cp.getDbaPassword();
   }
