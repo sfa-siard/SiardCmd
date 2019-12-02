@@ -19,7 +19,7 @@ public class DvdRentalTester extends BaseFromDbTester
   private static final String _sPOSTGRES_DBA_PASSWORD;
   static
   {
-    ConnectionProperties cp = new ConnectionProperties("nw");
+    ConnectionProperties cp = new ConnectionProperties("dvd");
     _sPOSTGRES_DB_URL = PostgresDriver.getUrl(cp.getHost() + ":" + cp.getPort() + "/" + cp.getCatalog());
     _sPOSTGRES_DB_USER = cp.getUser();
     _sPOSTGRES_DB_PASSWORD = cp.getPassword();
