@@ -383,40 +383,6 @@ Created    : 29.08.2016, Hartwig Thomas
     </javac>
   </target>
   
-  <echo message="before postgres test: ${dbuserpostgres}"/>
-  <!-- run Postgres tests -->
-  <property name="classpostgrestestsuite" value="ch.admin.bar.siard2.cmd._PostgresTestSuite"/>
-  <property name="filepostgrestests" value="postgres-tests"/>
-  <target name="tests-postgres" depends="tests"  if="dbuserpostgres">
-    <echo message="${ant.project.name}: test-postgres run"/>
-    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
-      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
-      <formatter type="plain"/>
-      <classpath>
-        <pathelement path="${dirbuildtests}"/>
-        <pathelement path="${dirdist}/${jarfile}"/>
-        <pathelement path="${cpantlr}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${sqlparser}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpjdbcbase-test}"/>
-        <pathelement path="${cpjdbcpostgres}"/>
-        <pathelement path="${cpjdbcpostgres-test}"/>
-        <pathelement path="${cpjaxb}"/>
-        <pathelement path="${cpzip64}"/>
-        <pathelement path="${cpwoodstox}"/>
-        <pathelement path="${cpmsv}"/>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpjunit}"/>
-      </classpath>
-      <test 
-      name="${classpostgrestestsuite}"
-      outfile="${filepostgrestests}"
-      todir="${dirtmp}"/>
-    </junit>
-  </target>
-  <echo message="before postgres test"/>
-  
   <!-- run access tests -->
   <property name="classaccesstestsuite" value="ch.admin.bar.siard2.cmd._AccessTestSuite"/>
   <property name="fileaccesstests" value="access-tests"/>
@@ -611,6 +577,38 @@ Created    : 29.08.2016, Hartwig Thomas
     </junit>
   </target>
   
+  <!-- run Postgres tests -->
+  <property name="classpostgrestestsuite" value="ch.admin.bar.siard2.cmd._PostgresTestSuite"/>
+  <property name="filepostgrestests" value="postgres-tests"/>
+  <target name="tests-postgres" depends="tests"  if="dbuserpostgres">
+    <echo message="${ant.project.name}: test-postgres run"/>
+    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+      <formatter type="plain"/>
+      <classpath>
+        <pathelement path="${dirbuildtests}"/>
+        <pathelement path="${dirdist}/${jarfile}"/>
+        <pathelement path="${cpantlr}"/>
+        <pathelement path="${cpenterutils}"/>
+        <pathelement path="${sqlparser}"/>
+        <pathelement path="${cpjdbcbase}"/>
+        <pathelement path="${cpjdbcbase-test}"/>
+        <pathelement path="${cpjdbcpostgres}"/>
+        <pathelement path="${cpjdbcpostgres-test}"/>
+        <pathelement path="${cpjaxb}"/>
+        <pathelement path="${cpzip64}"/>
+        <pathelement path="${cpwoodstox}"/>
+        <pathelement path="${cpmsv}"/>
+        <pathelement path="${cpsiardapi}"/>
+        <pathelement path="${cpjunit}"/>
+      </classpath>
+      <test 
+      name="${classpostgrestestsuite}"
+      outfile="${filepostgrestests}"
+      todir="${dirtmp}"/>
+    </junit>
+  </target>
+	
   <!-- run AdventureWorks tests -->
   <property name="classawtestsuite" value="ch.admin.bar.siard2.cmd._AwTestSuite"/>
   <property name="fileawtests" value="aw-tests"/>
@@ -675,8 +673,71 @@ Created    : 29.08.2016, Hartwig Thomas
     </junit>
   </target>
   
+  <!-- run dvd_rental tests -->
+  <property name="classdvdtestsuite" value="ch.admin.bar.siard2.cmd._DvdTestSuite"/>
+  <property name="filedvdtests" value="dvd-tests"/>
+  <target name="tests-dvd" depends="tests" if="dbuserdvd">
+    <echo message="${ant.project.name}: test-dvd run"/>
+    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+      <formatter type="plain"/>
+      <classpath>
+        <pathelement path="${dirbuildtests}"/>
+        <pathelement path="${dirdist}/${jarfile}"/>
+        <pathelement path="${cpantlr}"/>
+        <pathelement path="${cpenterutils}"/>
+        <pathelement path="${cpsqlparser}"/>
+        <pathelement path="${cpjdbcbase}"/>
+        <pathelement path="${cpjdbcbase-test}"/>
+        <pathelement path="${cpjdbcpostgres}"/>
+        <pathelement path="${cpjdbcpostgres-test}"/>
+        <pathelement path="${cpjaxb}"/>
+        <pathelement path="${cpzip64}"/>
+        <pathelement path="${cpwoodstox}"/>
+        <pathelement path="${cpmsv}"/>
+        <pathelement path="${cpsiardapi}"/>
+        <pathelement path="${cpjunit}"/>
+      </classpath>
+      <test 
+      name="${classdvdtestsuite}"
+      outfile="${filedvdtests}"
+      todir="${dirtmp}"/>
+    </junit>
+  </target>
+  
+  <!-- run Northwind tests -->
+  <property name="classnwtestsuite" value="ch.admin.bar.siard2.cmd._NwTestSuite"/>
+  <property name="filenwtests" value="nw-tests"/>
+  <target name="tests-nw" depends="tests" if="dbusernw">
+    <echo message="${ant.project.name}: test-nw run"/>
+    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+      <formatter type="plain"/>
+      <classpath>
+        <pathelement path="${dirbuildtests}"/>
+        <pathelement path="${dirdist}/${jarfile}"/>
+        <pathelement path="${cpantlr}"/>
+        <pathelement path="${cpenterutils}"/>
+        <pathelement path="${cpsqlparser}"/>
+        <pathelement path="${cpjdbcbase}"/>
+        <pathelement path="${cpjdbcbase-test}"/>
+        <pathelement path="${cpjdbcaccess}"/>
+        <pathelement path="${cpjaxb}"/>
+        <pathelement path="${cpzip64}"/>
+        <pathelement path="${cpwoodstox}"/>
+        <pathelement path="${cpmsv}"/>
+        <pathelement path="${cpsiardapi}"/>
+        <pathelement path="${cpjunit}"/>
+      </classpath>
+      <test 
+      name="${classnwtestsuite}"
+      outfile="${filenwtests}"
+      todir="${dirtmp}"/>
+    </junit>
+  </target>
+  
   <!-- create the ZIP file with binaries for Windows and LINUX -->
-  <target name="zip" depends="tests-access,tests-db2,tests-h2,tests-mssql,tests-mysql,tests-oracle,tests-postgres,tests-aw,tests-oe">
+  <target name="zip" depends="tests-access,tests-db2,tests-h2,tests-mssql,tests-mysql,tests-oracle,tests-postgres,tests-aw,tests-oe,tests-nw,tests-dvd">
     <echo message="${ant.project.name}: zip"/>
     <zip zipfile="${dirdist}/${ant.project.name}-${version}.${revision}.zip">
     	
