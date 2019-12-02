@@ -43,7 +43,7 @@ public class DvdRentalTester extends BaseFromDbTester
 		  PostgresConnection connPostgres = (PostgresConnection)dsPostgres.getConnection();
 		  connPostgres.setAutoCommit(false);
 		  /* grant ownership to dvd_rental */
-		  TestPostgresDatabase.grantSchemaUser(connPostgres, "public", "buguser");
+		  TestPostgresDatabase.grantSchemaUser(connPostgres, "public", _sPOSTGRES_DB_USER);
 		  connPostgres.close();
       String[] args = new String[]{
         "-o",
