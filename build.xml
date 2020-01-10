@@ -91,7 +91,7 @@ Created    : 29.08.2016, Hartwig Thomas
   <property name="cpjdbcmssql" value="${dirlib}/${jarjdbcmssql};${dirlib}/${jarmssqljdbc}"/>
   <property name="cpjdbcmssql-test" value="${dirlib}/${jarjdbcmssqltest}"/>
   <!-- jdbcmysql jars -->
-  <property name="jarmysqljdbc" value="mysql-connector-java-8.0.11.jar"/>
+  <property name="jarmysqljdbc" value="mysql-connector-java-8.0.18.jar"/>
   <property name="jarjdbcmysql" value="jdbcmysql.jar"/>
   <property name="jarjdbcmysqltest" value="jdbcmysql-test.jar"/>
   <property name="cpjdbcmysql" value="${dirlib}/${jarjdbcmysql};${dirlib}/${jarmysqljdbc}"/>

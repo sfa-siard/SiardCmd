@@ -27,7 +27,7 @@ Class-Path: siardapi.jar
   jdbcdb2.jar
   db2jcc4.jar
   jdbcmysql.jar
-  mysql-connector-java-8.0.11.jar
+  mysql-connector-java-8.0.18.jar
   jdbcoracle.jar
   ojdbc6.jar
   xdb6.jar

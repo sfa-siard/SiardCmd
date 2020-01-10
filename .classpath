@@ -4,11 +4,11 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="lib" path="lib/sunjdbc.jar" sourcepath="/JdbcAccess/src"/>
 	<classpathentry kind="lib" path="lib/activation-1.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/mysql-connector-java-8.0.11.jar"/>
 	<classpathentry kind="lib" path="lib/jdbcpostgres-test.jar" sourcepath="/JdbcPostgres/test"/>
 	<classpathentry kind="lib" path="lib/jdbcpostgres.jar" sourcepath="/JdbcPostgres/src"/>
 	<classpathentry kind="lib" path="lib/json-simple-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql-42.2.5.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-8.0.18.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
@@ -35,7 +35,7 @@
 	<classpathentry kind="lib" path="lib/jdbcmssql-test.jar"/>
 	<classpathentry kind="lib" path="lib/jdbcmssql.jar"/>
 	<classpathentry kind="lib" path="lib/jdbcmysql-test.jar" sourcepath="/JdbcMySql/test"/>
-	<classpathentry kind="lib" path="lib/jdbcmysql.jar"/>
+	<classpathentry kind="lib" path="lib/jdbcmysql.jar" sourcepath="/JdbcMySql/src"/>
 	<classpathentry kind="lib" path="lib/jdbcoracle-test.jar" sourcepath="/JdbcOracle/test"/>
 	<classpathentry kind="lib" path="lib/jdbcoracle.jar" sourcepath="/JdbcOracle/src"/>
 	<classpathentry kind="lib" path="lib/jts-1.14.jar"/>
