@@ -6,7 +6,7 @@ import org.junit.runners.Suite.*;
 
 @RunWith(Suite.class)
 @SuiteClasses({ 
-	DvdRentalTester.class
+	DvdRentalFromDbTester.class
 })
 public class _DvdTestSuite
 {

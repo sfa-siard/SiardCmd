@@ -10,7 +10,7 @@ import ch.admin.bar.siard2.postgres.*;
 import ch.enterag.utils.*;
 import ch.enterag.utils.base.*;
 
-public class DvdRentalTester extends BaseFromDbTester
+public class DvdRentalFromDbTester extends BaseFromDbTester
 {
   private static final String _sPOSTGRES_DB_URL;
   private static final String _sPOSTGRES_DB_USER;
