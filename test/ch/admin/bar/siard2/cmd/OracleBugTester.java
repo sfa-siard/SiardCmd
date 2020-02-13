@@ -17,12 +17,11 @@ public class OracleBugTester extends BaseFromDbTester
   {
     ConnectionProperties cp = new ConnectionProperties("oracle");
     _sORACLE_DB_URL = OracleDriver.getUrl(cp.getHost() + ":" + cp.getPort() + ":" + cp.getInstance());
-    _sORACLE_DB_USER = "DIGIT_B2";
-    _sORACLE_DB_PASSWORD = "DIGIT_B2";
+    _sORACLE_DB_USER = "BUGUSER";
+    _sORACLE_DB_PASSWORD = "bugpwd";
   }
-  private static final String _sORACLE_SIARD_FILE = "tmp/sfdbsybil.siard";
-  private static final String _sORACLE_METADATA_FILE = "tmp/sfdbsybil.xml";
-  private static final File _fileORACLE_SIARD_FINAL = new File("testfiles/sfdbsybil.siard");
+  private static final String _sORACLE_SIARD_FILE = "tmp/simone.siard";
+  private static final String _sORACLE_METADATA_FILE = "tmp/simone.xml";
 
   @Test
   public void testOracleBugFrom()
@@ -40,8 +39,6 @@ public class OracleBugTester extends BaseFromDbTester
       };
       SiardFromDb sfdb = new SiardFromDb(args);
       assertEquals("SiardFromDb failed!",0, sfdb.getReturn());
-      if (!_fileORACLE_SIARD_FINAL.exists())
-        FU.copy(new File(_sORACLE_SIARD_FILE),_fileORACLE_SIARD_FINAL);
       System.out.println("---------------------------------------");
     }
     catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
