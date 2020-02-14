@@ -20,7 +20,9 @@ import org.junit.runners.Suite.SuiteClasses;
   OracleFromDbTester.class,
   OracleToDbTester.class,
   AwFromDbTester.class,
-  OeFromDbTester.class
+  OeFromDbTester.class,
+  NorthwindFromDbTester.class,
+  DvdRentalFromDbTester.class
 })
 public class _SiardCmdTestSuite {
 

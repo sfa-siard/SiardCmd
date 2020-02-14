@@ -22,7 +22,7 @@ public class MySqlBugTester extends BaseFromDbTester
     _sMYSQL_DB_USER = "buguser";
     _sMYSQL_DB_PASSWORD = "bugpwd";
   }
-  private static final String _sMYSQL_SIARD_FILE = "..\\Bugs\\462\\bugdb.siard";
+  private static final String _sMYSQL_SIARD_FILE = "..\\Bugs\\479\\dvd_rental.siard";
   static
   {
     System.setProperty("java.util.logging.config.file", "etc\\debug.properties");
@@ -41,8 +41,7 @@ public class MySqlBugTester extends BaseFromDbTester
           "-u:"+_sMYSQL_DB_USER,
           "-p:"+_sMYSQL_DB_PASSWORD,
           "-s:"+_sMYSQL_SIARD_FILE,
-          "dbo", _sCATALOG,
-          "sys", _sCATALOG
+          "public", _sCATALOG
       };
       SiardToDb sfdb = new SiardToDb(args);
       assertEquals("SiardToDb failed!",0, sfdb.getReturn());
