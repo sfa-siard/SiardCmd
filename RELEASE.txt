@@ -1,6 +1,9 @@
 Release Notes for SiardCmd 2.1
 ==============================
 
+2.1.171
+Corrected type mapping of Oracle Driver.
+
 2.1.167
 Fixed problem with Postgres domains/types in schema public having an SQL keyword as name.
 (DVD Retail database added as test.)
