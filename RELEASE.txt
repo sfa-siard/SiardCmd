@@ -1,6 +1,9 @@
 Release Notes for SiardCmd 2.1
 ==============================
 
+2.1.172
+Corrected upload of large arrays in Oracle driver.
+
 2.1.171
 Corrected type mapping of Oracle Driver.
 
