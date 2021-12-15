@@ -16,3 +16,6 @@
 # intellij idea project files
 .idea/
 *.iml
+
+# asdf tools configuration
+.tool-versions
