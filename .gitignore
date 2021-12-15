@@ -12,3 +12,7 @@
 # sometimes junit4 produces temporary files that we do not want to check in
 /junit*.*
 /build/
+
+# intellij idea project files
+.idea/
+*.iml
