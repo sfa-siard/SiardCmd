@@ -136,3 +136,13 @@ dbuseraw=aw
 dbpasswordaw=awpwd
 dbauseraw=sa
 dbapasswordaw=sapwd
+
+# -----------------------------------------------------------------------
+# db connection properties for postgresql
+dbhostpostgres=localhost
+dbportpostgres=5432
+dbcatalogpostgres=testschema
+dbuserpostgres=postgres
+dbpasswordpostgres=postgres
+dbauserpostgres=postgres
+dbapasswordpostgres=postgres
