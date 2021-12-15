@@ -1,0 +1,3 @@
+[mysqld]
+#allow larger BLOBs to be stored
+max_allowed_packet = 100M

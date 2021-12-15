@@ -84,7 +84,7 @@ dbapasswordmssql=sapwd
 # ----------------------------------------------------------------------
 # db connection properties for mysql
 # if dbusermysql is undefined, no tests with MySQL databases will be run by build 
-dbhostmysql=vmw10.enterag.ch
+dbhostmysql=localhost
 dbportmysql=3306
 dbcatalogmysql=testschema
 dbusermysql=testuser
