@@ -31,6 +31,8 @@ jobs:
         shell: bash
       - name: check logs of docker-compose
         run: docker-compose logs
+      - name: Build project
+        run: ant -noinput -buildfile build.xml test-access
       - name: MS Access DB Tests
         run: ant -noinput -buildfile build.xml test-access
       - name: PostgresQL DB Tests
