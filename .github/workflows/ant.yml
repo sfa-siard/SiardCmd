@@ -23,5 +23,15 @@ jobs:
         with:
           java-version: '8'
           distribution: 'adopt'
+      - name: run docker-compose
+        run: docker-compose up -d
+        # TODO: find a better way to wait until the database is ready
+      - name: Sleep for 100 seconds
+        run: sleep 100s
+        shell: bash
+      - name: check logs of docker-compose
+        run: docker-compose logs
       - name: MS Access DB Tests
         run: ant -noinput -buildfile build.xml test-access
+      - name: PostgresQL DB Tests
+        run: ant -noinput -buildfile build.xml test-postgres
