@@ -12,10 +12,8 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  test-postgres:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 8
@@ -24,22 +22,29 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
       - name: run docker-compose
-        run: docker-compose up -d
-        # TODO: find a better way to wait until the database is ready
+        run: docker-compose up -d postgres
+      # TODO: find a better way to wait until the database is ready
       - name: Sleep for 100 seconds
         run: sleep 100s
         shell: bash
       - name: check logs of docker-compose
         run: docker-compose logs
-      - name: Build project
-        run: ant -noinput -buildfile build.xml test-access
-      - name: MS Access DB Tests
-        run: ant -noinput -buildfile build.xml test-access
       - name: PostgresQL DB Tests
         run: ant -noinput -buildfile build.xml test-postgres
-        continue-on-error: true
       - name: Upload postgres test output file
         uses: actions/upload-artifact@v2
         with:
           name: postgres-tests.txt
           path: ${{ github.workspace}}/tmp/postgres-tests.txt
+
+  test-access:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+      - name: MS Access DB Tests
+        run: ant -noinput -buildfile build.xml test-access
