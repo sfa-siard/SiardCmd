@@ -386,7 +386,7 @@ Created    : 29.08.2016, Hartwig Thomas
   <!-- run access tests -->
   <property name="classaccesstestsuite" value="ch.admin.bar.siard2.cmd._AccessTestSuite"/>
   <property name="fileaccesstests" value="access-tests"/>
-  <target name="tests-access" depends="tests"  if="dbuseraccess">
+  <target name="test-access" depends="tests"  if="dbuseraccess">
     <echo message="${ant.project.name}: test-access run"/>
     <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
       <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
@@ -737,7 +737,7 @@ Created    : 29.08.2016, Hartwig Thomas
   </target>
   
   <!-- create the ZIP file with binaries for Windows and LINUX -->
-  <target name="zip" depends="tests-access,tests-db2,tests-h2,tests-mssql,tests-mysql,tests-oracle,tests-postgres,tests-aw,tests-oe,tests-nw,tests-dvd">
+  <target name="zip" depends="test-access,tests-db2,tests-h2,tests-mssql,tests-mysql,tests-oracle,tests-postgres,tests-aw,tests-oe,tests-nw,tests-dvd">
     <echo message="${ant.project.name}: zip"/>
     <zip zipfile="${dirdist}/${ant.project.name}-${version}.${revision}.zip">
     	
