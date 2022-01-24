@@ -47,7 +47,7 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
       - name: run docker-compose
-        run: docker-compose up -d
+        run: docker-compose up -d oracle
       # TODO: find a better way to wait until the database is ready
       - name: Sleep for 100 seconds
         run: sleep 100s
@@ -56,6 +56,26 @@ jobs:
         run: docker-compose logs
       - name: Test Oracle DB with Ant
         run: ant -noinput -buildfile build.xml test-oracle
+
+  test-mssql:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+      - name: run docker-compose
+        run: docker-compose up -d mssql
+      # TODO: find a better way to wait until the database is ready
+      - name: Sleep for 100 seconds
+        run: sleep 100s
+        shell: bash
+      - name: check logs of docker-compose
+        run: docker-compose logs
+      - name: Test MS SQL Server with Ant
+        run: ant -noinput -buildfile build.xml test-mssql
 
   test-access:
     runs-on: ubuntu-latest
