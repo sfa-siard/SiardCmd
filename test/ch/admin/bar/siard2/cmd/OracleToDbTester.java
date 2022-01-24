@@ -21,7 +21,7 @@ public class OracleToDbTester
   static
   {
     ConnectionProperties cp = new ConnectionProperties("oracle");
-    _sORACLE_DB_URL = OracleDriver.getUrl(cp.getHost() + ":" + cp.getPort() + ":" + cp.getInstance());
+    _sORACLE_DB_URL = OracleDriver.getUrl(cp.getHost() + ":" + cp.getPort() + "/" + cp.getInstance());
     _sORACLE_DB_USER = cp.getUser();
     _sORACLE_DB_PASSWORD = cp.getPassword();
     _sORACLE_DBA_USER = cp.getDbaUser();

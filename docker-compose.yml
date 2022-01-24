@@ -9,6 +9,14 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - 5432:5432
+  oracle:
+    image: gvenzl/oracle-xe:18.4.0
+    environment:
+      ORACLE_PASSWORD: SYSTEM
+      APP_USER: TESTUSER
+      APP_USER_PASSWORD: testpwd
+    ports:
+      - 1521:1521
   #mysql:
   #  image: mysql:5.7.36
   #  environment:
