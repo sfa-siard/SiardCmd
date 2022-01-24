@@ -35,3 +35,9 @@ jobs:
         run: ant -noinput -buildfile build.xml test-access
       - name: PostgresQL DB Tests
         run: ant -noinput -buildfile build.xml test-postgres
+        continue-on-error: true
+      - name: Upload postgres test output file
+        uses: actions/upload-artifact@v2
+        with:
+          name: postgres-tests.txt
+          path: ${{ github.workspace}}/tmp/postgres-tests.txt
