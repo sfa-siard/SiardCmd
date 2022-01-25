@@ -38,3 +38,16 @@ services:
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
     ports:
       - 3306:3306
+  db2:
+    build:
+      context: ./docker/db2
+      dockerfile: Dockerfile
+    environment:
+      LICENSE: accept
+      DB2INSTANCE: db2inst1
+      DB2INST1_PASSWORD: mypasswd
+      DBNAME: testdb
+    # privileged true is essential - it will not work otherwise!!!
+    privileged: true
+    ports:
+      - 50000:50000
