@@ -57,7 +57,7 @@ ant deploy
 [./doc/manual/developer/index.html](./doc/manual/developer/index.html) is the manual for developers wishing to
 build the binaries or work on the code.  
 
-For building the binaries, Java JDK (1.8 or higher), Ant, and Git must 
+For building the binaries, Java JDK (1.8 or higher) and Ant must 
 have been installed. A copy of build.properties.template must be called 
 build.properties. In it using a text editor the local values must be 
 entered as directed by the comments.
