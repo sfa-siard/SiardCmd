@@ -78,12 +78,6 @@ Created    : 29.08.2016, Hartwig Thomas
   <property name="jardb2jdbc" value="db2jcc4.jar"/>
   <property name="cpjdbcdb2" value="${dirlib}/${jarjdbcdb2};${dirlib}/${jardb2jdbc}"/>
   <property name="cpjdbcdb2-test" value="${dirlib}/${jarjdbcdb2test}"/>
-  <!-- jdbch2 jars -->
-  <property name="jarh2jdbc" value="h2-1.3.176.jar"/>
-  <property name="jarjdbch2" value="jdbch2.jar"/>
-  <property name="jarjdbch2test" value="jdbch2-test.jar"/>
-  <property name="cpjdbch2" value="${dirlib}/${jarjdbch2};${dirlib}/${jarh2jdbc}"/> 
-  <property name="cpjdbch2-test" value="${dirlib}/${jarjdbch2test}"/>
   <!-- jdbcmssql jars -->
   <property name="jarmssqljdbc" value="sqljdbc41.jar"/>
   <property name="jarjdbcmssql" value="jdbcmssql.jar"/>
@@ -221,7 +215,7 @@ Created    : 29.08.2016, Hartwig Thomas
   
   <!-- build the SiardCmd classes -->
   <target name="build" depends="init,revision">
-    <echo message="${ant.project.name}: build (${cpsiardapi};${cpjdbcaccess};${cpjdbcdb2};${cpjdbcmysql};${cpjdbcoracle};${cpjdbcmssql};${cpjdbch2};${cpjdbcbase};${cpenterutils};)"/>
+    <echo message="${ant.project.name}: build (${cpsiardapi};${cpjdbcaccess};${cpjdbcdb2};${cpjdbcmysql};${cpjdbcoracle};${cpjdbcmssql};${cpjdbcbase};${cpenterutils};)"/>
     <!-- without this, the package-info class is not generated! -->
     <touch>
       <fileset dir="${dirsrc}" includes="**/*.*"/>
@@ -238,7 +232,6 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${cpsiardapi}"/>
         <pathelement path="${cpjdbcaccess}"/>
         <pathelement path="${cpjdbcdb2}"/>
-        <pathelement path="${cpjdbch2}"/>
         <pathelement path="${cpjdbcmssql}"/>
         <pathelement path="${cpjdbcmysql}"/>
         <pathelement path="${cpjdbcoracle}"/>
@@ -283,8 +276,6 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${cpjdbcaccess}"/>
         <pathelement path="${cpjdbcdb2}"/>
         <pathelement path="${cpjdbcdb2-test}"/>
-        <pathelement path="${cpjdbch2}"/>
-        <pathelement path="${cpjdbch2-test}"/>
         <pathelement path="${cpjdbcmssql}"/>
         <pathelement path="${cpjdbcmssql-test}"/>
         <pathelement path="${cpjdbcmysql}"/>
@@ -360,39 +351,6 @@ Created    : 29.08.2016, Hartwig Thomas
       <test 
       name="${classdb2testsuite}"
       outfile="${filedb2tests}"
-      todir="${dirtmp}"/>
-    </junit>
-  </target>
-  
-  <!-- run H2 tests -->
-  <property name="classh2testsuite" value="ch.admin.bar.siard2.cmd._H2TestSuite"/>
-  <property name="fileh2tests" value="h2-tests"/>
-  <target name="tests-h2" depends="tests"  if="dbuserh2">
-    <echo message="${ant.project.name}: test-h2 run"/>
-    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
-      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
-      <formatter type="plain"/>
-      <classpath>
-        <pathelement path="${dirbuildtests}"/>
-        <pathelement path="${dirdist}/${jarfile}"/>
-        <pathelement path="${cpantlr}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${cpsqlparser}"/>
-        <pathelement path="${cpjts}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpjdbcbase-test}"/>
-        <pathelement path="${cpjdbch2}"/>
-        <pathelement path="${cpjdbch2-test}"/>
-        <pathelement path="${cpjaxb}"/>
-        <pathelement path="${cpzip64}"/>
-        <pathelement path="${cpwoodstox}"/>
-        <pathelement path="${cpmsv}"/>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpjunit}"/>
-      </classpath>
-      <test 
-      name="${classh2testsuite}"
-      outfile="${fileh2tests}"
       todir="${dirtmp}"/>
     </junit>
   </target>
@@ -654,7 +612,7 @@ Created    : 29.08.2016, Hartwig Thomas
   </target>
   
   <!-- create the ZIP file with binaries for Windows and LINUX -->
-  <target name="zip" depends="test-access,test-db2,tests-h2,test-mssql,test-mysql,test-oracle,test-postgres,tests-aw,tests-oe,tests-nw,tests-dvd">
+  <target name="zip" depends="test-access,test-db2,test-mssql,test-mysql,test-oracle,test-postgres,tests-aw,tests-oe,tests-nw,tests-dvd">
     <echo message="${ant.project.name}: zip"/>
     <zip zipfile="${dirdist}/${ant.project.name}-${version}.${revision}.zip">
     	

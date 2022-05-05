@@ -12,7 +12,6 @@ import ch.enterag.utils.jdbc.*;
 import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.jdbc.*;
 import ch.admin.bar.siard2.jdbcx.*;
-import ch.admin.bar.siard2.h2.*;
 import ch.admin.bar.siard2.mssql.*;
 import ch.admin.bar.siard2.oracle.*;
 import ch.admin.bar.siard2.mysql.*;
@@ -20,17 +19,6 @@ import ch.admin.bar.siard2.db2.*;
 
 public class SiardToOtherTester
 {
-  private static final String _sH2_DB_URL;
-  private static final String _sH2_DB_USER;
-  private static final String _sH2_DB_PASSWORD;
-  static
-  {
-    ConnectionProperties cp = new ConnectionProperties("h2");
-    _sH2_DB_URL = "jdbc:h2:"+cp.getInstance()+"/"+cp.getCatalog();
-    _sH2_DB_USER = cp.getUser();
-    _sH2_DB_PASSWORD = cp.getPassword();
-  }
-  private static final String _sH2_SIARD_FILE = "testfiles\\sfdbh2.siard";
 
   private static final String _sMSSQL_DB_URL;
   private static final String _sMSSQL_DB_USER;
@@ -106,94 +94,6 @@ public class SiardToOtherTester
   }
   
   @Test
-  public void testMsSqlToH2()
-  {
-    System.out.println("testMsSqlToH2");
-    try
-    {
-      /* now upload sample */
-      String[] args = new String[]{
-        "-o",
-        "-j:"+_sH2_DB_URL,
-        "-u:"+_sH2_DB_USER,
-        "-p:"+_sH2_DB_PASSWORD,
-        "-s:"+_sMSSQL_SIARD_FILE
-      };
-      SiardToDb stdb = new SiardToDb(args);
-      assertEquals("SiardToDb failed!",0, stdb.getReturn());
-      System.out.println("---------------------------------------");
-    }
-    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
-    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-  } /* testMsSqlToH2 */
-  
-  @Test
-  public void testOracleToH2()
-  {
-    System.out.println("testOracleToH2");
-    try
-    {
-      /* now upload sample */
-      String[] args = new String[]{
-        "-o",
-        "-j:"+_sH2_DB_URL,
-        "-u:"+_sH2_DB_USER,
-        "-p:"+_sH2_DB_PASSWORD,
-        "-s:"+_sORACLE_SIARD_FILE
-      };
-      SiardToDb stdb = new SiardToDb(args);
-      assertEquals("SiardToDb failed!",0, stdb.getReturn());
-      System.out.println("---------------------------------------");
-    }
-    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
-    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-  } /* testOracleToH2 */
-  
-  @Test
-  public void testMySqlToH2()
-  {
-    System.out.println("testMySqlToH2");
-    try
-    {
-      /* now upload sample */
-      String[] args = new String[]{
-        "-o",
-        "-j:"+_sH2_DB_URL,
-        "-u:"+_sH2_DB_USER,
-        "-p:"+_sH2_DB_PASSWORD,
-        "-s:"+_sMYSQL_SIARD_FILE
-      };
-      SiardToDb stdb = new SiardToDb(args);
-      assertEquals("SiardToDb failed!",0, stdb.getReturn());
-      System.out.println("---------------------------------------");
-    }
-    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
-    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-  } /* testMySqlToH2 */
-  
-  @Test
-  public void testDb2ToH2()
-  {
-    System.out.println("testDb2ToH2");
-    try
-    {
-      /* now upload sample */
-      String[] args = new String[]{
-        "-o",
-        "-j:"+_sH2_DB_URL,
-        "-u:"+_sH2_DB_USER,
-        "-p:"+_sH2_DB_PASSWORD,
-        "-s:"+_sDB2_SIARD_FILE
-      };
-      SiardToDb stdb = new SiardToDb(args);
-      assertEquals("SiardToDb failed!",0, stdb.getReturn());
-      System.out.println("---------------------------------------");
-    }
-    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
-    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-  } /* testDb2ToH2 */
-  
-  @Test
   public void testOracleToMsSql()
   {
     System.out.println("testOracleToMsSql");
@@ -214,28 +114,6 @@ public class SiardToOtherTester
     catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
     catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
   } /* testOracleToMsSql */
-
-  @Test
-  public void testH2ToMsSql()
-  {
-    System.out.println("testH2ToMsSql");
-    try
-    {
-      /* now upload sample */
-      String[] args = new String[]{
-        "-o",
-        "-j:"+_sMSSQL_DB_URL,
-        "-u:"+_sMSSQL_DB_USER,
-        "-p:"+_sMSSQL_DB_PASSWORD,
-        "-s:"+_sH2_SIARD_FILE,
-      };
-      SiardToDb stdb = new SiardToDb(args);
-      assertEquals("SiardToDb failed!",0, stdb.getReturn());
-      System.out.println("---------------------------------------");
-    }
-    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
-    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-  } /* testH2ToMsSql */
 
   @Test
   public void testMySqlToMsSql()
@@ -306,32 +184,6 @@ public class SiardToOtherTester
     catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
     catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
   } /* testMsSqlToOracle */
-
-  @Test
-  public void testH2ToOracle()
-  {
-    System.out.println("testH2ToDb");
-    try
-    {
-      // now upload sample
-      String[] args = new String[]{
-        "-o",
-        "-j:"+_sORACLE_DB_URL,
-        "-u:"+_sORACLE_DBA_USER,
-        "-p:"+_sORACLE_DBA_PASSWORD,
-        "-s:"+_sH2_SIARD_FILE,
-        "SampleSchema", _sORACLE_DB_USER,
-        TestH2Database._sTEST_SCHEMA, TestOracleDatabase._sTEST_SCHEMA,
-        ch.admin.bar.siard2.h2.TestSqlDatabase._sTEST_SCHEMA,
-        ch.admin.bar.siard2.oracle.TestSqlDatabase._sTEST_SCHEMA
-      };
-      SiardToDb stdb = new SiardToDb(args);
-      assertEquals("SiardToDb failed!",0, stdb.getReturn());
-      System.out.println("---------------------------------------");
-    }
-    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
-    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-  } /* testH2ToOracle */
 
   @Test
   public void testMySqlToOracle()
@@ -452,28 +304,6 @@ public class SiardToOtherTester
   } /* testDb2ToMySql */
   
   @Test
-  public void testH2ToMySql()
-  {
-    System.out.println("testH2ToMySql");
-    try
-    {
-      /* now upload sample */
-      String[] args = new String[]{
-        "-o",
-        "-j:"+_sMYSQL_DB_URL,
-        "-u:"+_sMYSQL_DB_USER,
-        "-p:"+_sMYSQL_DB_PASSWORD,
-        "-s:"+_sH2_SIARD_FILE
-      };
-      SiardToDb stdb = new SiardToDb(args);
-      assertEquals("SiardToDb failed!",0, stdb.getReturn());
-      System.out.println("---------------------------------------");
-    }
-    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
-    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-  } /* testH2ToMySql */
-  
-  @Test
   public void testMsSqlToDb2()
   {
     System.out.println("testMsSqlToDb2");
@@ -538,28 +368,6 @@ public class SiardToOtherTester
     catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
     catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
   } /* testMySqlToDb2 */
-  
-  @Test
-  public void testH2ToDb2()
-  {
-    System.out.println("testH2ToDb2");
-    try
-    {
-      /* now upload sample */
-      String[] args = new String[]{
-        "-o",
-        "-j:"+_sDB2_DB_URL,
-        "-u:"+_sDB2_DB_USER,
-        "-p:"+_sDB2_DB_PASSWORD,
-        "-s:"+_sH2_SIARD_FILE
-      };
-      SiardToDb stdb = new SiardToDb(args);
-      assertEquals("SiardToDb failed!",0, stdb.getReturn());
-      System.out.println("---------------------------------------");
-    }
-    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
-    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-  } /* testH2ToDb2 */
 
   // execute a single DDL statement
   // N.B.: It is important that AutoCommit on connection is set to false!
