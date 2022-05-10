@@ -47,7 +47,7 @@ Valid values for `db-name`
 Run all tests and create release:
 
 ```shell
-ant deploy
+ant release
 ```
 
 

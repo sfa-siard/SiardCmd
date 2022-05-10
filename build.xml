@@ -214,7 +214,7 @@ Created    : 29.08.2016, Hartwig Thomas
   </target>
   
   <!-- build the SiardCmd classes -->
-  <target name="build" depends="init,revision">
+  <target name="build" depends="init">
     <echo message="${ant.project.name}: build (${cpsiardapi};${cpjdbcaccess};${cpjdbcdb2};${cpjdbcmysql};${cpjdbcoracle};${cpjdbcmssql};${cpjdbcbase};${cpenterutils};)"/>
     <!-- without this, the package-info class is not generated! -->
     <touch>
@@ -241,10 +241,22 @@ Created    : 29.08.2016, Hartwig Thomas
       </classpath>
     </javac>
   </target>
-  
+
+  <!-- create the JAR file containing all classes whithout manifest-->
+  <property name="jarfile" value="${ant.project.name}.jar"/>
+  <target name="jar-test" depends="build">
+    <echo message="${ant.project.name}: jar"/>
+    <jar jarfile="${dirdist}/${jarfile}">
+      <fileset dir="${dirbuildclasses}">
+        <include name="**/*.class"/>
+        <include name="**/res/*.*"/>
+      </fileset>
+    </jar>
+  </target>
+
   <!-- create the JAR file containing all classes -->
   <property name="jarfile" value="${ant.project.name}.jar"/>
-  <target name="jar" depends="build">
+  <target name="jar" depends="tests, revision">
     <echo message="${ant.project.name}: jar"/>
     <jar jarfile="${dirdist}/${jarfile}"
        manifest="${filemanifest}">
@@ -256,7 +268,7 @@ Created    : 29.08.2016, Hartwig Thomas
   </target>
 	
 	<!-- create all tests -->
-	<target name="tests" depends="jar">
+	<target name="tests" depends="jar-test">
     <echo message="${ant.project.name}: tests build"/>
 		<!-- build the tests -->
     <javac debug="true" debuglevel="${debuglevel}"
@@ -612,7 +624,7 @@ Created    : 29.08.2016, Hartwig Thomas
   </target>
   
   <!-- create the ZIP file with binaries for Windows and LINUX -->
-  <target name="zip" depends="test-access,test-db2,test-mssql,test-mysql,test-oracle,test-postgres,tests-aw,tests-oe,tests-nw,tests-dvd">
+  <target name="release" depends="test-access,test-db2,test-mssql,test-mysql,test-oracle,test-postgres,tests-aw,tests-oe,tests-nw,tests-dvd">
     <echo message="${ant.project.name}: zip"/>
     <zip zipfile="${dirdist}/${ant.project.name}-${version}.${revision}.zip">
     	
