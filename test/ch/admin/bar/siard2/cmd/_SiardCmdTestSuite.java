@@ -11,8 +11,6 @@ import org.junit.runners.Suite.SuiteClasses;
   AccessToDbTester.class,
   Db2FromDbTester.class,
   Db2ToDbTester.class,
-  H2FromDbTester.class,
-  H2ToDbTester.class,
   MsSqlFromDbTester.class,
   MsSqlToDbTester.class,
   MySqlFromDbTester.class,

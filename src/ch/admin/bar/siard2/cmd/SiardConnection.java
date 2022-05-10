@@ -85,9 +85,6 @@ public class SiardConnection extends Properties
     propDrivers.put(AccessDriver.sACCESS_SCHEME, AccessDriver.class.getName());
     propDrivers.put(AccessDriver.sACCESS_SCHEME+sTITLE_SUFFIX, "Microsoft Access");
     propDrivers.put(AccessDriver.sACCESS_SCHEME+sSAMPLE_SUFFIX, "jdbc:access:D:\\Projekte\\SIARD2\\JdbcAccess\\testfiles\\dbfile.mdb");
-    propDrivers.put(H2Driver.sH2_SCHEME, H2Driver.class.getName());
-    propDrivers.put(H2Driver.sH2_SCHEME+sTITLE_SUFFIX, "H2 database");
-    propDrivers.put(H2Driver.sH2_SCHEME+sSAMPLE_SUFFIX, "jdbc:h2:D:/Projekte/SIARD2/JdbcH2/data/prefixdbfile");
     return propDrivers;
   } /* getJdbcDriversDefaultProperties */
 
