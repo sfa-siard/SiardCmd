@@ -665,5 +665,30 @@ Created    : 29.08.2016, Hartwig Thomas
     <unzip dest="${dirdeploy}" src="${dirdist}/${ant.project.name}-${version}.${revision}.zip" />
   	<chmod dir="${dirdeploy}" perm="ugo+rx" includes="**/*.sh"/>
   </target>
+
+  <!-- commit local work -->
+  <target name="copy-dependencies" depends="check">
+    <echo message="Copy jar files from dependency projects on local file system"/>
+    <copy file="../EnterUtilities/dist/enterutils.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../SqlParser/dist/sqlparser.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../Zip64File/dist/zip64.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../SiardApi/dist/siardapi.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcBase/dist/jdbcbase.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcBase/dist/jdbcbase-test.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcAccess/dist/jdbcaccess.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcAccess/dist/jdbcaccess-test.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcDb2/dist/jdbcdb2.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcDb2/dist/jdbcdb2-test.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcH2/dist/jdbch2.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcH2/dist/jdbch2-test.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcMsSql/dist/jdbcmssql.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcMsSql/dist/jdbcmssql-test.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcMySql/dist/jdbcmysql.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcMySql/dist/jdbcmysql-test.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcOracle/dist/jdbcoracle.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcOracle/dist/jdbcoracle-test.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcPostgres/dist/jdbcpostgres.jar" todir="${dirlib}" failonerror="false"/>
+    <copy file="../JdbcPostgres/dist/jdbcpostgres-test.jar" todir="${dirlib}" failonerror="false"/>
+  </target>
   
 </project>
