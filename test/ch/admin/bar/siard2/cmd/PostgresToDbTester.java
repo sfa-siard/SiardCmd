@@ -27,88 +27,88 @@ public class PostgresToDbTester extends BaseFromDbTester
     _sPOSTGRES_DBA_USER = cp.getDbaUser();
     _sPOSTGRES_DBA_PASSWORD = cp.getDbaPassword();
   }
-  private static final String _sPOSTGRES_SAMPLE_FILE = "testfiles/sample.siard";
+
+
+  private static final String TESTFILES_SAMPLE_2_2_SIARD = "testfiles/sample-2.2.siard";
+
+  private static final String SAMPLE_2_1_SIARD = "testfiles/sample.siard"; // TODO: rename file
   private static final String _sPOSTGRES_SIARD_FILE = "testfiles/sfdbpostgres.siard";
 
   @Test
-  public void testPostgresToPostgres()
-  {
+  public void testPostgresToPostgres() throws SQLException, IOException {
     System.out.println("testPostgresToPostgres");
-    try
-    {
-      // now upload sample
-      String[] args = new String[]{
-        "-o",
-        "-j:"+_sPOSTGRES_DB_URL,
-        "-u:"+_sPOSTGRES_DBA_USER,
-        "-p:"+_sPOSTGRES_DBA_PASSWORD,
-        "-s:"+_sPOSTGRES_SIARD_FILE,
-        "pg_catalog", "testschema",
-        "testpgschema", "testschema"
-      };
-      SiardToDb stdb = new SiardToDb(args);
-      assertEquals("SiardToDb failed!",0, stdb.getReturn());
-      System.out.println("---------------------------------------");
-    }
-    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
-    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-  } /* testPostgresToPostgres */
+    // now upload sample
+    String[] args = new String[]{
+            "-o",
+            "-j:" + _sPOSTGRES_DB_URL,
+            "-u:" + _sPOSTGRES_DBA_USER,
+            "-p:" + _sPOSTGRES_DBA_PASSWORD,
+            "-s:" + _sPOSTGRES_SIARD_FILE,
+            "pg_catalog", "testschema",
+            "testpgschema", "testschema"
+    };
+    SiardToDb stdb = new SiardToDb(args);
+    assertEquals("SiardToDb failed!", 0, stdb.getReturn());
+    System.out.println("---------------------------------------");
+  }
 
   @Test
-  public void testSampleToPostgres()
-  {
-    System.out.println("testSampleToPostgres");
-    try
-    {
-      PostgresDataSource dsPostgres = new PostgresDataSource();
-      dsPostgres.setUrl(_sPOSTGRES_DB_URL);
-      dsPostgres.setUser(_sPOSTGRES_DBA_USER);
-      dsPostgres.setPassword(_sPOSTGRES_DBA_PASSWORD);
-      PostgresConnection connPostgres = (PostgresConnection)dsPostgres.getConnection();
-      connPostgres.setAutoCommit(false);
-      try
-      {
-	    	Statement stmt = connPostgres.createStatement();
-	    	stmt.executeUpdate("DROP SCHEMA "+_sPOSTGRES_TEST_SCHEMA+" CASCADE");
-	    	stmt.close();
-	    	connPostgres.commit();
-      }
-      catch(SQLException se) 
-      {
-        System.out.println(EU.getExceptionMessage(se));
-        /* terminate transaction */
-        try { connPostgres.rollback(); }
-        catch(SQLException seRollback) { System.out.println("Rollback failed with "+EU.getExceptionMessage(seRollback)); }
-      }
-      Statement stmt = connPostgres.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
-      String sSql = "CREATE SCHEMA "+_sPOSTGRES_TEST_SCHEMA+" AUTHORIZATION "+_sPOSTGRES_DB_USER;
-      int iResult = stmt.executeUpdate(sSql);
+  public void testSample22ToPostgres() throws SQLException, IOException {
+    archiveToPostgres(TESTFILES_SAMPLE_2_2_SIARD);
+  }
+
+  @Test
+  public void testSample21ToPostgres() throws SQLException, IOException {
+    archiveToPostgres(SAMPLE_2_1_SIARD);
+  }
+
+  private void archiveToPostgres(String siardFile) throws SQLException, IOException {
+    PostgresDataSource dsPostgres = new PostgresDataSource();
+    dsPostgres.setUrl(_sPOSTGRES_DB_URL);
+    dsPostgres.setUser(_sPOSTGRES_DBA_USER);
+    dsPostgres.setPassword(_sPOSTGRES_DBA_PASSWORD);
+    PostgresConnection connPostgres = (PostgresConnection) dsPostgres.getConnection();
+    connPostgres.setAutoCommit(false);
+    try {
+      Statement stmt = connPostgres.createStatement();
+      stmt.executeUpdate("DROP SCHEMA " + _sPOSTGRES_TEST_SCHEMA + " CASCADE");
       stmt.close();
-      if (iResult == 0)
-        connPostgres.commit();
-      else
-      {
+      connPostgres.commit();
+    } catch (SQLException se) {
+      System.out.println(EU.getExceptionMessage(se));
+      /* terminate transaction */
+      try {
         connPostgres.rollback();
-        fail(sSql + " failed!");
+      } catch (SQLException seRollback) {
+        System.out.println("Rollback failed with " + EU.getExceptionMessage(seRollback));
       }
-      TestPostgresDatabase.grantSchemaUser(connPostgres, _sPOSTGRES_TEST_SCHEMA, _sPOSTGRES_DB_USER);
-      connPostgres.close();
-      /* now upload sample */
-      String[] args = new String[]{
-        "-o",
-        "-j:"+_sPOSTGRES_DB_URL,
-        "-u:"+_sPOSTGRES_DB_USER,
-        "-p:"+_sPOSTGRES_DB_PASSWORD,
-        "-s:"+_sPOSTGRES_SAMPLE_FILE,
-        "pg_catalog", "testschema",
-        "SampleSchema", "testschema"
-      };
-      SiardToDb stdb = new SiardToDb(args);
-      assertEquals("SiardToDb failed!",0, stdb.getReturn());
-      System.out.println("---------------------------------------");
     }
-    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
-    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-  } /* testSampleToPostgres */
+    Statement stmt = connPostgres.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+    String sSql = "CREATE SCHEMA " + _sPOSTGRES_TEST_SCHEMA + " AUTHORIZATION " + _sPOSTGRES_DB_USER;
+    int iResult = stmt.executeUpdate(sSql);
+    stmt.close();
+    if (iResult == 0)
+      connPostgres.commit();
+    else {
+      connPostgres.rollback();
+      fail(sSql + " failed!");
+    }
+    TestPostgresDatabase.grantSchemaUser(connPostgres, _sPOSTGRES_TEST_SCHEMA, _sPOSTGRES_DB_USER);
+    connPostgres.close();
+    /* now upload sample */
+
+    String[] args = new String[]{
+            "-o",
+            "-j:" + _sPOSTGRES_DB_URL,
+            "-u:" + _sPOSTGRES_DB_USER,
+            "-p:" + _sPOSTGRES_DB_PASSWORD,
+            "-s:" + siardFile,
+            "pg_catalog", "testschema",
+            "SampleSchema", "testschema"
+    };
+    SiardToDb stdb = new SiardToDb(args);
+    assertEquals("SiardToDb failed!", 0, stdb.getReturn());
+    System.out.println("---------------------------------------");
+  }
 
 }
