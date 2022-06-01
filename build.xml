@@ -214,7 +214,7 @@ Created    : 29.08.2016, Hartwig Thomas
   </target>
   
   <!-- build the SiardCmd classes -->
-  <target name="build" depends="init">
+  <target name="build" depends="init,copy-dependencies">
     <echo message="${ant.project.name}: build (${cpsiardapi};${cpjdbcaccess};${cpjdbcdb2};${cpjdbcmysql};${cpjdbcoracle};${cpjdbcmssql};${cpjdbcbase};${cpenterutils};)"/>
     <!-- without this, the package-info class is not generated! -->
     <touch>
