@@ -34,7 +34,7 @@ public class PostgresToDbTester extends BaseFromDbTester
     return cp.getHost() + ":" + cp.getPort() + "/" + cp.getCatalog();
   }
 
-  private static final String TESTFILES_SAMPLE_2_2_SIARD = "testfiles/sample-2.2.siard";
+  private static final String TESTFILES_SAMPLE_2_2_SIARD = "testfiles/sample-datalink-2.2.siard";
 
   private static final String SAMPLE_2_1_SIARD = "testfiles/sample.siard"; // TODO: rename file
   private static final String POSTGRES_SIARD_FILE = "testfiles/sfdbpostgres.siard";

@@ -10,6 +10,7 @@ package ch.admin.bar.siard2.cmd;
 
 import java.io.*;
 import java.math.*;
+import java.net.URL;
 import java.sql.*;
 import java.util.*;
 
@@ -293,6 +294,9 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
           case Types.TIMESTAMP:
             o = value.getTimestamp();
             break;
+          case Types.DATALINK:
+            o = value.getString();
+            break;
           case Types.OTHER:
             o = value.getDuration();
             break;
@@ -411,14 +415,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       setResources.clear();
       rs.moveToInsertRow();
       putRecord(record,rs,setResources);
-      /***
-      ResultSetMetaData rsmd = rs.getMetaData();
-      for (int i = 0; i < rsmd.getColumnCount(); i++)
-      {
-        Object o = rs.getObject(i+1);
-        System.out.println(String.valueOf(i)+". "+rsmd.getColumnName(i+1)+"/"+rsmd.getColumnLabel(i+1)+": "+o.toString());
-      }
-      ***/
       rs.insertRow();
       freeResources(setResources);
       rs.moveToCurrentRow();
