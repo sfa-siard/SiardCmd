@@ -10,6 +10,7 @@ package ch.admin.bar.siard2.cmd;
 
 import java.io.*;
 import java.math.*;
+import java.net.URL;
 import java.sql.*;
 import javax.xml.datatype.*;
 
@@ -121,6 +122,10 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
         value.setInputStream(blob.getBinaryStream());
         blob.free();
       }
+      else if (oValue instanceof URL) {
+        URL url = (URL) oValue;
+        value.setInputStream(url.openStream());
+      }
       else if (oValue instanceof Array)
       {
         Array array = (Array)oValue;
@@ -207,6 +212,9 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
           break;
         case Types.BLOB:
           oValue = rs.getBlob(iPosition);
+          break;
+        case Types.DATALINK:
+          oValue = rs.getURL(iPosition);
           break;
         case Types.BOOLEAN:
           oValue = Boolean.valueOf(rs.getBoolean(iPosition));

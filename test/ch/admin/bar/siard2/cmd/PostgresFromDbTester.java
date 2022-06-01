@@ -31,47 +31,44 @@ public class PostgresFromDbTester extends BaseFromDbTester
   private static final File _filePOSTGRES_SIARD_FINAL = new File("testfiles/sfdbpostgres.siard");
 
   @Test
-  public void testPostgresFromDb()
-  {
+  public void testPostgresFromDb() throws SQLException, IOException, ClassNotFoundException {
     System.out.println("testPostgresFromDb");
-    try
-    {
-      PostgresDataSource dsPostgres = new PostgresDataSource();
-      dsPostgres.setUrl(_sPOSTGRES_DB_URL);
-      dsPostgres.setUser(_sPOSTGRES_DBA_USER);
-      dsPostgres.setPassword(_sPOSTGRES_DBA_PASSWORD);
-      PostgresConnection connPostgres = (PostgresConnection)dsPostgres.getConnection();
-      clearDatabase(connPostgres,
-        "testschema",
-        TestPostgresDatabase._sTEST_SCHEMA, 
-        ch.admin.bar.siard2.postgres.TestSqlDatabase._sTEST_SCHEMA,
-        null);
-      // dropTables(connPostgres,"public","TABLE");
-      /* drop and create the test database */
-      System.out.println("Create TestSqlDatabase");
-      new ch.admin.bar.siard2.postgres.TestSqlDatabase(connPostgres,_sPOSTGRES_DB_USER);
-      TestPostgresDatabase.grantSchemaUser(connPostgres, TestSqlDatabase._sTEST_SCHEMA, _sPOSTGRES_DB_USER);
-      System.out.println("Create TestPostgresDatabase");
-      new TestPostgresDatabase(connPostgres,_sPOSTGRES_DB_USER);
-      TestPostgresDatabase.grantSchemaUser(connPostgres, TestPostgresDatabase._sTEST_SCHEMA, _sPOSTGRES_DB_USER);
-      connPostgres.close();
-      String[] args = new String[]{
-        "-o",
-        "-j:"+_sPOSTGRES_DB_URL,
-        "-u:"+_sPOSTGRES_DB_USER,
-        "-p:"+_sPOSTGRES_DB_PASSWORD,
-        "-e:"+_sPOSTGRES_METADATA_FILE,
-        "-s:"+_sPOSTGRES_SIARD_FILE
-      };
-      SiardFromDb sfdb = new SiardFromDb(args);
-      assertEquals("SiardFromDb failed!",0, sfdb.getReturn());
-      if (!_filePOSTGRES_SIARD_FINAL.exists())
-        FU.copy(new File(_sPOSTGRES_SIARD_FILE),_filePOSTGRES_SIARD_FINAL);
-      System.out.println("---------------------------------------");
+
+    PostgresDataSource dsPostgres = new PostgresDataSource();
+    dsPostgres.setUrl(_sPOSTGRES_DB_URL);
+    dsPostgres.setUser(_sPOSTGRES_DBA_USER);
+    dsPostgres.setPassword(_sPOSTGRES_DBA_PASSWORD);
+    PostgresConnection connPostgres = (PostgresConnection) dsPostgres.getConnection();
+    clearDatabase(connPostgres,
+            "testschema",
+            TestPostgresDatabase._sTEST_SCHEMA,
+            ch.admin.bar.siard2.postgres.TestSqlDatabase._sTEST_SCHEMA,
+            null);
+
+    // dropTables(connPostgres,"public","TABLE");
+    System.out.println("Create TestSqlDatabase");
+    new ch.admin.bar.siard2.postgres.TestSqlDatabase(connPostgres, _sPOSTGRES_DB_USER);
+    TestPostgresDatabase.grantSchemaUser(connPostgres, TestSqlDatabase._sTEST_SCHEMA, _sPOSTGRES_DB_USER);
+    System.out.println("Create TestPostgresDatabase");
+    new TestPostgresDatabase(connPostgres, _sPOSTGRES_DB_USER);
+    TestPostgresDatabase.grantSchemaUser(connPostgres, TestPostgresDatabase._sTEST_SCHEMA, _sPOSTGRES_DB_USER);
+    connPostgres.close();
+
+    String[] args = new String[]{
+            "-o",
+            "-j:" + _sPOSTGRES_DB_URL,
+            "-u:" + _sPOSTGRES_DB_USER,
+            "-p:" + _sPOSTGRES_DB_PASSWORD,
+            "-e:" + _sPOSTGRES_METADATA_FILE,
+            "-s:" + _sPOSTGRES_SIARD_FILE
+    };
+    SiardFromDb sfdb = new SiardFromDb(args);
+
+    assertEquals("SiardFromDb failed!", 0, sfdb.getReturn());
+    if (!_filePOSTGRES_SIARD_FINAL.exists()) {
+      FU.copy(new File(_sPOSTGRES_SIARD_FILE), _filePOSTGRES_SIARD_FINAL);
     }
-    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
-    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-    catch(ClassNotFoundException cnfe) { fail(EU.getExceptionMessage(cnfe)); }
-  } /* testPostgresFromDb */
-  
+    System.out.println("---------------------------------------");
+  }
+
 }
