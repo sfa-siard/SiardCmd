@@ -26,9 +26,8 @@ public class PostgresFromDbTester extends BaseFromDbTester
     _sPOSTGRES_DBA_USER = cp.getDbaUser();
     _sPOSTGRES_DBA_PASSWORD = cp.getDbaPassword();
   }
-  private static final String _sPOSTGRES_SIARD_FILE = "tmp/sfdbpostgres.siard";
-  private static final String _sPOSTGRES_METADATA_FILE = "tmp/sfdbpostgres.xml";
-  private static final File _filePOSTGRES_SIARD_FINAL = new File("testfiles/sfdbpostgres.siard");
+  private static final String _sPOSTGRES_SIARD_FILE = "testfiles/sfdbpostgres.siard";
+  private static final String _sPOSTGRES_METADATA_FILE = "testfiles/sfdbpostgres.xml";
 
   @Test
   public void testPostgresFromDb() throws SQLException, IOException, ClassNotFoundException {
@@ -38,20 +37,23 @@ public class PostgresFromDbTester extends BaseFromDbTester
     dsPostgres.setUrl(_sPOSTGRES_DB_URL);
     dsPostgres.setUser(_sPOSTGRES_DBA_USER);
     dsPostgres.setPassword(_sPOSTGRES_DBA_PASSWORD);
+
     PostgresConnection connPostgres = (PostgresConnection) dsPostgres.getConnection();
     clearDatabase(connPostgres,
             "testschema",
             TestPostgresDatabase._sTEST_SCHEMA,
             ch.admin.bar.siard2.postgres.TestSqlDatabase._sTEST_SCHEMA,
             null);
-
     // dropTables(connPostgres,"public","TABLE");
+
     System.out.println("Create TestSqlDatabase");
     new ch.admin.bar.siard2.postgres.TestSqlDatabase(connPostgres, _sPOSTGRES_DB_USER);
     TestPostgresDatabase.grantSchemaUser(connPostgres, TestSqlDatabase._sTEST_SCHEMA, _sPOSTGRES_DB_USER);
+
     System.out.println("Create TestPostgresDatabase");
     new TestPostgresDatabase(connPostgres, _sPOSTGRES_DB_USER);
     TestPostgresDatabase.grantSchemaUser(connPostgres, TestPostgresDatabase._sTEST_SCHEMA, _sPOSTGRES_DB_USER);
+
     connPostgres.close();
 
     String[] args = new String[]{
@@ -62,12 +64,11 @@ public class PostgresFromDbTester extends BaseFromDbTester
             "-e:" + _sPOSTGRES_METADATA_FILE,
             "-s:" + _sPOSTGRES_SIARD_FILE
     };
+
     SiardFromDb sfdb = new SiardFromDb(args);
 
     assertEquals("SiardFromDb failed!", 0, sfdb.getReturn());
-    if (!_filePOSTGRES_SIARD_FINAL.exists()) {
-      FU.copy(new File(_sPOSTGRES_SIARD_FILE), _filePOSTGRES_SIARD_FINAL);
-    }
+
     System.out.println("---------------------------------------");
   }
 
