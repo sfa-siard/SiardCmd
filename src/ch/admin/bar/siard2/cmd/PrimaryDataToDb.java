@@ -215,7 +215,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
    * @throws IOException if an I/O error occurred.
    * @throws SQLException if a database error occurred.
    */
-  private Object getValue(Value value, Connection conn, Set<Object> setResources)
+  private Object getValue(Value value, ch.enterag.utils.jdbc.BaseConnection conn, Set<Object> setResources)
     throws IOException, SQLException
   {
     Object o = null;
@@ -294,9 +294,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
           case Types.TIMESTAMP:
             o = value.getTimestamp();
             break;
-          case Types.DATALINK:
-            o = value.getString();
-            break;
           case Types.OTHER:
             o = value.getDuration();
             break;
@@ -318,12 +315,21 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
             o = nclob;
             setResources.add(o);
             break;
-          case Types.BLOB:
+          case Types.BLOB: {
             Blob blob = conn.createBlob();
-            copyFromInputToOutput(value.getInputStream(),blob.setBinaryStream(1));
+            copyFromInputToOutput(value.getInputStream(), blob.setBinaryStream(1));
             o = blob;
             setResources.add(o);
             break;
+          }
+          case Types.DATALINK: {
+            Object obj = conn.createDatalinkObject();
+            if (obj instanceof Blob) {
+              setResources.add(obj);
+            }
+            o = obj;
+            break;
+          }
         } /* switch */
       }
       else if (iCardinality >= 0)
@@ -378,7 +384,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       Value value = listValues.get(iValue);
       if (!value.isNull())
       {
-        Object oValue = getValue(value,rs.getStatement().getConnection(),setResources);
+        Object oValue = getValue(value, (ch.enterag.utils.jdbc.BaseConnection) rs.getStatement().getConnection(),setResources);
         rs.updateObject(iValue+1, oValue);
       } /* if not NULL */
     } /* loop over values */
