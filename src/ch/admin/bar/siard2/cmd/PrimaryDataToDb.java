@@ -325,6 +325,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
           case Types.DATALINK: {
             Object obj = conn.createDatalinkObject();
             if (obj instanceof Blob) {
+              copyFromInputToOutput(value.getInputStream(), ((Blob) obj).setBinaryStream(1));
               setResources.add(obj);
             }
             o = obj;
