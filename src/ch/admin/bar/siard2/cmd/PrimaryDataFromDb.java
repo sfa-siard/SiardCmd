@@ -124,7 +124,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       }
       else if (oValue instanceof URL) {
         URL url = (URL) oValue;
-        value.setInputStream(url.openStream());
+        value.setInputStream(url.openStream(), url.getPath());
       }
       else if (oValue instanceof Array)
       {
