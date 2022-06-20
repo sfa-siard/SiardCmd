@@ -27,7 +27,7 @@ public class MySqlToDbTester
     _sMYSQL_DBA_USER = cp.getDbaUser();
     _sMYSQL_DBA_PASSWORD = cp.getDbaPassword();
   }
-  private static final String _sMYSQL_SAMPLE_FILE = "testfiles/sample.siard";
+  private static final String _sMYSQL_SAMPLE_FILE = "testfiles/test.siard";
   private static final String _sMYSQL_SIARD_FILE = "testfiles/sfdbmysql.siard";
   private static final File _fileMYSQL_EXT_LOBS = new File("testfiles/lobs");
   private static final File _fileMYSQL_TMP_LOBS = new File("tmp/lobs");
@@ -37,7 +37,6 @@ public class MySqlToDbTester
   {
     System.setProperty("ch.admin.bar.siard2.cmd.drivers","etc/jdbcdrivers.properties");
   }
-  
 
   @Test
   public void testMySqlToMySql()
