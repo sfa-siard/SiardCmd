@@ -252,8 +252,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
         {
           case Types.CHAR:
           case Types.VARCHAR:
-            o = value.getString();
-            break;
           case Types.NCHAR:
           case Types.NVARCHAR:
             o = value.getString();
@@ -266,8 +264,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
             o = value.getBoolean();
             break;
           case Types.SMALLINT:
-            o = value.getLong();
-            break;
           case Types.INTEGER:
             o = value.getLong();
             break;
