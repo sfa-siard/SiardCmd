@@ -23,8 +23,7 @@ public class MsSqlToDbTester
     _sMSSQL_DB_USER = cp.getUser();
     _sMSSQL_DB_PASSWORD = cp.getPassword();
   }
-  // private static final String _sMSSQL_SIARD_FILE = "testfiles/sfdbmssql.siard";
-  private static final String _sMSSQL_SAMPLE_FILE = "testfiles/sample.siard";
+  private static final String _sMSSQL_SAMPLE_FILE = "testfiles/test.siard";
   private static final String _sMSSQL_SIARD_FILE = "testfiles/sfdbmssql.siard";
   
   /* In JUnit testing getMainJar-relative addressing is not useful */
@@ -53,28 +52,22 @@ public class MsSqlToDbTester
     }
     catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
     catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-  } /* testMsSqlToMsSql */
+  }
 
   @Test
-  public void testSampleToMsSql()
-  {
+  public void testSampleToMsSql() throws SQLException, IOException {
     System.out.println("testSampleToMsSql");
-    try
-    {
-      /* now upload sample */
-      String[] args = new String[]{
-        "-o",
-        "-j:"+_sMSSQL_DB_URL,
-        "-u:"+_sMSSQL_DB_USER,
-        "-p:"+_sMSSQL_DB_PASSWORD,
-        "-s:"+_sMSSQL_SAMPLE_FILE,
-      };
-      SiardToDb stdb = new SiardToDb(args);
-      assertEquals("SiardToDb failed!",0, stdb.getReturn());
-      System.out.println("---------------------------------------");
-    }
-    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
-    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-  } /* testSampleToMsSql */
+    /* now upload sample */
+    String[] args = new String[]{
+            "-o",
+            "-j:" + _sMSSQL_DB_URL,
+            "-u:" + _sMSSQL_DB_USER,
+            "-p:" + _sMSSQL_DB_PASSWORD,
+            "-s:" + _sMSSQL_SAMPLE_FILE,
+    };
+    SiardToDb stdb = new SiardToDb(args);
+    assertEquals("SiardToDb failed!", 0, stdb.getReturn());
+    System.out.println("---------------------------------------");
+  }
 
 }

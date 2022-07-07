@@ -10,6 +10,7 @@ package ch.admin.bar.siard2.cmd;
 
 import java.io.*;
 import java.math.*;
+import java.net.URL;
 import java.sql.*;
 import java.util.*;
 
@@ -214,7 +215,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
    * @throws IOException if an I/O error occurred.
    * @throws SQLException if a database error occurred.
    */
-  private Object getValue(Value value, Connection conn, Set<Object> setResources)
+  private Object getValue(Value value, ch.enterag.utils.jdbc.BaseConnection conn, Set<Object> setResources)
     throws IOException, SQLException
   {
     Object o = null;
@@ -251,8 +252,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
         {
           case Types.CHAR:
           case Types.VARCHAR:
-            o = value.getString();
-            break;
           case Types.NCHAR:
           case Types.NVARCHAR:
             o = value.getString();
@@ -265,8 +264,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
             o = value.getBoolean();
             break;
           case Types.SMALLINT:
-            o = value.getLong();
-            break;
           case Types.INTEGER:
             o = value.getLong();
             break;
@@ -314,12 +311,22 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
             o = nclob;
             setResources.add(o);
             break;
-          case Types.BLOB:
+          case Types.BLOB: {
             Blob blob = conn.createBlob();
-            copyFromInputToOutput(value.getInputStream(),blob.setBinaryStream(1));
+            copyFromInputToOutput(value.getInputStream(), blob.setBinaryStream(1));
             o = blob;
             setResources.add(o);
             break;
+          }
+          case Types.DATALINK: {
+            Object obj = conn.createDatalinkObject();
+            if (obj instanceof Blob) {
+              copyFromInputToOutput(value.getInputStream(), ((Blob) obj).setBinaryStream(1));
+              setResources.add(obj);
+            }
+            o = obj;
+            break;
+          }
         } /* switch */
       }
       else if (iCardinality >= 0)
@@ -374,7 +381,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       Value value = listValues.get(iValue);
       if (!value.isNull())
       {
-        Object oValue = getValue(value,rs.getStatement().getConnection(),setResources);
+        Object oValue = getValue(value, (ch.enterag.utils.jdbc.BaseConnection) rs.getStatement().getConnection(),setResources);
         rs.updateObject(iValue+1, oValue);
       } /* if not NULL */
     } /* loop over values */
@@ -411,14 +418,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       setResources.clear();
       rs.moveToInsertRow();
       putRecord(record,rs,setResources);
-      /***
-      ResultSetMetaData rsmd = rs.getMetaData();
-      for (int i = 0; i < rsmd.getColumnCount(); i++)
-      {
-        Object o = rs.getObject(i+1);
-        System.out.println(String.valueOf(i)+". "+rsmd.getColumnName(i+1)+"/"+rsmd.getColumnLabel(i+1)+": "+o.toString());
-      }
-      ***/
       rs.insertRow();
       freeResources(setResources);
       rs.moveToCurrentRow();

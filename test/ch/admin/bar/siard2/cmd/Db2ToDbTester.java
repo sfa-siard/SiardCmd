@@ -37,50 +37,38 @@ public class Db2ToDbTester
   {
     System.setProperty("ch.admin.bar.siard2.cmd.drivers","etc/jdbcdrivers.properties");
   }
-  
-  @Test
-  public void testDb2ToDb2()
-  {
-    System.out.println("testDb2ToDb2");
-    try
-    {
-      // now upload sample
-      String[] args = new String[]{
-        "-o",
-        "-j:"+_sDB2_DB_URL,
-        "-u:"+_sDB2_DBA_USER,
-        "-p:"+_sDB2_DBA_PASSWORD,
-        "-s:"+_sDB2_SIARD_FILE
-      };
-      SiardToDb stdb = new SiardToDb(args);
-      assertEquals("SiardToDb failed!",0, stdb.getReturn());
-      System.out.println("---------------------------------------");
-    }
-    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
-    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-  } /* testDb2ToDb2 */
 
   @Test
-  public void testSampleToDb2()
-  {
+  public void testDb2ToDb2() throws SQLException, IOException {
+    System.out.println("testDb2ToDb2");
+    // now upload sample
+    String[] args = new String[]{
+            "-o",
+            "-j:" + _sDB2_DB_URL,
+            "-u:" + _sDB2_DBA_USER,
+            "-p:" + _sDB2_DBA_PASSWORD,
+            "-s:" + _sDB2_SIARD_FILE
+    };
+    SiardToDb stdb = new SiardToDb(args);
+    assertEquals("SiardToDb failed!", 0, stdb.getReturn());
+    System.out.println("---------------------------------------");
+  }
+
+  @Test
+  public void testSampleToDb2() throws SQLException, IOException {
     System.out.println("testSampleToDb2");
-    try
-    {
-      /* now upload sample */
-      String[] args = new String[]{
-        "-o",
-        "-j:"+_sDB2_DB_URL,
-        "-u:"+_sDB2_DB_USER,
-        "-p:"+_sDB2_DB_PASSWORD,
-        "-s:"+_sDB2_SAMPLE_FILE,
-        "SampleSchema", _sDB2_DB_USER
-      };
-      SiardToDb stdb = new SiardToDb(args);
-      assertEquals("SiardToDb failed!",0, stdb.getReturn());
-      System.out.println("---------------------------------------");
-    }
-    catch(IOException ie) { fail(EU.getExceptionMessage(ie)); }
-    catch(SQLException se) { fail(EU.getExceptionMessage(se)); }
-  } /* testSampleToDb2 */
+    /* now upload sample */
+    String[] args = new String[]{
+            "-o",
+            "-j:" + _sDB2_DB_URL,
+            "-u:" + _sDB2_DB_USER,
+            "-p:" + _sDB2_DB_PASSWORD,
+            "-s:" + _sDB2_SAMPLE_FILE,
+            "SampleSchema", _sDB2_DB_USER
+    };
+    SiardToDb stdb = new SiardToDb(args);
+    assertEquals("SiardToDb failed!", 0, stdb.getReturn());
+    System.out.println("---------------------------------------");
+  }
   
 }
