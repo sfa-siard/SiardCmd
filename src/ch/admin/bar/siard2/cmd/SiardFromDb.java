@@ -211,18 +211,20 @@ public class SiardFromDb
         {
           System.out.println("External LOB folder  "+_fileExternalLobFolder.getAbsolutePath() + " does not exist!");
           _iReturn = iRETURN_ERROR;
-        }
-        else
-        {
-          /* relativize it from SIARD file's parent folder */
-          File fileRelative = _fileSiard.getParentFile().getAbsoluteFile().toPath().relativize(_fileExternalLobFolder.getAbsoluteFile().toPath()).toFile();
-          /* prepend a ../ for exiting the SIARD file and append a / to indicate that it is a folder */
-          try { _uriExternalLobFolder =  new URI("../"+fileRelative.toString()+"/"); }
-          catch (URISyntaxException use) 
-          {
-            System.out.println("External LOB folder  "+_fileExternalLobFolder.getAbsolutePath() + " could not be relativized!");
-            _iReturn = iRETURN_ERROR;
-          }
+        } else {
+            if (_fileSiard.getParentFile() == null) {
+                System.out.println("To use external LOB folder, specify the parent directory of " + _fileSiard + "!");
+                _iReturn = iRETURN_ERROR;
+            }
+            /* relativize it from SIARD file's parent folder */
+            File fileRelative = _fileSiard.getParentFile().getAbsoluteFile().toPath().relativize(_fileExternalLobFolder.getAbsoluteFile().toPath()).toFile();
+            /* prepend a ../ for exiting the SIARD file and append a / to indicate that it is a folder */
+            try {
+                _uriExternalLobFolder = new URI("../" + fileRelative.toString() + "/");
+            } catch (URISyntaxException use) {
+                System.out.println("External LOB folder  " + _fileExternalLobFolder.getAbsolutePath() + " could not be relativized!");
+                _iReturn = iRETURN_ERROR;
+            }
         }
         
       }
