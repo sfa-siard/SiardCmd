@@ -18,3 +18,8 @@ out/
 
 # asdf tools configuration
 .tool-versions
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
