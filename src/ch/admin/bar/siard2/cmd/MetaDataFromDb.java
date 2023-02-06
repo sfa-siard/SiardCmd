@@ -398,12 +398,13 @@ public class MetaDataFromDb
       {
         System.out.println("  Type: "+qiType.format());
         mt = ms.createMetaType(qiType.getName());
-        ResultSet rs = _dmd.getUDTs(null, 
-          ((BaseDatabaseMetaData)_dmd).toPattern(qiType.getSchema()), 
-          ((BaseDatabaseMetaData)_dmd).toPattern(qiType.getName()), 
-          new int[]{ Types.DISTINCT, Types.STRUCT });
+        String name = (qiType.getName().startsWith("\"") && qiType.getName().endsWith("\"")) ? qiType.getName().substring(1, qiType.getName().length() - 1) : qiType.getName();
+        ResultSet rs = _dmd.getUDTs(null,
+                                    ((BaseDatabaseMetaData)_dmd).toPattern(qiType.getSchema()),
+                                    ((BaseDatabaseMetaData)_dmd).toPattern(name),
+                                    new int[]{ Types.DISTINCT, Types.STRUCT });
         rs.next();
-        if (qiType.getName().equals(rs.getString("TYPE_NAME")) &&
+        if (name.equals(rs.getString("TYPE_NAME")) &&
             qiType.getSchema().equals(rs.getString("TYPE_SCHEM")))
         {
           String sRemarks = rs.getString("REMARKS");
@@ -757,7 +758,7 @@ public class MetaDataFromDb
     MetaType mty = null;
     if ((iDataType == Types.DISTINCT) || 
         (iDataType == Types.STRUCT))
-      mty = createType(sTypeName, ms.getName(),(int)lColumnSize,iDecimalDigits);
+      mty = createType(sTypeName, ms.getName(),(int)lColumnSize,iDecimalDigits); // sTypeName now is ""dtDay2"" in case of sql server
     if ((iDataType != Types.DISTINCT) &&
         (iDataType != Types.ARRAY) &&
         (iDataType != Types.STRUCT))
