@@ -60,7 +60,7 @@ public abstract class MetaDataBase
   protected MetaDataBase(DatabaseMetaData dmd, MetaData md)
     throws SQLException
   {
-    _dmd = (BaseDatabaseMetaData)dmd;
+    _dmd = dmd;
     _md = md;
     /* determine, whether UDTs are supported */
     ResultSet rs = _dmd.getUDTs(null, "%", "%", null);
