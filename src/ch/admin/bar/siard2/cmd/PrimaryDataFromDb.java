@@ -105,7 +105,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       {
         Clob clob = (Clob)oValue;
         String mimeType = tika.detect(clob.getAsciiStream());
-        ((CellImpl) value).getMetaColumn().setMimeType(mimeType);
+        value.getMetaValue().setMimeType(mimeType);
         value.setReader(clob.getCharacterStream());
         clob.free();
       }
@@ -119,7 +119,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       {
         NClob nclob = (NClob)oValue;
         String mimeType = tika.detect(nclob.getAsciiStream());
-        ((CellImpl) value).getMetaColumn().setMimeType(mimeType);
+        value.getMetaValue().setMimeType(mimeType);
         value.setReader(nclob.getCharacterStream());
         nclob.free();
       }
@@ -127,7 +127,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       {
         Blob blob = (Blob)oValue;
         String mimeType = tika.detect(blob.getBinaryStream());
-        ((CellImpl) value).getMetaColumn().setMimeType(mimeType);
+        value.getMetaValue().setMimeType(mimeType);
         value.setInputStream(blob.getBinaryStream());
         blob.free();
       }
