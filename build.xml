@@ -112,6 +112,8 @@ Created    : 29.08.2016, Hartwig Thomas
 	<property name="jarhamcrest" value="hamcrest-core-1.3.jar"/>
 	<property name="jarjunit4" value="junit-4.12.jar"/>
   <property name="cpjunit" value="${dirlib}/${jarhamcrest};${dirlib}/${jarjunit4}"/>
+  <property name="jartika" value="tika-app-2.8.0.jar"/>
+  <property name="cptika" value="${dirlib}/${jartika}"/>
 
   <!-- delete build folders -->
   <property name="dirbuild" value="build"/>
@@ -215,7 +217,7 @@ Created    : 29.08.2016, Hartwig Thomas
   
   <!-- build the SiardCmd classes -->
   <target name="build" depends="init,copy-dependencies">
-    <echo message="${ant.project.name}: build (${cpsiardapi};${cpjdbcaccess};${cpjdbcdb2};${cpjdbcmysql};${cpjdbcoracle};${cpjdbcmssql};${cpjdbcbase};${cpenterutils};)"/>
+    <echo message="${ant.project.name}: build (${cpsiardapi};${cpjdbcaccess};${cpjdbcdb2};${cpjdbcmysql};${cpjdbcoracle};${cpjdbcmssql};${cpjdbcbase};${cpenterutils};${cptika})"/>
     <!-- without this, the package-info class is not generated! -->
     <touch>
       <fileset dir="${dirsrc}" includes="**/*.*"/>
@@ -238,6 +240,7 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${cpjdbcpostgres}"/>
         <pathelement path="${cpjdbcbase}"/>
         <pathelement path="${cpenterutils}"/>
+        <pathelement path="${cptika}"/>
       </classpath>
     </javac>
   </target>
@@ -282,6 +285,7 @@ Created    : 29.08.2016, Hartwig Thomas
     	<classpath>
         <pathelement path="${dirdist}/${jarfile}"/>
         <pathelement path="${cpenterutils}"/>
+        <pathelement path="${cptika}"/>
         <pathelement path="${cpsqlparser}"/>
         <pathelement path="${cpjdbcbase}"/>
         <pathelement path="${cpjdbcbase-test}"/>
@@ -299,6 +303,7 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${cpsiardapi}"/>
         <pathelement path="${cpsunjdbc}"/>
         <pathelement path="${cpjunit}"/>
+
   		</classpath>
     </javac>
   </target>
@@ -316,7 +321,8 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${dirdist}/${jarfile}"/>
         <pathelement path="${cpantlr}"/>
         <pathelement path="${cpenterutils}"/>
-        <pathelement path="${sqlparser}"/>
+        <pathelement path="${cptika}"/>
+        <pathelement path="${cpsqlparser}"/>
         <pathelement path="${cpjdbcbase}"/>
         <pathelement path="${cpjdbcbase-test}"/>
         <pathelement path="${cpjdbcaccess}"/>
@@ -348,6 +354,7 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${dirdist}/${jarfile}"/>
         <pathelement path="${cpantlr}"/>
         <pathelement path="${cpenterutils}"/>
+        <pathelement path="${cptika}"/>
         <pathelement path="${cpsqlparser}"/>
         <pathelement path="${cpjdbcbase}"/>
         <pathelement path="${cpjdbcbase-test}"/>
@@ -380,6 +387,7 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${dirdist}/${jarfile}"/>
         <pathelement path="${cpantlr}"/>
         <pathelement path="${cpenterutils}"/>
+        <pathelement path="${cptika}"/>
         <pathelement path="${cpsqlparser}"/>
         <pathelement path="${cpjdbcbase}"/>
         <pathelement path="${cpjdbcbase-test}"/>
@@ -412,6 +420,7 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${dirdist}/${jarfile}"/>
         <pathelement path="${cpantlr}"/>
         <pathelement path="${cpenterutils}"/>
+        <pathelement path="${cptika}"/>
         <pathelement path="${cpsqlparser}"/>
         <pathelement path="${cpjts}"/>
         <pathelement path="${cpjdbcbase}"/>
@@ -445,7 +454,8 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${dirdist}/${jarfile}"/>
         <pathelement path="${cpantlr}"/>
         <pathelement path="${cpenterutils}"/>
-        <pathelement path="${sqlparser}"/>
+        <pathelement path="${cptika}"/>
+        <pathelement path="${cpsqlparser}"/>
         <pathelement path="${cpjdbcbase}"/>
         <pathelement path="${cpjdbcbase-test}"/>
         <pathelement path="${cpjdbcoracle}"/>
@@ -477,7 +487,8 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${dirdist}/${jarfile}"/>
         <pathelement path="${cpantlr}"/>
         <pathelement path="${cpenterutils}"/>
-        <pathelement path="${sqlparser}"/>
+        <pathelement path="${cptika}"/>
+        <pathelement path="${cpsqlparser}"/>
         <pathelement path="${cpjdbcbase}"/>
         <pathelement path="${cpjdbcbase-test}"/>
         <pathelement path="${cpjdbcpostgres}"/>
@@ -509,6 +520,7 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${dirdist}/${jarfile}"/>
         <pathelement path="${cpantlr}"/>
         <pathelement path="${cpenterutils}"/>
+        <pathelement path="${cptika}"/>
         <pathelement path="${cpsqlparser}"/>
         <pathelement path="${cpjdbcbase}"/>
         <pathelement path="${cpjdbcbase-test}"/>
@@ -541,6 +553,7 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${dirdist}/${jarfile}"/>
         <pathelement path="${cpantlr}"/>
         <pathelement path="${cpenterutils}"/>
+        <pathelement path="${cptika}"/>
         <pathelement path="${cpsqlparser}"/>
         <pathelement path="${cpjdbcbase}"/>
         <pathelement path="${cpjdbcbase-test}"/>
@@ -573,6 +586,7 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${dirdist}/${jarfile}"/>
         <pathelement path="${cpantlr}"/>
         <pathelement path="${cpenterutils}"/>
+        <pathelement path="${cptika}"/>
         <pathelement path="${cpsqlparser}"/>
         <pathelement path="${cpjdbcbase}"/>
         <pathelement path="${cpjdbcbase-test}"/>
@@ -605,6 +619,7 @@ Created    : 29.08.2016, Hartwig Thomas
         <pathelement path="${dirdist}/${jarfile}"/>
         <pathelement path="${cpantlr}"/>
         <pathelement path="${cpenterutils}"/>
+        <pathelement path="${cptika}"/>
         <pathelement path="${cpsqlparser}"/>
         <pathelement path="${cpjdbcbase}"/>
         <pathelement path="${cpjdbcbase-test}"/>
@@ -668,7 +683,7 @@ Created    : 29.08.2016, Hartwig Thomas
 
   <!-- commit local work -->
   <target name="copy-dependencies" depends="check">
-    <echo message="Copy jar files from dependency projects on local file system"/>
+   <!-- <echo message="Copy jar files from dependency projects on local file system"/>
     <copy file="../EnterUtilities/dist/enterutils.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
     <copy file="../SqlParser/dist/sqlparser.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
     <copy file="../Zip64File/dist/zip64.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
@@ -688,7 +703,7 @@ Created    : 29.08.2016, Hartwig Thomas
     <copy file="../JdbcOracle/dist/jdbcoracle.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
     <copy file="../JdbcOracle/dist/jdbcoracle-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
     <copy file="../JdbcPostgres/dist/jdbcpostgres.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcPostgres/dist/jdbcpostgres-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+    <copy file="../JdbcPostgres/dist/jdbcpostgres-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>-->
   </target>
   
 </project>

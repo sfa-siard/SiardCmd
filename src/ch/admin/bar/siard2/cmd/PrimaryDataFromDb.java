@@ -14,6 +14,7 @@ import java.net.URL;
 import java.sql.*;
 import javax.xml.datatype.*;
 
+import ch.admin.bar.siard2.api.primary.CellImpl;
 import ch.enterag.utils.*;
 import ch.enterag.utils.background.*;
 import ch.enterag.utils.logging.*;
@@ -21,6 +22,7 @@ import ch.enterag.utils.database.*;
 import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.*;
 import ch.admin.bar.siard2.api.generated.*;
+import org.apache.tika.Tika;
 
 /*====================================================================*/
 /** Transfers primary data from databases to SIARD files.
@@ -38,6 +40,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
   private StopWatch _swGetCell = null;
   private StopWatch _swGetValue = null;
   private StopWatch _swSetValue = null;
+  private Tika tika = new Tika();
 
   /*------------------------------------------------------------------*/
   /** increment the number or records downloaded, issuing a notification,
@@ -101,6 +104,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       else if (oValue instanceof Clob)
       {
         Clob clob = (Clob)oValue;
+        String mimeType = tika.detect(clob.getAsciiStream());
+        ((CellImpl) value).getMetaColumn().setMimeType(mimeType);
         value.setReader(clob.getCharacterStream());
         clob.free();
       }
@@ -113,12 +118,16 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
       else if (oValue instanceof NClob)
       {
         NClob nclob = (NClob)oValue;
+        String mimeType = tika.detect(nclob.getAsciiStream());
+        ((CellImpl) value).getMetaColumn().setMimeType(mimeType);
         value.setReader(nclob.getCharacterStream());
         nclob.free();
       }
       else if (oValue instanceof Blob)
       {
         Blob blob = (Blob)oValue;
+        String mimeType = tika.detect(blob.getBinaryStream());
+        ((CellImpl) value).getMetaColumn().setMimeType(mimeType);
         value.setInputStream(blob.getBinaryStream());
         blob.free();
       }
