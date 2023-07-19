@@ -75,8 +75,13 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer
     {
       if (oValue instanceof String)
         value.setString((String)oValue);
-      else if (oValue instanceof byte[])
-        value.setBytes((byte[])oValue);
+      else if (oValue instanceof byte[]) {
+        byte[] bytes = (byte[]) oValue;
+        String mimeType = tika.detect(bytes);
+        value.getMetaValue().setMimeType(mimeType);
+        value.setBytes(bytes);
+      }
+
       else if (oValue instanceof Boolean)
         value.setBoolean(((Boolean)oValue).booleanValue());
       else if (oValue instanceof Short)
