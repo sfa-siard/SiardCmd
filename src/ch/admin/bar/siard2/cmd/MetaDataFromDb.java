@@ -387,7 +387,7 @@ public class MetaDataFromDb
       {
         sTypeSchema = sDefaultSchema;
         qiType.setSchema(sTypeSchema);
-        qiType.setName(sTypeName);
+        qiType.parseName(sTypeName);
       }
       Schema schema = _md.getArchive().getSchema(qiType.getSchema());
       if (schema == null)
