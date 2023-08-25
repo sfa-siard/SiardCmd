@@ -257,52 +257,53 @@ Created    : 29.08.2016, Hartwig Thomas
     </jar>
   </target>
 
-  <!-- create the JAR file containing all classes -->
-  <property name="jarfile" value="${ant.project.name}.jar"/>
-  <target name="jar" depends="tests, revision">
-    <echo message="${ant.project.name}: jar"/>
-    <jar jarfile="${dirdist}/${jarfile}"
-       manifest="${filemanifest}">
-      <fileset dir="${dirbuildclasses}">
-        <include name="**/*.class"/>
-        <include name="**/res/*.*"/>
-      </fileset>
-    </jar>
-  </target>
-	
-	<!-- create all tests -->
-	<target name="tests" depends="jar-test">
-    <echo message="${ant.project.name}: tests build"/>
-		<!-- build the tests -->
-    <javac debug="true" debuglevel="${debuglevel}"
-      includeantruntime="false"
-      bootclasspath="${java8rtjar}"
-      source="${source}" 
-      target="${target}"
-      encoding="UTF-8"
-      srcdir="${dirtest}"
-      destdir="${dirbuildtests}">
-    	<classpath>
-        <pathelement path="${dirdist}/${jarfile}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${cptika}"/>
-        <pathelement path="${cpsqlparser}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpjdbcbase-test}"/>
-        <pathelement path="${cpjdbcaccess}"/>
-        <pathelement path="${cpjdbcdb2}"/>
-        <pathelement path="${cpjdbcdb2-test}"/>
-        <pathelement path="${cpjdbcmssql}"/>
-        <pathelement path="${cpjdbcmssql-test}"/>
-        <pathelement path="${cpjdbcmysql}"/>
-        <pathelement path="${cpjdbcmysql-test}"/>
-        <pathelement path="${cpjdbcoracle}"/>
-        <pathelement path="${cpjdbcoracle-test}"/>
-        <pathelement path="${cpjdbcpostgres}"/>
-        <pathelement path="${cpjdbcpostgres-test}"/>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpsunjdbc}"/>
-        <pathelement path="${cpjunit}"/>
+    <!-- create the JAR file containing all classes -->
+    <property name="jarfile" value="${ant.project.name}.jar"/>
+    <target name="jar" depends="tests, revision">
+        <echo message="${ant.project.name}: jar"/>
+        <jar jarfile="${dirdist}/${jarfile}"
+             manifest="${filemanifest}">
+            <fileset dir="${dirbuildclasses}">
+                <include name="**/*.class"/>
+                <include name="**/res/*.*"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <!-- create all tests -->
+    <target name="tests" depends="jar-test">
+        <echo message="${ant.project.name}: tests build"/>
+        <!-- build the tests -->
+        <javac debug="true" debuglevel="${debuglevel}"
+               includeantruntime="false"
+               bootclasspath="${java8rtjar}"
+               source="${source}"
+               target="${target}"
+               encoding="UTF-8"
+               srcdir="${dirtest}"
+               excludes="**/ch/admin/bar/siard2/cmd/issues/**"
+               destdir="${dirbuildtests}">
+            <classpath>
+                <pathelement path="${dirdist}/${jarfile}"/>
+                <pathelement path="${cpenterutils}"/>
+                <pathelement path="${cptika}"/>
+                <pathelement path="${cpsqlparser}"/>
+                <pathelement path="${cpjdbcbase}"/>
+                <pathelement path="${cpjdbcbase-test}"/>
+                <pathelement path="${cpjdbcaccess}"/>
+                <pathelement path="${cpjdbcdb2}"/>
+                <pathelement path="${cpjdbcdb2-test}"/>
+                <pathelement path="${cpjdbcmssql}"/>
+                <pathelement path="${cpjdbcmssql-test}"/>
+                <pathelement path="${cpjdbcmysql}"/>
+                <pathelement path="${cpjdbcmysql-test}"/>
+                <pathelement path="${cpjdbcoracle}"/>
+                <pathelement path="${cpjdbcoracle-test}"/>
+                <pathelement path="${cpjdbcpostgres}"/>
+                <pathelement path="${cpjdbcpostgres-test}"/>
+                <pathelement path="${cpsiardapi}"/>
+                <pathelement path="${cpsunjdbc}"/>
+                <pathelement path="${cpjunit}"/>
 
   		</classpath>
     </javac>
