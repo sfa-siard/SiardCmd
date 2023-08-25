@@ -29,7 +29,5 @@ public class DoubleQuotesInUserDefinedTypesTest extends BaseFromDbTester {
         });
 
         Assert.assertEquals(0, siardFromDb.getReturn());
-        Assert.assertTrue(true);
-
     }
 }
