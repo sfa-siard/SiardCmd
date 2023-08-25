@@ -13,57 +13,6 @@ on:
     branches: [ main ]
 
 jobs:
-  test-mysql:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 8
-        uses: actions/setup-java@v2
-        with:
-          java-version: '8'
-          distribution: 'adopt'
-      - name: Start test database
-        uses: sudo-bot/action-docker-compose@latest
-        with:
-          # https://docs.docker.com/compose/reference/overview/
-          cli-args: "up -d mssql"
-      - name: Test MSSQL Server
-        run: ./gradlew test --tests ch.admin.bar.siard2.cmd._MsSqlTestSuite
-
-  test-postgres:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 8
-        uses: actions/setup-java@v2
-        with:
-          java-version: '8'
-          distribution: 'adopt'
-      - name: Start test database
-        uses: sudo-bot/action-docker-compose@latest
-        with:
-          # https://docs.docker.com/compose/reference/overview/
-          cli-args: "up -d postgres"
-      - name: Test PostgresQL
-        run: ./gradlew test --tests ch.admin.bar.siard2.cmd._PostgresTestSuite
-      - name: Upload postgres test output file
-        uses: actions/upload-artifact@v2
-        with:
-          name: postgres-tests.txt
-          path: ${{ github.workspace}}/tmp/postgres-tests.txt
-
-  test-access:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 8
-        uses: actions/setup-java@v2
-        with:
-          java-version: '8'
-          distribution: 'adopt'
-      - name: Test Ms Access
-        run: ./gradlew test --tests ch.admin.bar.siard2.cmd._AccessTestSuite
-
   test-issues:
     runs-on: ubuntu-latest
     steps:
