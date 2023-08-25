@@ -79,7 +79,7 @@ public class SiardFromDb
   private Connection _conn = null;
   
 	private int _iReturn = iRETURN_WARNING;
-	int getReturn() { return _iReturn; }
+	public int getReturn() { return _iReturn; }
   
   /*====================================================================
   methods
@@ -282,7 +282,7 @@ public class SiardFromDb
   ====================================================================*/
 	/*------------------------------------------------------------------*/
 	/** runs main program of SiardFromDb. */
-	SiardFromDb(String asArgs[])
+    public SiardFromDb(String asArgs[])
 	  throws SQLException, IOException, ClassNotFoundException
   {
 	  super();

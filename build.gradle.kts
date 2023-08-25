@@ -27,6 +27,9 @@ sourceSets {
         java {
             setSrcDirs(listOf("test"))
         }
+        resources {
+            setSrcDirs(listOf("test/resources"))
+        }
     }
 }
 
@@ -35,4 +38,20 @@ dependencies {
 
     // Use JUnit test framework.
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.testcontainers:testcontainers:1.19.0")
+    testImplementation("org.testcontainers:mssqlserver:1.19.0")
+}
+
+/**
+ *  ManifestAttributes (from enterutils.jar) expects the manifest file to sit in some weird places. The copyManifest task
+ *  makes sure that the file is located at the correct location.
+ *  This is a workaround until EnterUtils is fixed.
+ */
+tasks.register<Copy>("copyManifest") {
+    from(layout.projectDirectory.file("src/META-INF/MANIFEST.MF"))
+    into(layout.buildDirectory.dir("tmp/jar"))
+}
+
+tasks.test {
+    dependsOn("copyManifest")
 }
