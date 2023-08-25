@@ -1,4 +1,4 @@
-package ch.admin.bar.siard2.cmd.mssql;
+package ch.admin.bar.siard2.cmd.issues.mssql;
 
 import ch.admin.bar.siard2.cmd.BaseFromDbTester;
 import ch.admin.bar.siard2.cmd.SiardFromDb;
