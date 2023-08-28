@@ -59,7 +59,7 @@ A gradual migration to gradle has started. The roadmap for this migration looks 
 - [ ] Create archives and zip distribution with gradle that are equivalent to the ones generated with ant
 - [ ] Remove ant as build tool
 - [ ] Migrate project folder structure to match the standard maven project layout
-[ ]: Remove the lib folder and let gradle manage all dependencies
+- [ ] Remove the lib folder and let gradle manage all dependencies
 
 In order to implement the last step, all other dependent siard repositories must be migrated to gradle
 
