@@ -54,7 +54,7 @@ ant release
 
 A gradual migration to gradle has started. The roadmap for this migration looks as follows:
 
-[x]: Enable unit tests using testcontainers
+- [x] Enable unit tests using testcontainers
 [ ]: Equivalent testing restults for ant and gradle tests (see github pipelines)
 [ ]: Create archives and zip distribution with gradle that are equivalent to the ones generated with ant
 [ ]: Remove ant as build tool
