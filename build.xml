@@ -9,701 +9,707 @@ Copyright  : 2016, Enter AG, Rüti ZH, Switzerland
 Created    : 29.08.2016, Hartwig Thomas
 ==================================================================== -->
 <project basedir="." default="build" name="siardcmd" xmlns:if="ant:if" xmlns:unless="ant:unless">
-  <!-- build properties contain local settings. They must reside in
-	   the same folder as this build.xml. Use build.properties.template
-	   as a guide for creating the local copy.
-  -->
-  <property file="build.properties"/>
-  <property name="debuglevel" value="source,lines,vars"/>
-  <property name="target" value="1.8"/>
-  <property name="source" value="1.8"/>
-  <!-- the main folders of the project -->
-  <property name="dirsrc" value="src"/>
-  <property name="dirtest" value="test/"/>
-  <property name="dirbin" value="bin"/>
-  <property name="dirlib" value="lib"/>
-  <property name="dirdoc" value="doc"/>
-  <property name="diretc" value="etc"/>
-  <property name="dirtestfiles" value="testfiles"/>
-  <property name="dirtmp" value="tmp"/>
-  <property name="dirdist" value="dist"/>
-	
-  <!-- enterutils jar -->
-  <property name="jarenterutils" value="enterutils.jar"/>
-  <property name="cpenterutils" value="${dirlib}/${jarenterutils}"/> 
-  <!-- antlr 4 jar -->
-  <property name="jarantlr4runtime" value="antlr-runtime-4.5.2.jar"/>
-  <property name="cpantlr" value="${dirlib}/${jarantlr4runtime}"/>
-  <!-- sqlparser jar -->
-  <property name="jarsqlparser" value="sqlparser.jar"/>
-  <property name="cpsqlparser" value="${dirlib}/${jarsqlparser}"/> 
-  <!-- JAXB jars -->
-  <property name="jaractivation" value="activation-1.1.1.jar"/>
-  <property name="jarjaxbapi" value="jaxb-api.jar"/>
-  <property name="jarjaxbcore" value="jaxb-core.jar"/>
-  <property name="jarjaxbimpl" value="jaxb-impl.jar"/>
-  <property name="cpjaxb" value="${dirlib}/${jaractivation};${dirlib}/${jarjaxbapi};${dirlib}/${jarjaxbcore};${dirlib}/${jarjaxbimpl}"/> 
-  <!-- zip64 jar -->
-  <property name="jarzip64" value="zip64.jar"/>
-  <property name="cpzip64" value="${dirlib}/${jarzip64}"/> 
-  <!-- woodstox -->
-  <property name="jarstax2api" value="stax2-api-3.1.1.jar"/>
-  <property name="jarwoodstoxcore" value="woodstox-core-lgpl-4.1.2.jar"/>
-  <property name="cpwoodstox" value="${dirlib}/${jarstax2api};${dirlib}/${jarwoodstoxcore}"/>
-  <!-- msv -->
-  <property name="jarmsvcore" value="msv-core-2010.2.jar"/>
-  <property name="jarxsdlib" value="xsdlib-2010.1.jar"/>
-  <property name="jarwoodstoxmsv" value="woodstox-msv-rng-datatype-20020414.jar"/>
-  <property name="cpmsv" value="${dirlib}/${jarmsvcore};${dirlib}/${jarxsdlib};${dirlib}/${jarwoodstoxmsv}"/>
-  <!-- jdbcbase jars -->
-  <property name="jarjdbcbase" value="jdbcbase.jar"/>
-  <property name="jarjdbcbasetest" value="jdbcbase-test.jar"/>
-  <property name="cpjdbcbase" value="${dirlib}/${jarjdbcbase}"/> 
-  <property name="cpjdbcbase-test" value="${dirlib}/${jarjdbcbasetest}"/>
-  <!-- sunjdbc -->
-  <property name="jarsunjdbc" value="sunjdbc.jar"/>
-  <property name="cpsunjdbc" value="${dirlib}/${jarsunjdbc}"/>
-  <!-- JTS -->
-  <property name="jarjts" value="jts-1.14.jar"/>
-  <property name="cpjts" value="${dirlib}/${jarjts}"/>
-  <!-- jdbcaccess jars -->
-  <property name="jarjdbcaccess" value="jdbcaccess.jar"/>
-  <property name="jarjackcess" value="jackcess-2.1.6a.jar"/>
-  <property name="jarcommonslang" value="commons-lang-2.6.jar"/>
-  <property name="jarcommonslogging" value="commons-logging-1.1.3.jar"/>
-  <property name="cpjdbcaccess" value="${dirlib}/${jarjdbcaccess};${dirlib}/${jarjackcess};${dirlib}/${jarcommonslang};${dirlib}/${jarcommonslogging}"/>
-  <!-- jdbcdb2 jars -->
-  <property name="jarjdbcdb2" value="jdbcdb2.jar"/>
-  <property name="jarjdbcdb2test" value="jdbcdb2-test.jar"/>
-  <property name="jardb2jdbc" value="db2jcc4.jar"/>
-  <property name="cpjdbcdb2" value="${dirlib}/${jarjdbcdb2};${dirlib}/${jardb2jdbc}"/>
-  <property name="cpjdbcdb2-test" value="${dirlib}/${jarjdbcdb2test}"/>
-  <!-- jdbcmssql jars -->
-  <property name="jarmssqljdbc" value="sqljdbc41.jar"/>
-  <property name="jarjdbcmssql" value="jdbcmssql.jar"/>
-  <property name="jarjdbcmssqltest" value="jdbcmssql-test.jar"/>
-  <property name="cpjdbcmssql" value="${dirlib}/${jarjdbcmssql};${dirlib}/${jarmssqljdbc}"/>
-  <property name="cpjdbcmssql-test" value="${dirlib}/${jarjdbcmssqltest}"/>
-  <!-- jdbcmysql jars -->
-  <property name="jarmysqljdbc" value="mysql-connector-java-8.0.18.jar"/>
-  <property name="jarjdbcmysql" value="jdbcmysql.jar"/>
-  <property name="jarjdbcmysqltest" value="jdbcmysql-test.jar"/>
-  <property name="cpjdbcmysql" value="${dirlib}/${jarjdbcmysql};${dirlib}/${jarmysqljdbc}"/>
-  <property name="cpjdbcmysql-test" value="${dirlib}/${jarjdbcmysqltest}"/>
-  <!-- jdbcoracle jars -->
-  <property name="jarojdbc" value="ojdbc6.jar"/>
-  <property name="jarxdb" value="xdb6.jar"/>
-  <property name="jarxmlparser" value="xmlparserv2.jar"/>
-  <property name="jarjdbcoracle" value="jdbcoracle.jar"/>
-  <property name="jarjdbcoracletest" value="jdbcoracle-test.jar"/>
-  <property name="cpjdbcoracle" value="${dirlib}/${jarjdbcoracle};${dirlib}/${jarojdbc};${dirlib}/${jarxdb};${dirlib}/${jarxmlparser}"/> 
-  <property name="cpjdbcoracle-test" value="${dirlib}/${jarjdbcoracletest}"/>
-  <!-- jdbcpostgres jars -->
-  <property name="jarpostgresjdbc" value="postgresql-42.2.5.jar"/>
-  <property name="jarjson" value="json-simple-1.1.1.jar"/>
-  <property name="jarjdbcpostgres" value="jdbcpostgres.jar"/>
-  <property name="jarjdbcpostgrestest" value="jdbcpostgres-test.jar"/>
-  <property name="cpjdbcpostgres" value="${dirlib}/${jarjdbcpostgres};${dirlib}/${jarpostgresjdbc}"/>
-  <property name="cpjdbcpostgres-test" value="${dirlib}/${jarjdbcpostgrestest};${dirlib}/${jarjson}"/>
-  <!-- siardapi -->
-  <property name="jarsiardapi" value="siardapi.jar"/>
-  <property name="cpsiardapi" value="${dirlib}/${jarsiardapi}"/> 
-  <!-- junit -->
-	<property name="jarhamcrest" value="hamcrest-core-1.3.jar"/>
-	<property name="jarjunit4" value="junit-4.12.jar"/>
-  <property name="cpjunit" value="${dirlib}/${jarhamcrest};${dirlib}/${jarjunit4}"/>
-  <property name="jartika" value="tika-app-2.8.0.jar"/>
-  <property name="cptika" value="${dirlib}/${jartika}"/>
+    <!-- build properties contain local settings. They must reside in
+         the same folder as this build.xml. Use build.properties.template
+         as a guide for creating the local copy.
+    -->
+    <property file="build.properties"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.8"/>
+    <property name="source" value="1.8"/>
+    <!-- the main folders of the project -->
+    <property name="dirsrc" value="src"/>
+    <property name="dirtest" value="test/"/>
+    <property name="dirbin" value="bin"/>
+    <property name="dirlib" value="lib"/>
+    <property name="dirdoc" value="doc"/>
+    <property name="diretc" value="etc"/>
+    <property name="dirtestfiles" value="testfiles"/>
+    <property name="dirtmp" value="tmp"/>
+    <property name="dirdist" value="dist"/>
 
-  <!-- delete build folders -->
-  <property name="dirbuild" value="build"/>
-  <property name="dirbuildclasses" value="${dirbuild}/classes"/>
-  <property name="dirbuildtests" value="${dirbuild}/tests"/>
-  <target name="clean">
-    <echo message="${ant.project.name}: clean"/>
-    <delete dir="${dirbuildclasses}"/>
-    <delete dir="${dirbuildtests}"/>
-    <delete dir="${dirtmp}"/>
-    <delete dir="${dirdist}"/>
-  </target>
-  
-  <!-- create build folders -->
-  <target name="init" depends="clean">
-    <echo message="${ant.project.name}: init"/>
-    <mkdir dir="${dirbuildclasses}"/>
-    <mkdir dir="${dirbuildtests}"/>
-    <mkdir dir="${dirtmp}"/>
-    <mkdir dir="${dirdist}"/>
-  </target>
-  
-  <!-- check if mainfest and local build properties are available -->
-  <property name="filemanifest" value="${dirsrc}/META-INF/MANIFEST.MF"/>
-  <property name="filerevoldproperties" value="${dirtmp}/revold.properties"/>
-  <property name="filegithead" value=".git/HEAD"/>
-  <property name="filebranchproperties" value="${dirtmp}/branch.properties"/>
-  <target name="check" depends="init">
-    <!-- get current date -->
-    <tstamp>
-      <format property="builtdate" pattern="dd. MMM yyyy" locale="en,CH"/>
-    </tstamp>
-    <echo message="builddate: ${builtdate}"/>
-    <!-- current version and revision are taken from manifest -->
-    <copy file="${filemanifest}" tofile="${filerevoldproperties}"/>
-    <!-- reduce it to version and revision properties --> 
-    <replaceregexp file="${filerevoldproperties}" 
-      match=".*Implementation-Version: (\d+\.\d+)\.(\d+).*" 
-      replace="version=\1&#x000A;revold=\2"
-      flags="gms"/>
-    <!-- load the properties -->
-    <property file="${filerevoldproperties}"/>
-    <echo message="version: ${version}"/>
-    <echo message="revold: ${revold}"/>
-    <!-- fail if build.properties are not configured -->
-    <fail  message="External build.properties not configured correctly!">
-      <condition>
-        <not>
-          <and>
-            <isset property="version"/>
-            <isset property="revold"/>
-            <isset property="java8rtjar"/>
-          </and>
-        </not>
-      </condition>
-    </fail>
-    <!-- check .git/HEAD for active branch name -->
-    <copy file="${filegithead}" tofile="${filebranchproperties}"/>
-    <!-- reduce it to branch property -->
-    <replaceregexp file="${filebranchproperties}" 
-      match="^ref: refs/heads/(.*)$" 
-      replace="branch=\1"
-      flags="gms"/>
-    <!-- load the property -->
-    <property file="${filebranchproperties}"/>
-    <!-- compute branch.master -->
-    <condition property="branch.master">
-      <and>
-        <not><isset property="submit"/></not> 
-        <equals arg1="${branch}" arg2="master"/>
-      </and>
-    </condition>
-    <echo message="branch: ${branch}"/>
-    <echo message="branch.master: ${branch.master}"/>
-    <echo message="build.properties.configured: ${build.properties.configured}"/>
-  </target>
-  
-  <!-- increment revision and update manifest -->
-  <property name="filerevisionproperties" value="${dirtmp}/revision.properties"/> 
-  <target name="revision" depends="check">
-    <echo message="${ant.project.name}: revision"/>
-    <copy file="${filerevoldproperties}" tofile="${filerevisionproperties}" overwrite="true"/>
-    <replaceregexp file="${filerevisionproperties}" 
-      match="^revold=(.*)$" 
-      replace="revision=\1"
-      flags="gm"/>
-    <propertyfile file="${filerevisionproperties}">
-      <entry key="revision" type="int" operation="+" value="1"/>
-    </propertyfile>
-    <property file="${filerevisionproperties}"/>
-    <echo message="revision: ${revision}" />
-    <replaceregexp file="${filemanifest}" 
-      match="^Implementation-Version: .*$" 
-      replace="Implementation-Version: ${version}.${revision}"
-      flags="gm"/>
-    <replaceregexp file="${filemanifest}" 
-      match="^Built-Date: .*$" 
-      replace="Built-Date: ${builtdate}"
-      flags="gm"/>
-  </target>
-  
-  <!-- build the SiardCmd classes -->
-  <target name="build" depends="init,copy-dependencies">
-    <echo message="${ant.project.name}: build (${cpsiardapi};${cpjdbcaccess};${cpjdbcdb2};${cpjdbcmysql};${cpjdbcoracle};${cpjdbcmssql};${cpjdbcbase};${cpenterutils};${cptika})"/>
-    <!-- without this, the package-info class is not generated! -->
-    <touch>
-      <fileset dir="${dirsrc}" includes="**/*.*"/>
-    </touch>
-    <javac debug="true" debuglevel="${debuglevel}"
-      includeantruntime="false"
-      bootclasspath="${java8rtjar}"
-      source="${source}" 
-      target="${target}"
-      encoding="UTF-8"
-      srcdir="${dirsrc}"
-      destdir="${dirbuildclasses}">
-      <classpath>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpjdbcaccess}"/>
-        <pathelement path="${cpjdbcdb2}"/>
-        <pathelement path="${cpjdbcmssql}"/>
-        <pathelement path="${cpjdbcmysql}"/>
-        <pathelement path="${cpjdbcoracle}"/>
-        <pathelement path="${cpjdbcpostgres}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${cptika}"/>
-      </classpath>
-    </javac>
-  </target>
+    <!-- enterutils jar -->
+    <property name="jarenterutils" value="enterutils.jar"/>
+    <property name="cpenterutils" value="${dirlib}/${jarenterutils}"/>
+    <!-- antlr 4 jar -->
+    <property name="jarantlr4runtime" value="antlr-runtime-4.5.2.jar"/>
+    <property name="cpantlr" value="${dirlib}/${jarantlr4runtime}"/>
+    <!-- sqlparser jar -->
+    <property name="jarsqlparser" value="sqlparser.jar"/>
+    <property name="cpsqlparser" value="${dirlib}/${jarsqlparser}"/>
+    <!-- JAXB jars -->
+    <property name="jaractivation" value="activation-1.1.1.jar"/>
+    <property name="jarjaxbapi" value="jaxb-api.jar"/>
+    <property name="jarjaxbcore" value="jaxb-core.jar"/>
+    <property name="jarjaxbimpl" value="jaxb-impl.jar"/>
+    <property name="cpjaxb"
+              value="${dirlib}/${jaractivation};${dirlib}/${jarjaxbapi};${dirlib}/${jarjaxbcore};${dirlib}/${jarjaxbimpl}"/>
+    <!-- zip64 jar -->
+    <property name="jarzip64" value="zip64.jar"/>
+    <property name="cpzip64" value="${dirlib}/${jarzip64}"/>
+    <!-- woodstox -->
+    <property name="jarstax2api" value="stax2-api-3.1.1.jar"/>
+    <property name="jarwoodstoxcore" value="woodstox-core-lgpl-4.1.2.jar"/>
+    <property name="cpwoodstox" value="${dirlib}/${jarstax2api};${dirlib}/${jarwoodstoxcore}"/>
+    <!-- msv -->
+    <property name="jarmsvcore" value="msv-core-2010.2.jar"/>
+    <property name="jarxsdlib" value="xsdlib-2010.1.jar"/>
+    <property name="jarwoodstoxmsv" value="woodstox-msv-rng-datatype-20020414.jar"/>
+    <property name="cpmsv" value="${dirlib}/${jarmsvcore};${dirlib}/${jarxsdlib};${dirlib}/${jarwoodstoxmsv}"/>
+    <!-- jdbcbase jars -->
+    <property name="jarjdbcbase" value="jdbcbase.jar"/>
+    <property name="jarjdbcbasetest" value="jdbcbase-test.jar"/>
+    <property name="cpjdbcbase" value="${dirlib}/${jarjdbcbase}"/>
+    <property name="cpjdbcbase-test" value="${dirlib}/${jarjdbcbasetest}"/>
+    <!-- sunjdbc -->
+    <property name="jarsunjdbc" value="sunjdbc.jar"/>
+    <property name="cpsunjdbc" value="${dirlib}/${jarsunjdbc}"/>
+    <!-- JTS -->
+    <property name="jarjts" value="jts-1.14.jar"/>
+    <property name="cpjts" value="${dirlib}/${jarjts}"/>
+    <!-- jdbcaccess jars -->
+    <property name="jarjdbcaccess" value="jdbcaccess.jar"/>
+    <property name="jarjackcess" value="jackcess-2.1.6a.jar"/>
+    <property name="jarcommonslang" value="commons-lang-2.6.jar"/>
+    <property name="jarcommonslogging" value="commons-logging-1.1.3.jar"/>
+    <property name="cpjdbcaccess"
+              value="${dirlib}/${jarjdbcaccess};${dirlib}/${jarjackcess};${dirlib}/${jarcommonslang};${dirlib}/${jarcommonslogging}"/>
+    <!-- jdbcdb2 jars -->
+    <property name="jarjdbcdb2" value="jdbcdb2.jar"/>
+    <property name="jarjdbcdb2test" value="jdbcdb2-test.jar"/>
+    <property name="jardb2jdbc" value="db2jcc4.jar"/>
+    <property name="cpjdbcdb2" value="${dirlib}/${jarjdbcdb2};${dirlib}/${jardb2jdbc}"/>
+    <property name="cpjdbcdb2-test" value="${dirlib}/${jarjdbcdb2test}"/>
+    <!-- jdbcmssql jars -->
+    <property name="jarmssqljdbc" value="sqljdbc41.jar"/>
+    <property name="jarjdbcmssql" value="jdbcmssql.jar"/>
+    <property name="jarjdbcmssqltest" value="jdbcmssql-test.jar"/>
+    <property name="cpjdbcmssql" value="${dirlib}/${jarjdbcmssql};${dirlib}/${jarmssqljdbc}"/>
+    <property name="cpjdbcmssql-test" value="${dirlib}/${jarjdbcmssqltest}"/>
+    <!-- jdbcmysql jars -->
+    <property name="jarmysqljdbc" value="mysql-connector-java-8.0.18.jar"/>
+    <property name="jarjdbcmysql" value="jdbcmysql.jar"/>
+    <property name="jarjdbcmysqltest" value="jdbcmysql-test.jar"/>
+    <property name="cpjdbcmysql" value="${dirlib}/${jarjdbcmysql};${dirlib}/${jarmysqljdbc}"/>
+    <property name="cpjdbcmysql-test" value="${dirlib}/${jarjdbcmysqltest}"/>
+    <!-- jdbcoracle jars -->
+    <property name="jarojdbc" value="ojdbc6.jar"/>
+    <property name="jarxdb" value="xdb6.jar"/>
+    <!--<property name="jarxmlparser" value="xmlparserv2.jar"/>-->
+    <property name="jarjdbcoracle" value="jdbcoracle.jar"/>
+    <property name="jarjdbcoracletest" value="jdbcoracle-test.jar"/>
+    <property name="cpjdbcoracle"
+              value="${dirlib}/${jarjdbcoracle};${dirlib}/${jarojdbc};${dirlib}/${jarxdb};${dirlib}/${jarxmlparser}"/>
+    <property name="cpjdbcoracle-test" value="${dirlib}/${jarjdbcoracletest}"/>
+    <!-- jdbcpostgres jars -->
+    <property name="jarpostgresjdbc" value="postgresql-42.2.5.jar"/>
+    <property name="jarjson" value="json-simple-1.1.1.jar"/>
+    <property name="jarjdbcpostgres" value="jdbcpostgres.jar"/>
+    <property name="jarjdbcpostgrestest" value="jdbcpostgres-test.jar"/>
+    <property name="cpjdbcpostgres" value="${dirlib}/${jarjdbcpostgres};${dirlib}/${jarpostgresjdbc}"/>
+    <property name="cpjdbcpostgres-test" value="${dirlib}/${jarjdbcpostgrestest};${dirlib}/${jarjson}"/>
+    <!-- siardapi -->
+    <property name="jarsiardapi" value="siardapi.jar"/>
+    <property name="cpsiardapi" value="${dirlib}/${jarsiardapi}"/>
+    <!-- junit -->
+    <property name="jarhamcrest" value="hamcrest-core-1.3.jar"/>
+    <property name="jarjunit4" value="junit-4.12.jar"/>
+    <property name="cpjunit" value="${dirlib}/${jarhamcrest};${dirlib}/${jarjunit4}"/>
+    <property name="jartika" value="tika-app-2.8.0.jar"/>
+    <property name="cptika" value="${dirlib}/${jartika}"/>
 
-  <!-- create the JAR file containing all classes whithout manifest-->
-  <property name="jarfile" value="${ant.project.name}.jar"/>
-  <target name="jar-test" depends="build">
-    <echo message="${ant.project.name}: jar"/>
-    <jar jarfile="${dirdist}/${jarfile}">
-      <fileset dir="${dirbuildclasses}">
-        <include name="**/*.class"/>
-        <include name="**/res/*.*"/>
-      </fileset>
-    </jar>
-  </target>
+    <!-- delete build folders -->
+    <property name="dirbuild" value="build"/>
+    <property name="dirbuildclasses" value="${dirbuild}/classes"/>
+    <property name="dirbuildtests" value="${dirbuild}/tests"/>
+    <target name="clean">
+        <echo message="${ant.project.name}: clean"/>
+        <delete dir="${dirbuildclasses}"/>
+        <delete dir="${dirbuildtests}"/>
+        <delete dir="${dirtmp}"/>
+        <delete dir="${dirdist}"/>
+    </target>
 
-  <!-- create the JAR file containing all classes -->
-  <property name="jarfile" value="${ant.project.name}.jar"/>
-  <target name="jar" depends="tests, revision">
-    <echo message="${ant.project.name}: jar"/>
-    <jar jarfile="${dirdist}/${jarfile}"
-       manifest="${filemanifest}">
-      <fileset dir="${dirbuildclasses}">
-        <include name="**/*.class"/>
-        <include name="**/res/*.*"/>
-      </fileset>
-    </jar>
-  </target>
-	
-	<!-- create all tests -->
-	<target name="tests" depends="jar-test">
-    <echo message="${ant.project.name}: tests build"/>
-		<!-- build the tests -->
-    <javac debug="true" debuglevel="${debuglevel}"
-      includeantruntime="false"
-      bootclasspath="${java8rtjar}"
-      source="${source}" 
-      target="${target}"
-      encoding="UTF-8"
-      srcdir="${dirtest}"
-      destdir="${dirbuildtests}">
-    	<classpath>
-        <pathelement path="${dirdist}/${jarfile}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${cptika}"/>
-        <pathelement path="${cpsqlparser}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpjdbcbase-test}"/>
-        <pathelement path="${cpjdbcaccess}"/>
-        <pathelement path="${cpjdbcdb2}"/>
-        <pathelement path="${cpjdbcdb2-test}"/>
-        <pathelement path="${cpjdbcmssql}"/>
-        <pathelement path="${cpjdbcmssql-test}"/>
-        <pathelement path="${cpjdbcmysql}"/>
-        <pathelement path="${cpjdbcmysql-test}"/>
-        <pathelement path="${cpjdbcoracle}"/>
-        <pathelement path="${cpjdbcoracle-test}"/>
-        <pathelement path="${cpjdbcpostgres}"/>
-        <pathelement path="${cpjdbcpostgres-test}"/>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpsunjdbc}"/>
-        <pathelement path="${cpjunit}"/>
+    <!-- create build folders -->
+    <target name="init" depends="clean">
+        <echo message="${ant.project.name}: init"/>
+        <mkdir dir="${dirbuildclasses}"/>
+        <mkdir dir="${dirbuildtests}"/>
+        <mkdir dir="${dirtmp}"/>
+        <mkdir dir="${dirdist}"/>
+    </target>
 
-  		</classpath>
-    </javac>
-  </target>
-  
-  <!-- run access tests -->
-  <property name="classaccesstestsuite" value="ch.admin.bar.siard2.cmd._AccessTestSuite"/>
-  <property name="fileaccesstests" value="access-tests"/>
-  <target name="test-access" depends="tests"  if="dbuseraccess">
-    <echo message="${ant.project.name}: test-access run"/>
-    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
-      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
-      <formatter type="plain"/>
-      <classpath>
-        <pathelement path="${dirbuildtests}"/>
-        <pathelement path="${dirdist}/${jarfile}"/>
-        <pathelement path="${cpantlr}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${cptika}"/>
-        <pathelement path="${cpsqlparser}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpjdbcbase-test}"/>
-        <pathelement path="${cpjdbcaccess}"/>
-        <pathelement path="${cpjaxb}"/>
-        <pathelement path="${cpzip64}"/>
-        <pathelement path="${cpwoodstox}"/>
-        <pathelement path="${cpmsv}"/>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpsunjdbc}"/>
-        <pathelement path="${cpjunit}"/>
-      </classpath>
-      <test 
-      name="${classaccesstestsuite}"
-      outfile="${fileaccesstests}"
-      todir="${dirtmp}"/>
-    </junit>
-  </target>
-  
-  <!-- run DB/2 tests -->
-  <property name="classdb2testsuite" value="ch.admin.bar.siard2.cmd._Db2TestSuite"/>
-  <property name="filedb2tests" value="db2-tests"/>
-  <target name="test-db2" depends="tests" if="dbuserdb2">
-    <echo message="${ant.project.name}: test-db2 run"/>
-    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
-      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
-      <formatter type="plain"/>
-      <classpath>
-        <pathelement path="${dirbuildtests}"/>
-        <pathelement path="${dirdist}/${jarfile}"/>
-        <pathelement path="${cpantlr}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${cptika}"/>
-        <pathelement path="${cpsqlparser}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpjdbcbase-test}"/>
-        <pathelement path="${cpjdbcdb2}"/>
-        <pathelement path="${cpjdbcdb2-test}"/>
-        <pathelement path="${cpjaxb}"/>
-        <pathelement path="${cpzip64}"/>
-        <pathelement path="${cpwoodstox}"/>
-        <pathelement path="${cpmsv}"/>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpjunit}"/>
-      </classpath>
-      <test 
-      name="${classdb2testsuite}"
-      outfile="${filedb2tests}"
-      todir="${dirtmp}"/>
-    </junit>
-  </target>
-  
-  <!-- run SQL Server tests -->
-  <property name="classmssqltestsuite" value="ch.admin.bar.siard2.cmd._MsSqlTestSuite"/>
-  <property name="filemssqltests" value="mssql-tests"/>
-  <target name="test-mssql" depends="tests" if="dbusermssql">
-    <echo message="${ant.project.name}: test-mssql run"/>
-    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
-      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
-      <formatter type="plain"/>
-      <classpath>
-        <pathelement path="${dirbuildtests}"/>
-        <pathelement path="${dirdist}/${jarfile}"/>
-        <pathelement path="${cpantlr}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${cptika}"/>
-        <pathelement path="${cpsqlparser}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpjdbcbase-test}"/>
-        <pathelement path="${cpjdbcmssql}"/>
-        <pathelement path="${cpjdbcmssql-test}"/>
-        <pathelement path="${cpjaxb}"/>
-        <pathelement path="${cpzip64}"/>
-        <pathelement path="${cpwoodstox}"/>
-        <pathelement path="${cpmsv}"/>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpjunit}"/>
-      </classpath>
-      <test 
-      name="${classmssqltestsuite}"
-      outfile="${filemssqltests}"
-      todir="${dirtmp}"/>
-    </junit>
-  </target>
-  
-  <!-- run MySQL tests -->
-  <property name="classmysqltestsuite" value="ch.admin.bar.siard2.cmd._MySqlTestSuite"/>
-  <property name="filemysqltests" value="mysql-tests"/>
-  <target name="test-mysql" depends="tests"  if="dbusermysql">
-    <echo message="${ant.project.name}: test-mysql run"/>
-    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
-      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
-      <formatter type="plain"/>
-      <classpath>
-        <pathelement path="${dirbuildtests}"/>
-        <pathelement path="${dirdist}/${jarfile}"/>
-        <pathelement path="${cpantlr}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${cptika}"/>
-        <pathelement path="${cpsqlparser}"/>
-        <pathelement path="${cpjts}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpjdbcbase-test}"/>
-        <pathelement path="${cpjdbcmysql}"/>
-        <pathelement path="${cpjdbcmysql-test}"/>
-        <pathelement path="${cpjaxb}"/>
-        <pathelement path="${cpzip64}"/>
-        <pathelement path="${cpwoodstox}"/>
-        <pathelement path="${cpmsv}"/>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpjunit}"/>
-      </classpath>
-      <test 
-      name="${classmysqltestsuite}"
-      outfile="${filemysqltests}"
-      todir="${dirtmp}"/>
-    </junit>
-  </target>
-  
-  <!-- run Oracle tests -->
-  <property name="classoracletestsuite" value="ch.admin.bar.siard2.cmd._OracleTestSuite"/>
-  <property name="fileoracletests" value="oracle-tests"/>
-  <target name="test-oracle" depends="tests"  if="dbuseroracle">
-    <echo message="${ant.project.name}: test-oracle run"/>
-    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
-      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
-      <formatter type="plain"/>
-      <classpath>
-        <pathelement path="${dirbuildtests}"/>
-        <pathelement path="${dirdist}/${jarfile}"/>
-        <pathelement path="${cpantlr}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${cptika}"/>
-        <pathelement path="${cpsqlparser}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpjdbcbase-test}"/>
-        <pathelement path="${cpjdbcoracle}"/>
-        <pathelement path="${cpjdbcoracle-test}"/>
-        <pathelement path="${cpjaxb}"/>
-        <pathelement path="${cpzip64}"/>
-        <pathelement path="${cpwoodstox}"/>
-        <pathelement path="${cpmsv}"/>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpjunit}"/>
-      </classpath>
-      <test 
-      name="${classoracletestsuite}"
-      outfile="${fileoracletests}"
-      todir="${dirtmp}"/>
-    </junit>
-  </target>
-  
-  <!-- run Postgres tests -->
-  <property name="classpostgrestestsuite" value="ch.admin.bar.siard2.cmd._PostgresTestSuite"/>
-  <property name="filepostgrestests" value="postgres-tests"/>
-  <target name="test-postgres" depends="tests"  if="dbuserpostgres">
-    <echo message="${ant.project.name}: test-postgres run"/>
-    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
-      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
-      <formatter type="plain"/>
-      <classpath>
-        <pathelement path="${dirbuildtests}"/>
-        <pathelement path="${dirdist}/${jarfile}"/>
-        <pathelement path="${cpantlr}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${cptika}"/>
-        <pathelement path="${cpsqlparser}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpjdbcbase-test}"/>
-        <pathelement path="${cpjdbcpostgres}"/>
-        <pathelement path="${cpjdbcpostgres-test}"/>
-        <pathelement path="${cpjaxb}"/>
-        <pathelement path="${cpzip64}"/>
-        <pathelement path="${cpwoodstox}"/>
-        <pathelement path="${cpmsv}"/>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpjunit}"/>
-      </classpath>
-      <test 
-      name="${classpostgrestestsuite}"
-      outfile="${filepostgrestests}"
-      todir="${dirtmp}"/>
-    </junit>
-  </target>
-	
-  <!-- run AdventureWorks tests -->
-  <property name="classawtestsuite" value="ch.admin.bar.siard2.cmd._AwTestSuite"/>
-  <property name="fileawtests" value="aw-tests"/>
-  <target name="tests-aw" depends="tests" if="dbuseraw">
-    <echo message="${ant.project.name}: test-aw run"/>
-    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
-      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
-      <formatter type="plain"/>
-      <classpath>
-        <pathelement path="${dirbuildtests}"/>
-        <pathelement path="${dirdist}/${jarfile}"/>
-        <pathelement path="${cpantlr}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${cptika}"/>
-        <pathelement path="${cpsqlparser}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpjdbcbase-test}"/>
-        <pathelement path="${cpjdbcmssql}"/>
-        <pathelement path="${cpjdbcmssql-test}"/>
-        <pathelement path="${cpjaxb}"/>
-        <pathelement path="${cpzip64}"/>
-        <pathelement path="${cpwoodstox}"/>
-        <pathelement path="${cpmsv}"/>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpjunit}"/>
-      </classpath>
-      <test 
-      name="${classawtestsuite}"
-      outfile="${fileawtests}"
-      todir="${dirtmp}"/>
-    </junit>
-  </target>
-  
-  <!-- run OE tests -->
-  <property name="classoetestsuite" value="ch.admin.bar.siard2.cmd._OeTestSuite"/>
-  <property name="fileoetests" value="oe-tests"/>
-  <target name="tests-oe" depends="tests" if="dbuseroe">
-    <echo message="${ant.project.name}: test-oe run"/>
-    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
-      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
-      <formatter type="plain"/>
-      <classpath>
-        <pathelement path="${dirbuildtests}"/>
-        <pathelement path="${dirdist}/${jarfile}"/>
-        <pathelement path="${cpantlr}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${cptika}"/>
-        <pathelement path="${cpsqlparser}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpjdbcbase-test}"/>
-        <pathelement path="${cpjdbcoracle}"/>
-        <pathelement path="${cpjdbcoracle-test}"/>
-        <pathelement path="${cpjaxb}"/>
-        <pathelement path="${cpzip64}"/>
-        <pathelement path="${cpwoodstox}"/>
-        <pathelement path="${cpmsv}"/>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpjunit}"/>
-      </classpath>
-      <test 
-      name="${classoetestsuite}"
-      outfile="${fileoetests}"
-      todir="${dirtmp}"/>
-    </junit>
-  </target>
-  
-  <!-- run dvd_rental tests -->
-  <property name="classdvdtestsuite" value="ch.admin.bar.siard2.cmd._DvdTestSuite"/>
-  <property name="filedvdtests" value="dvd-tests"/>
-  <target name="tests-dvd" depends="tests" if="dbuserdvd">
-    <echo message="${ant.project.name}: test-dvd run"/>
-    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
-      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
-      <formatter type="plain"/>
-      <classpath>
-        <pathelement path="${dirbuildtests}"/>
-        <pathelement path="${dirdist}/${jarfile}"/>
-        <pathelement path="${cpantlr}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${cptika}"/>
-        <pathelement path="${cpsqlparser}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpjdbcbase-test}"/>
-        <pathelement path="${cpjdbcpostgres}"/>
-        <pathelement path="${cpjdbcpostgres-test}"/>
-        <pathelement path="${cpjaxb}"/>
-        <pathelement path="${cpzip64}"/>
-        <pathelement path="${cpwoodstox}"/>
-        <pathelement path="${cpmsv}"/>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpjunit}"/>
-      </classpath>
-      <test 
-      name="${classdvdtestsuite}"
-      outfile="${filedvdtests}"
-      todir="${dirtmp}"/>
-    </junit>
-  </target>
-  
-  <!-- run Northwind tests -->
-  <property name="classnwtestsuite" value="ch.admin.bar.siard2.cmd._NwTestSuite"/>
-  <property name="filenwtests" value="nw-tests"/>
-  <target name="tests-nw" depends="tests" if="dbusernw">
-    <echo message="${ant.project.name}: test-nw run"/>
-    <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
-      <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
-      <formatter type="plain"/>
-      <classpath>
-        <pathelement path="${dirbuildtests}"/>
-        <pathelement path="${dirdist}/${jarfile}"/>
-        <pathelement path="${cpantlr}"/>
-        <pathelement path="${cpenterutils}"/>
-        <pathelement path="${cptika}"/>
-        <pathelement path="${cpsqlparser}"/>
-        <pathelement path="${cpjdbcbase}"/>
-        <pathelement path="${cpjdbcbase-test}"/>
-        <pathelement path="${cpjdbcaccess}"/>
-        <pathelement path="${cpjaxb}"/>
-        <pathelement path="${cpzip64}"/>
-        <pathelement path="${cpwoodstox}"/>
-        <pathelement path="${cpmsv}"/>
-        <pathelement path="${cpsiardapi}"/>
-        <pathelement path="${cpjunit}"/>
-      </classpath>
-      <test 
-      name="${classnwtestsuite}"
-      outfile="${filenwtests}"
-      todir="${dirtmp}"/>
-    </junit>
-  </target>
-  
-  <!-- create the ZIP file with binaries for Windows and LINUX -->
-  <target name="release" depends="jar, jar-test">
-    <echo message="${ant.project.name}: zip"/>
-    <zip zipfile="${dirdist}/${ant.project.name}-${version}.${revision}.zip">
-    	
-      <zipfileset dir="${dirdist}" prefix="${ant.project.name}/${dirlib}">
-        <include name="${jarfile}"/>
-      </zipfileset>
-      <zipfileset dir="${dirlib}" prefix="${ant.project.name}/${dirlib}">
-        <exclude name="*-test.jar"/>
-      	<exclude name="${jarhamcrest}"/>
-      	<exclude name="${jarjunit4}"/>
-      </zipfileset>
-      <zipfileset dir="${dirbin}" prefix="${ant.project.name}">
-        <exclude name="**/*.sh"/>
-      </zipfileset>
-      <zipfileset filemode="755" dir="${dirbin}" prefix="${ant.project.name}">
-        <include name="**/*.sh"/>
-      </zipfileset>
-      <zipfileset dir="${dirdoc}" prefix="${ant.project.name}/${dirdoc}">
-        <include name="**/*.*"/>
-        <exclude name="developer/**/*.*"/>
-      </zipfileset>
-      <zipfileset dir="${diretc}" prefix="${ant.project.name}/${diretc}">
-        <exclude name="debug.properties"/>
-      </zipfileset>
-      <zipfileset dir="${dirtestfiles}" prefix="${ant.project.name}/${dirtestfiles}">
-        <include name="sample.siard"/>
-      </zipfileset>
-      <zipfileset dir="." prefix="${ant.project.name}">
-        <include name="*.txt"/>
-      </zipfileset>
-    </zip>
-  </target>
-  
-  <!-- deploy to file system -->
-  <target name="deploy" if="dirdeploy">
-    <echo message="${ant.project.name}: deploy"/>
-    <delete dir="${dirdeploy}/${ant.project.name}"/>
-    <unzip dest="${dirdeploy}" src="${dirdist}/${ant.project.name}-${version}.${revision}.zip" />
-  	<chmod dir="${dirdeploy}" perm="ugo+rx" includes="**/*.sh"/>
-  </target>
+    <!-- check if mainfest and local build properties are available -->
+    <property name="filemanifest" value="${dirsrc}/META-INF/MANIFEST.MF"/>
+    <property name="filerevoldproperties" value="${dirtmp}/revold.properties"/>
+    <property name="filegithead" value=".git/HEAD"/>
+    <property name="filebranchproperties" value="${dirtmp}/branch.properties"/>
+    <target name="check" depends="init">
+        <!-- get current date -->
+        <tstamp>
+            <format property="builtdate" pattern="dd. MMM yyyy" locale="en,CH"/>
+        </tstamp>
+        <echo message="builddate: ${builtdate}"/>
+        <!-- current version and revision are taken from manifest -->
+        <copy file="${filemanifest}" tofile="${filerevoldproperties}"/>
+        <!-- reduce it to version and revision properties -->
+        <replaceregexp file="${filerevoldproperties}"
+                       match=".*Implementation-Version: (\d+\.\d+)\.(\d+).*"
+                       replace="version=\1&#x000A;revold=\2"
+                       flags="gms"/>
+        <!-- load the properties -->
+        <property file="${filerevoldproperties}"/>
+        <echo message="version: ${version}"/>
+        <echo message="revold: ${revold}"/>
+        <!-- fail if build.properties are not configured -->
+        <fail message="External build.properties not configured correctly!">
+            <condition>
+                <not>
+                    <and>
+                        <isset property="version"/>
+                        <isset property="revold"/>
+                        <isset property="java8rtjar"/>
+                    </and>
+                </not>
+            </condition>
+        </fail>
+        <!-- check .git/HEAD for active branch name -->
+        <copy file="${filegithead}" tofile="${filebranchproperties}"/>
+        <!-- reduce it to branch property -->
+        <replaceregexp file="${filebranchproperties}"
+                       match="^ref: refs/heads/(.*)$"
+                       replace="branch=\1"
+                       flags="gms"/>
+        <!-- load the property -->
+        <property file="${filebranchproperties}"/>
+        <!-- compute branch.master -->
+        <condition property="branch.master">
+            <and>
+                <not>
+                    <isset property="submit"/>
+                </not>
+                <equals arg1="${branch}" arg2="master"/>
+            </and>
+        </condition>
+        <echo message="branch: ${branch}"/>
+        <echo message="branch.master: ${branch.master}"/>
+        <echo message="build.properties.configured: ${build.properties.configured}"/>
+    </target>
 
-  <!-- commit local work -->
-  <target name="copy-dependencies" depends="check">
-   <!-- <echo message="Copy jar files from dependency projects on local file system"/>
-    <copy file="../EnterUtilities/dist/enterutils.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../SqlParser/dist/sqlparser.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../Zip64File/dist/zip64.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../SiardApi/dist/siardapi.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcBase/dist/jdbcbase.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcBase/dist/jdbcbase-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcAccess/dist/jdbcaccess.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcAccess/dist/jdbcaccess-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcDb2/dist/jdbcdb2.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcDb2/dist/jdbcdb2-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcH2/dist/jdbch2.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcH2/dist/jdbch2-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcMsSql/dist/jdbcmssql.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcMsSql/dist/jdbcmssql-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcMySql/dist/jdbcmysql.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcMySql/dist/jdbcmysql-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcOracle/dist/jdbcoracle.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcOracle/dist/jdbcoracle-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcPostgres/dist/jdbcpostgres.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
-    <copy file="../JdbcPostgres/dist/jdbcpostgres-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>-->
-  </target>
-  
+    <!-- increment revision and update manifest -->
+    <property name="filerevisionproperties" value="${dirtmp}/revision.properties"/>
+    <target name="revision" depends="check">
+        <echo message="${ant.project.name}: revision"/>
+        <copy file="${filerevoldproperties}" tofile="${filerevisionproperties}" overwrite="true"/>
+        <replaceregexp file="${filerevisionproperties}"
+                       match="^revold=(.*)$"
+                       replace="revision=\1"
+                       flags="gm"/>
+        <propertyfile file="${filerevisionproperties}">
+            <entry key="revision" type="int" operation="+" value="1"/>
+        </propertyfile>
+        <property file="${filerevisionproperties}"/>
+        <echo message="revision: ${revision}"/>
+        <replaceregexp file="${filemanifest}"
+                       match="^Implementation-Version: .*$"
+                       replace="Implementation-Version: ${version}.${revision}"
+                       flags="gm"/>
+        <replaceregexp file="${filemanifest}"
+                       match="^Built-Date: .*$"
+                       replace="Built-Date: ${builtdate}"
+                       flags="gm"/>
+    </target>
+
+    <!-- build the SiardCmd classes -->
+    <target name="build" depends="init,copy-dependencies">
+        <echo message="${ant.project.name}: build (${cpsiardapi};${cpjdbcaccess};${cpjdbcdb2};${cpjdbcmysql};${cpjdbcoracle};${cpjdbcmssql};${cpjdbcbase};${cpenterutils};${cptika})"/>
+        <!-- without this, the package-info class is not generated! -->
+        <touch>
+            <fileset dir="${dirsrc}" includes="**/*.*"/>
+        </touch>
+        <javac debug="true" debuglevel="${debuglevel}"
+               includeantruntime="false"
+               bootclasspath="${java8rtjar}"
+               source="${source}"
+               target="${target}"
+               encoding="UTF-8"
+               srcdir="${dirsrc}"
+               destdir="${dirbuildclasses}">
+            <classpath>
+                <pathelement path="${cpsiardapi}"/>
+                <pathelement path="${cpjdbcaccess}"/>
+                <pathelement path="${cpjdbcdb2}"/>
+                <pathelement path="${cpjdbcmssql}"/>
+                <pathelement path="${cpjdbcmysql}"/>
+                <pathelement path="${cpjdbcoracle}"/>
+                <pathelement path="${cpjdbcpostgres}"/>
+                <pathelement path="${cpjdbcbase}"/>
+                <pathelement path="${cpenterutils}"/>
+                <pathelement path="${cptika}"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <!-- create the JAR file containing all classes whithout manifest-->
+    <property name="jarfile" value="${ant.project.name}.jar"/>
+    <target name="jar-test" depends="build">
+        <echo message="${ant.project.name}: jar"/>
+        <jar jarfile="${dirdist}/${jarfile}">
+            <fileset dir="${dirbuildclasses}">
+                <include name="**/*.class"/>
+                <include name="**/res/*.*"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <!-- create the JAR file containing all classes -->
+    <property name="jarfile" value="${ant.project.name}.jar"/>
+    <target name="jar" depends="tests, revision">
+        <echo message="${ant.project.name}: jar"/>
+        <jar jarfile="${dirdist}/${jarfile}"
+             manifest="${filemanifest}">
+            <fileset dir="${dirbuildclasses}">
+                <include name="**/*.class"/>
+                <include name="**/res/*.*"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <!-- create all tests -->
+    <target name="tests" depends="jar-test">
+        <echo message="${ant.project.name}: tests build"/>
+        <!-- build the tests -->
+        <javac debug="true" debuglevel="${debuglevel}"
+               includeantruntime="false"
+               bootclasspath="${java8rtjar}"
+               source="${source}"
+               target="${target}"
+               encoding="UTF-8"
+               srcdir="${dirtest}"
+               excludes="**/ch/admin/bar/siard2/cmd/issues/**"
+               destdir="${dirbuildtests}">
+            <classpath>
+                <pathelement path="${dirdist}/${jarfile}"/>
+                <pathelement path="${cpenterutils}"/>
+                <pathelement path="${cptika}"/>
+                <pathelement path="${cpsqlparser}"/>
+                <pathelement path="${cpjdbcbase}"/>
+                <pathelement path="${cpjdbcbase-test}"/>
+                <pathelement path="${cpjdbcaccess}"/>
+                <pathelement path="${cpjdbcdb2}"/>
+                <pathelement path="${cpjdbcdb2-test}"/>
+                <pathelement path="${cpjdbcmssql}"/>
+                <pathelement path="${cpjdbcmssql-test}"/>
+                <pathelement path="${cpjdbcmysql}"/>
+                <pathelement path="${cpjdbcmysql-test}"/>
+                <pathelement path="${cpjdbcoracle}"/>
+                <pathelement path="${cpjdbcoracle-test}"/>
+                <pathelement path="${cpjdbcpostgres}"/>
+                <pathelement path="${cpjdbcpostgres-test}"/>
+                <pathelement path="${cpsiardapi}"/>
+                <pathelement path="${cpsunjdbc}"/>
+                <pathelement path="${cpjunit}"/>
+
+            </classpath>
+        </javac>
+    </target>
+
+    <!-- run access tests -->
+    <property name="classaccesstestsuite" value="ch.admin.bar.siard2.cmd._AccessTestSuite"/>
+    <property name="fileaccesstests" value="access-tests"/>
+    <target name="test-access" depends="tests" if="dbuseraccess">
+        <echo message="${ant.project.name}: test-access run"/>
+        <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+            <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+            <formatter type="plain"/>
+            <classpath>
+                <pathelement path="${dirbuildtests}"/>
+                <pathelement path="${dirdist}/${jarfile}"/>
+                <pathelement path="${cpantlr}"/>
+                <pathelement path="${cpenterutils}"/>
+                <pathelement path="${cptika}"/>
+                <pathelement path="${cpsqlparser}"/>
+                <pathelement path="${cpjdbcbase}"/>
+                <pathelement path="${cpjdbcbase-test}"/>
+                <pathelement path="${cpjdbcaccess}"/>
+                <pathelement path="${cpjaxb}"/>
+                <pathelement path="${cpzip64}"/>
+                <pathelement path="${cpwoodstox}"/>
+                <pathelement path="${cpmsv}"/>
+                <pathelement path="${cpsiardapi}"/>
+                <pathelement path="${cpsunjdbc}"/>
+                <pathelement path="${cpjunit}"/>
+            </classpath>
+            <test
+                    name="${classaccesstestsuite}"
+                    outfile="${fileaccesstests}"
+                    todir="${dirtmp}"/>
+        </junit>
+    </target>
+
+    <!-- run DB/2 tests -->
+    <property name="classdb2testsuite" value="ch.admin.bar.siard2.cmd._Db2TestSuite"/>
+    <property name="filedb2tests" value="db2-tests"/>
+    <target name="test-db2" depends="tests" if="dbuserdb2">
+        <echo message="${ant.project.name}: test-db2 run"/>
+        <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+            <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+            <formatter type="plain"/>
+            <classpath>
+                <pathelement path="${dirbuildtests}"/>
+                <pathelement path="${dirdist}/${jarfile}"/>
+                <pathelement path="${cpantlr}"/>
+                <pathelement path="${cpenterutils}"/>
+                <pathelement path="${cptika}"/>
+                <pathelement path="${cpsqlparser}"/>
+                <pathelement path="${cpjdbcbase}"/>
+                <pathelement path="${cpjdbcbase-test}"/>
+                <pathelement path="${cpjdbcdb2}"/>
+                <pathelement path="${cpjdbcdb2-test}"/>
+                <pathelement path="${cpjaxb}"/>
+                <pathelement path="${cpzip64}"/>
+                <pathelement path="${cpwoodstox}"/>
+                <pathelement path="${cpmsv}"/>
+                <pathelement path="${cpsiardapi}"/>
+                <pathelement path="${cpjunit}"/>
+            </classpath>
+            <test
+                    name="${classdb2testsuite}"
+                    outfile="${filedb2tests}"
+                    todir="${dirtmp}"/>
+        </junit>
+    </target>
+
+    <!-- run SQL Server tests -->
+    <property name="classmssqltestsuite" value="ch.admin.bar.siard2.cmd._MsSqlTestSuite"/>
+    <property name="filemssqltests" value="mssql-tests"/>
+    <target name="test-mssql" depends="tests" if="dbusermssql">
+        <echo message="${ant.project.name}: test-mssql run"/>
+        <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+            <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+            <formatter type="plain"/>
+            <classpath>
+                <pathelement path="${dirbuildtests}"/>
+                <pathelement path="${dirdist}/${jarfile}"/>
+                <pathelement path="${cpantlr}"/>
+                <pathelement path="${cpenterutils}"/>
+                <pathelement path="${cptika}"/>
+                <pathelement path="${cpsqlparser}"/>
+                <pathelement path="${cpjdbcbase}"/>
+                <pathelement path="${cpjdbcbase-test}"/>
+                <pathelement path="${cpjdbcmssql}"/>
+                <pathelement path="${cpjdbcmssql-test}"/>
+                <pathelement path="${cpjaxb}"/>
+                <pathelement path="${cpzip64}"/>
+                <pathelement path="${cpwoodstox}"/>
+                <pathelement path="${cpmsv}"/>
+                <pathelement path="${cpsiardapi}"/>
+                <pathelement path="${cpjunit}"/>
+            </classpath>
+            <test
+                    name="${classmssqltestsuite}"
+                    outfile="${filemssqltests}"
+                    todir="${dirtmp}"/>
+        </junit>
+    </target>
+
+    <!-- run MySQL tests -->
+    <property name="classmysqltestsuite" value="ch.admin.bar.siard2.cmd._MySqlTestSuite"/>
+    <property name="filemysqltests" value="mysql-tests"/>
+    <target name="test-mysql" depends="tests" if="dbusermysql">
+        <echo message="${ant.project.name}: test-mysql run"/>
+        <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+            <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+            <formatter type="plain"/>
+            <classpath>
+                <pathelement path="${dirbuildtests}"/>
+                <pathelement path="${dirdist}/${jarfile}"/>
+                <pathelement path="${cpantlr}"/>
+                <pathelement path="${cpenterutils}"/>
+                <pathelement path="${cptika}"/>
+                <pathelement path="${cpsqlparser}"/>
+                <pathelement path="${cpjts}"/>
+                <pathelement path="${cpjdbcbase}"/>
+                <pathelement path="${cpjdbcbase-test}"/>
+                <pathelement path="${cpjdbcmysql}"/>
+                <pathelement path="${cpjdbcmysql-test}"/>
+                <pathelement path="${cpjaxb}"/>
+                <pathelement path="${cpzip64}"/>
+                <pathelement path="${cpwoodstox}"/>
+                <pathelement path="${cpmsv}"/>
+                <pathelement path="${cpsiardapi}"/>
+                <pathelement path="${cpjunit}"/>
+            </classpath>
+            <test
+                    name="${classmysqltestsuite}"
+                    outfile="${filemysqltests}"
+                    todir="${dirtmp}"/>
+        </junit>
+    </target>
+
+    <!-- run Oracle tests -->
+    <property name="classoracletestsuite" value="ch.admin.bar.siard2.cmd._OracleTestSuite"/>
+    <property name="fileoracletests" value="oracle-tests"/>
+    <target name="test-oracle" depends="tests" if="dbuseroracle">
+        <echo message="${ant.project.name}: test-oracle run"/>
+        <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+            <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+            <formatter type="plain"/>
+            <classpath>
+                <pathelement path="${dirbuildtests}"/>
+                <pathelement path="${dirdist}/${jarfile}"/>
+                <pathelement path="${cpantlr}"/>
+                <pathelement path="${cpenterutils}"/>
+                <pathelement path="${cptika}"/>
+                <pathelement path="${cpsqlparser}"/>
+                <pathelement path="${cpjdbcbase}"/>
+                <pathelement path="${cpjdbcbase-test}"/>
+                <pathelement path="${cpjdbcoracle}"/>
+                <pathelement path="${cpjdbcoracle-test}"/>
+                <pathelement path="${cpjaxb}"/>
+                <pathelement path="${cpzip64}"/>
+                <pathelement path="${cpwoodstox}"/>
+                <pathelement path="${cpmsv}"/>
+                <pathelement path="${cpsiardapi}"/>
+                <pathelement path="${cpjunit}"/>
+            </classpath>
+            <test
+                    name="${classoracletestsuite}"
+                    outfile="${fileoracletests}"
+                    todir="${dirtmp}"/>
+        </junit>
+    </target>
+
+    <!-- run Postgres tests -->
+    <property name="classpostgrestestsuite" value="ch.admin.bar.siard2.cmd._PostgresTestSuite"/>
+    <property name="filepostgrestests" value="postgres-tests"/>
+    <target name="test-postgres" depends="tests" if="dbuserpostgres">
+        <echo message="${ant.project.name}: test-postgres run"/>
+        <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+            <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+            <formatter type="plain"/>
+            <classpath>
+                <pathelement path="${dirbuildtests}"/>
+                <pathelement path="${dirdist}/${jarfile}"/>
+                <pathelement path="${cpantlr}"/>
+                <pathelement path="${cpenterutils}"/>
+                <pathelement path="${cptika}"/>
+                <pathelement path="${cpsqlparser}"/>
+                <pathelement path="${cpjdbcbase}"/>
+                <pathelement path="${cpjdbcbase-test}"/>
+                <pathelement path="${cpjdbcpostgres}"/>
+                <pathelement path="${cpjdbcpostgres-test}"/>
+                <pathelement path="${cpjaxb}"/>
+                <pathelement path="${cpzip64}"/>
+                <pathelement path="${cpwoodstox}"/>
+                <pathelement path="${cpmsv}"/>
+                <pathelement path="${cpsiardapi}"/>
+                <pathelement path="${cpjunit}"/>
+            </classpath>
+            <test
+                    name="${classpostgrestestsuite}"
+                    outfile="${filepostgrestests}"
+                    todir="${dirtmp}"/>
+        </junit>
+    </target>
+
+    <!-- run AdventureWorks tests -->
+    <property name="classawtestsuite" value="ch.admin.bar.siard2.cmd._AwTestSuite"/>
+    <property name="fileawtests" value="aw-tests"/>
+    <target name="tests-aw" depends="tests" if="dbuseraw">
+        <echo message="${ant.project.name}: test-aw run"/>
+        <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+            <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+            <formatter type="plain"/>
+            <classpath>
+                <pathelement path="${dirbuildtests}"/>
+                <pathelement path="${dirdist}/${jarfile}"/>
+                <pathelement path="${cpantlr}"/>
+                <pathelement path="${cpenterutils}"/>
+                <pathelement path="${cptika}"/>
+                <pathelement path="${cpsqlparser}"/>
+                <pathelement path="${cpjdbcbase}"/>
+                <pathelement path="${cpjdbcbase-test}"/>
+                <pathelement path="${cpjdbcmssql}"/>
+                <pathelement path="${cpjdbcmssql-test}"/>
+                <pathelement path="${cpjaxb}"/>
+                <pathelement path="${cpzip64}"/>
+                <pathelement path="${cpwoodstox}"/>
+                <pathelement path="${cpmsv}"/>
+                <pathelement path="${cpsiardapi}"/>
+                <pathelement path="${cpjunit}"/>
+            </classpath>
+            <test
+                    name="${classawtestsuite}"
+                    outfile="${fileawtests}"
+                    todir="${dirtmp}"/>
+        </junit>
+    </target>
+
+    <!-- run OE tests -->
+    <property name="classoetestsuite" value="ch.admin.bar.siard2.cmd._OeTestSuite"/>
+    <property name="fileoetests" value="oe-tests"/>
+    <target name="tests-oe" depends="tests" if="dbuseroe">
+        <echo message="${ant.project.name}: test-oe run"/>
+        <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+            <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+            <formatter type="plain"/>
+            <classpath>
+                <pathelement path="${dirbuildtests}"/>
+                <pathelement path="${dirdist}/${jarfile}"/>
+                <pathelement path="${cpantlr}"/>
+                <pathelement path="${cpenterutils}"/>
+                <pathelement path="${cptika}"/>
+                <pathelement path="${cpsqlparser}"/>
+                <pathelement path="${cpjdbcbase}"/>
+                <pathelement path="${cpjdbcbase-test}"/>
+                <pathelement path="${cpjdbcoracle}"/>
+                <pathelement path="${cpjdbcoracle-test}"/>
+                <pathelement path="${cpjaxb}"/>
+                <pathelement path="${cpzip64}"/>
+                <pathelement path="${cpwoodstox}"/>
+                <pathelement path="${cpmsv}"/>
+                <pathelement path="${cpsiardapi}"/>
+                <pathelement path="${cpjunit}"/>
+            </classpath>
+            <test
+                    name="${classoetestsuite}"
+                    outfile="${fileoetests}"
+                    todir="${dirtmp}"/>
+        </junit>
+    </target>
+
+    <!-- run dvd_rental tests -->
+    <property name="classdvdtestsuite" value="ch.admin.bar.siard2.cmd._DvdTestSuite"/>
+    <property name="filedvdtests" value="dvd-tests"/>
+    <target name="tests-dvd" depends="tests" if="dbuserdvd">
+        <echo message="${ant.project.name}: test-dvd run"/>
+        <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+            <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+            <formatter type="plain"/>
+            <classpath>
+                <pathelement path="${dirbuildtests}"/>
+                <pathelement path="${dirdist}/${jarfile}"/>
+                <pathelement path="${cpantlr}"/>
+                <pathelement path="${cpenterutils}"/>
+                <pathelement path="${cptika}"/>
+                <pathelement path="${cpsqlparser}"/>
+                <pathelement path="${cpjdbcbase}"/>
+                <pathelement path="${cpjdbcbase-test}"/>
+                <pathelement path="${cpjdbcpostgres}"/>
+                <pathelement path="${cpjdbcpostgres-test}"/>
+                <pathelement path="${cpjaxb}"/>
+                <pathelement path="${cpzip64}"/>
+                <pathelement path="${cpwoodstox}"/>
+                <pathelement path="${cpmsv}"/>
+                <pathelement path="${cpsiardapi}"/>
+                <pathelement path="${cpjunit}"/>
+            </classpath>
+            <test
+                    name="${classdvdtestsuite}"
+                    outfile="${filedvdtests}"
+                    todir="${dirtmp}"/>
+        </junit>
+    </target>
+
+    <!-- run Northwind tests -->
+    <property name="classnwtestsuite" value="ch.admin.bar.siard2.cmd._NwTestSuite"/>
+    <property name="filenwtests" value="nw-tests"/>
+    <target name="tests-nw" depends="tests" if="dbusernw">
+        <echo message="${ant.project.name}: test-nw run"/>
+        <junit haltonerror="true" haltonfailure="true" fork="true" printsummary="on" dir="${basedir}">
+            <sysproperty key="java.util.logging.config.file" value="${diretc}/debug.properties"/>
+            <formatter type="plain"/>
+            <classpath>
+                <pathelement path="${dirbuildtests}"/>
+                <pathelement path="${dirdist}/${jarfile}"/>
+                <pathelement path="${cpantlr}"/>
+                <pathelement path="${cpenterutils}"/>
+                <pathelement path="${cptika}"/>
+                <pathelement path="${cpsqlparser}"/>
+                <pathelement path="${cpjdbcbase}"/>
+                <pathelement path="${cpjdbcbase-test}"/>
+                <pathelement path="${cpjdbcaccess}"/>
+                <pathelement path="${cpjaxb}"/>
+                <pathelement path="${cpzip64}"/>
+                <pathelement path="${cpwoodstox}"/>
+                <pathelement path="${cpmsv}"/>
+                <pathelement path="${cpsiardapi}"/>
+                <pathelement path="${cpjunit}"/>
+            </classpath>
+            <test
+                    name="${classnwtestsuite}"
+                    outfile="${filenwtests}"
+                    todir="${dirtmp}"/>
+        </junit>
+    </target>
+
+    <!-- create the ZIP file with binaries for Windows and LINUX -->
+    <target name="release" depends="jar, jar-test">
+        <echo message="${ant.project.name}: zip"/>
+        <zip zipfile="${dirdist}/${ant.project.name}-${version}.${revision}.zip">
+
+            <zipfileset dir="${dirdist}" prefix="${ant.project.name}/${dirlib}">
+                <include name="${jarfile}"/>
+            </zipfileset>
+            <zipfileset dir="${dirlib}" prefix="${ant.project.name}/${dirlib}">
+                <exclude name="*-test.jar"/>
+                <exclude name="${jarhamcrest}"/>
+                <exclude name="${jarjunit4}"/>
+            </zipfileset>
+            <zipfileset dir="${dirbin}" prefix="${ant.project.name}">
+                <exclude name="**/*.sh"/>
+            </zipfileset>
+            <zipfileset filemode="755" dir="${dirbin}" prefix="${ant.project.name}">
+                <include name="**/*.sh"/>
+            </zipfileset>
+            <zipfileset dir="${dirdoc}" prefix="${ant.project.name}/${dirdoc}">
+                <include name="**/*.*"/>
+                <exclude name="developer/**/*.*"/>
+            </zipfileset>
+            <zipfileset dir="${diretc}" prefix="${ant.project.name}/${diretc}">
+                <exclude name="debug.properties"/>
+            </zipfileset>
+            <zipfileset dir="${dirtestfiles}" prefix="${ant.project.name}/${dirtestfiles}">
+                <include name="sample.siard"/>
+            </zipfileset>
+            <zipfileset dir="." prefix="${ant.project.name}">
+                <include name="*.txt"/>
+            </zipfileset>
+        </zip>
+    </target>
+
+    <!-- deploy to file system -->
+    <target name="deploy" if="dirdeploy">
+        <echo message="${ant.project.name}: deploy"/>
+        <delete dir="${dirdeploy}/${ant.project.name}"/>
+        <unzip dest="${dirdeploy}" src="${dirdist}/${ant.project.name}-${version}.${revision}.zip"/>
+        <chmod dir="${dirdeploy}" perm="ugo+rx" includes="**/*.sh"/>
+    </target>
+
+    <!-- commit local work -->
+    <target name="copy-dependencies" depends="check">
+        <!-- <echo message="Copy jar files from dependency projects on local file system"/>
+         <copy file="../EnterUtilities/dist/enterutils.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../SqlParser/dist/sqlparser.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../Zip64File/dist/zip64.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../SiardApi/dist/siardapi.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcBase/dist/jdbcbase.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcBase/dist/jdbcbase-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcAccess/dist/jdbcaccess.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcAccess/dist/jdbcaccess-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcDb2/dist/jdbcdb2.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcDb2/dist/jdbcdb2-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcH2/dist/jdbch2.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcH2/dist/jdbch2-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcMsSql/dist/jdbcmssql.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcMsSql/dist/jdbcmssql-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcMySql/dist/jdbcmysql.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcMySql/dist/jdbcmysql-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcOracle/dist/jdbcoracle.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcOracle/dist/jdbcoracle-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcPostgres/dist/jdbcpostgres.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>
+         <copy file="../JdbcPostgres/dist/jdbcpostgres-test.jar" todir="${dirlib}" failonerror="false" overwrite="true"/>-->
+    </target>
+
 </project>
