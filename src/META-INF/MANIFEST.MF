@@ -1,12 +1,12 @@
 Manifest-Version: 1.0
-Created-By: Hartwig Thomas, Enter AG, Rüti ZH, Switzerland
+Created-By: Hartwig Thomas, Enter AG, Rüti ZH, Switzerland; Puzzle ITC GmbH, Switzerland
 Specification-Title: SIARD CMD
 Specification-Version: 2.1
 Specification-Vendor: Swiss Federal Archives, Berne, Switzerland
 Implementation-Title: SIARD CMD
-Implementation-Version: 2.2.9
+Implementation-Version: 2.2.10
 Implementation-Vendor: Swiss Federal Archives, Berne, Switzerland
-Built-Date: 19. Jul 2023
+Built-Date: 30. Aug 2023
 Class-Path: siardapi.jar
   Zip64File.jar
   xsdlib-2010.1.jar
