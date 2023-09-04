@@ -40,6 +40,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.testcontainers:testcontainers:1.19.0")
     testImplementation("org.testcontainers:mssqlserver:1.19.0")
+    testImplementation("org.testcontainers:postgresql:1.19.0")
 }
 
 /**
