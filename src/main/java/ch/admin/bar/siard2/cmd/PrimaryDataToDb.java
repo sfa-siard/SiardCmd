@@ -10,16 +10,30 @@ package ch.admin.bar.siard2.cmd;
 
 import java.io.*;
 import java.math.*;
-import java.net.URL;
 import java.sql.*;
 import java.util.*;
 
+import ch.admin.bar.siard2.api.Archive;
+import ch.admin.bar.siard2.api.Cell;
+import ch.admin.bar.siard2.api.Field;
+import ch.admin.bar.siard2.api.MetaColumn;
+import ch.admin.bar.siard2.api.MetaData;
+import ch.admin.bar.siard2.api.MetaField;
+import ch.admin.bar.siard2.api.MetaForeignKey;
+import ch.admin.bar.siard2.api.MetaSchema;
+import ch.admin.bar.siard2.api.MetaTable;
+import ch.admin.bar.siard2.api.MetaType;
+import ch.admin.bar.siard2.api.MetaUniqueKey;
+import ch.admin.bar.siard2.api.Record;
+import ch.admin.bar.siard2.api.RecordDispenser;
+import ch.admin.bar.siard2.api.Schema;
+import ch.admin.bar.siard2.api.Table;
+import ch.admin.bar.siard2.api.Value;
 import ch.enterag.utils.*;
 import ch.enterag.utils.background.*;
 import ch.enterag.utils.logging.*;
 import ch.enterag.sqlparser.*;
 import ch.enterag.sqlparser.identifier.*;
-import ch.admin.bar.siard2.api.*;
 import ch.admin.bar.siard2.api.generated.*;
 
 /*====================================================================*/

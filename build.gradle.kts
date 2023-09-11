@@ -17,7 +17,12 @@ repositories {
 }
 
 sourceSets {
-
+    create("integrationTest") {
+        java.srcDir("src/integrationTest/java")
+        resources.srcDir("src/integrationTest/resources")
+        compileClasspath += sourceSets["main"].output + configurations["testRuntimeClasspath"]
+        runtimeClasspath += output + compileClasspath + sourceSets["test"].runtimeClasspath
+    }
 }
 
 dependencies {
@@ -37,6 +42,15 @@ dependencies {
 tasks.register<Copy>("copyManifest") {
     from(layout.projectDirectory.file("src/main/META-INF/MANIFEST.MF"))
     into(layout.buildDirectory.dir("tmp/jar"))
+}
+
+task<Test>("integrationTest") {
+    description = "Runs the integration tests"
+    group = "verification"
+    testClassesDirs = sourceSets["integrationTest"].output.classesDirs
+    classpath = sourceSets["integrationTest"].runtimeClasspath
+    mustRunAfter(tasks["test"])
+    useJUnit()
 }
 
 tasks.test {

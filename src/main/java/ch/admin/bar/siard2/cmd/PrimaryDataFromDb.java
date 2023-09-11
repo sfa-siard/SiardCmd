@@ -8,7 +8,15 @@ Created    : 01.09.2016, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.cmd;
 
-import ch.admin.bar.siard2.api.*;
+import ch.admin.bar.siard2.api.Archive;
+import ch.admin.bar.siard2.api.Cell;
+import ch.admin.bar.siard2.api.MetaColumn;
+import ch.admin.bar.siard2.api.MetaType;
+import ch.admin.bar.siard2.api.Record;
+import ch.admin.bar.siard2.api.RecordRetainer;
+import ch.admin.bar.siard2.api.Schema;
+import ch.admin.bar.siard2.api.Table;
+import ch.admin.bar.siard2.api.Value;
 import ch.admin.bar.siard2.api.generated.CategoryType;
 import ch.enterag.sqlparser.identifier.QualifiedId;
 import ch.enterag.utils.StopWatch;
