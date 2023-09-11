@@ -3,9 +3,10 @@ package ch.admin.bar.siard2.cmd;
 import static org.junit.Assert.*;
 import java.io.*;
 import java.sql.*;
+
+import ch.enterag.utils.EU;
 import org.junit.*;
 import ch.admin.bar.siard2.jdbc.*;
-import ch.enterag.utils.*;
 import ch.enterag.utils.base.*;
 
 public class OracleBugTester extends BaseFromDbTester

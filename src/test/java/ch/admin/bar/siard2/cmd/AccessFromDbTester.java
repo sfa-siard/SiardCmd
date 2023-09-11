@@ -4,9 +4,11 @@ import java.io.*;
 import java.sql.*;
 
 import static org.junit.Assert.*;
+
+import ch.enterag.utils.EU;
+import ch.enterag.utils.FU;
 import org.junit.Test;
 
-import ch.enterag.utils.*;
 import ch.admin.bar.siard2.jdbc.*;
 
 public class AccessFromDbTester extends BaseFromDbTester

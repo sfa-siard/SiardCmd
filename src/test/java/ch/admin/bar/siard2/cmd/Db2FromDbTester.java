@@ -4,11 +4,12 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 import java.sql.*;
+
+import ch.enterag.utils.FU;
 import org.junit.*;
 import ch.admin.bar.siard2.db2.*;
 import ch.admin.bar.siard2.jdbc.*;
 import ch.admin.bar.siard2.jdbcx.*;
-import ch.enterag.utils.*;
 import ch.enterag.utils.base.*;
 
 public class Db2FromDbTester extends BaseFromDbTester 

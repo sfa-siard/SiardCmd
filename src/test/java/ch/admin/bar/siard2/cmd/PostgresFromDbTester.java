@@ -7,7 +7,6 @@ import org.junit.*;
 import ch.admin.bar.siard2.jdbc.*;
 import ch.admin.bar.siard2.jdbcx.*;
 import ch.admin.bar.siard2.postgres.*;
-import ch.enterag.utils.*;
 import ch.enterag.utils.base.*;
 
 public class PostgresFromDbTester extends BaseFromDbTester

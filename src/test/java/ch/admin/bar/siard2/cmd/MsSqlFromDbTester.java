@@ -4,11 +4,13 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 import java.sql.*;
+
+import ch.enterag.utils.EU;
+import ch.enterag.utils.FU;
 import org.junit.*;
 import ch.admin.bar.siard2.jdbc.*;
 import ch.admin.bar.siard2.jdbcx.*;
 import ch.admin.bar.siard2.mssql.*;
-import ch.enterag.utils.*;
 import ch.enterag.utils.base.*;
 
 public class MsSqlFromDbTester extends BaseFromDbTester
