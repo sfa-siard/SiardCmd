@@ -5,39 +5,39 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.containers.MSSQLServerContainer;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class PostgresUploadDownloadSiardProjectIT {
+public class MsSqlUploadDownloadSiardProjectIT {
 
     @Rule
     public TemporaryFolder zippedDownloadedProjectFileTempFolder = new TemporaryFolder();
 
     @Rule
-    public PostgreSQLContainer postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:9.6.12"));
+    public MSSQLServerContainer db = new MSSQLServerContainer()
+            .acceptLicense();
 
     @Test
-    public void uploadAndDownload_expectNoExceptions() throws IOException, InterruptedException, SQLException, ClassNotFoundException {
+    public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
         // given
         final File siardProject = ResourcesLoader.loadResource(ResourcesLoader.SAMPLE_DATALINK_2_2_SIARD);
 
         // when
         SiardToDb siardToDb = new SiardToDb(new String[]{
                 "-o",
-                "-j:" + postgres.getJdbcUrl(),
-                "-u:" + postgres.getUsername(),
-                "-p:" + postgres.getPassword(),
+                "-j:" + db.getJdbcUrl(),
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
                 "-s:" + siardProject.getPath()
         });
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
-                "-j:" + postgres.getJdbcUrl(),
-                "-u:" + postgres.getUsername(),
-                "-p:" + postgres.getPassword(),
+                "-j:" + db.getJdbcUrl(),
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
                 "-s:" + zippedDownloadedProjectFileTempFolder.getRoot().toString()
         });
 
