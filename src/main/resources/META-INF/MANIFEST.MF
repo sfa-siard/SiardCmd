@@ -39,4 +39,3 @@ Class-Path: siardapi.jar
   enterutils.jar
   antlr-runtime-4.5.2.jar
   tika-app-2.8.0.jar
-  

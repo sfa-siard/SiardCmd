@@ -24,10 +24,10 @@ import ch.admin.bar.siard2.api.primary.*;
  * @author Hartwig Thomas
  */
 public class SiardFromDb {
-    private static final int iRETURN_OK = 0;
-    private static final int iRETURN_WARNING = 4;
-    private static final int iRETURN_ERROR = 8;
-    private static final int iRETURN_FATAL = 12;
+    public static final int iRETURN_OK = 0;
+    public static final int iRETURN_WARNING = 4;
+    public static final int iRETURN_ERROR = 8;
+    public static final int iRETURN_FATAL = 12;
 
     private static IndentLogger _il = IndentLogger.getIndentLogger(SiardFromDb.class.getName());
     private static final ManifestAttributes MF = ManifestAttributes.getInstance(SiardFromDb.class);

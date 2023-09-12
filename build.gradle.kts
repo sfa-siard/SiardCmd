@@ -19,7 +19,7 @@ repositories {
 sourceSets {
     create("integrationTest") {
         java.srcDir("src/integrationTest/java")
-        resources.srcDir("src/integrationTest/resources")
+        //resources.srcDir("src/integrationTest/resources") --> If active, then the following error occurs: "Entry siard-projects/xxx.siard is a duplicate but no duplicate handling strategy has been set."
         compileClasspath += sourceSets["main"].output + configurations["testRuntimeClasspath"]
         runtimeClasspath += output + compileClasspath + sourceSets["test"].runtimeClasspath
     }
@@ -32,6 +32,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.testcontainers:testcontainers:1.19.0")
     testImplementation("org.testcontainers:mssqlserver:1.19.0")
+    testImplementation("org.testcontainers:postgresql:1.19.0")
 }
 
 /**

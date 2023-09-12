@@ -29,10 +29,10 @@ public class SiardToDb
   /*====================================================================
   (private) constants
   ====================================================================*/
-	private static final int iRETURN_OK = 0;
-	private static final int iRETURN_WARNING = 4;
-	private static final int iRETURN_ERROR = 8;
-	private static final int iRETURN_FATAL = 12;
+	public static final int iRETURN_OK = 0;
+    public static final int iRETURN_WARNING = 4;
+    public static final int iRETURN_ERROR = 8;
+    public static final int iRETURN_FATAL = 12;
 
   /*====================================================================
   (private) data members
