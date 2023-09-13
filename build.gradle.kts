@@ -9,6 +9,7 @@
 plugins {
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
+    id("io.freefair.lombok") version "6.5.0"
 }
 
 repositories {
@@ -33,6 +34,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:1.19.0")
     testImplementation("org.testcontainers:mssqlserver:1.19.0")
     testImplementation("org.testcontainers:postgresql:1.19.0")
+    testImplementation("org.testcontainers:mysql:1.19.0")
 }
 
 /**

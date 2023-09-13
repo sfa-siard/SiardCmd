@@ -6,10 +6,12 @@ import java.util.Optional;
 
 public class ResourcesLoader {
 
+    public final static String SAMPLE_DATALINK_2_2_SIARD = "siard-projects/2_2/sample-datalink-2.2.siard";
+    public final static String MY_SQL_INIT_SCRIPT = "config/mysql/init.sql";
+
+
     private ResourcesLoader() {
     }
-
-    public final static String SAMPLE_DATALINK_2_2_SIARD = "siard-projects/2_2/sample-datalink-2.2.siard";
 
     public static File loadResource(final String resource) {
         final Optional<URL> urlToResource = Optional.ofNullable(ResourcesLoader.class
