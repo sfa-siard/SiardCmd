@@ -1,6 +1,7 @@
 package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.cmd.utils.ResourcesLoader;
+import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -28,7 +29,7 @@ public class MySql5UploadDownloadSiardProjectIT {
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException, InterruptedException {
         // given
-        final File siardProject = ResourcesLoader.loadResource(ResourcesLoader.SAMPLE_DATALINK_2_2_SIARD);
+        final File siardProject = ResourcesLoader.loadResource(SiardProjectExamples.SAMPLE_DATALINK_2_2_SIARD);
 
         // when
         SiardToDb siardToDb = new SiardToDb(new String[]{

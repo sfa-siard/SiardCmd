@@ -2,6 +2,7 @@ package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.cmd.utils.ConsoleLogConsumer;
 import ch.admin.bar.siard2.cmd.utils.ResourcesLoader;
+import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -26,8 +27,6 @@ public class OracleUploadDownloadSiardProjectIT {
 
     public OracleUploadDownloadSiardProjectIT() {
         db = new OracleContainer("gvenzl/oracle-xe:21-slim-faststart")
-                .withUsername("testUser")
-                .withPassword("testPassword")
                 .withLogConsumer(new ConsoleLogConsumer())
                 .withCopyFileToContainer(
                         MountableFile.forHostPath(ResourcesLoader.loadResource(ResourcesLoader.ORACLE_INIT).toPath()),
@@ -37,20 +36,20 @@ public class OracleUploadDownloadSiardProjectIT {
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
         // given
-        final File siardProject = ResourcesLoader.loadResource(ResourcesLoader.SIMPLE_TEAMS_EXAMPLE_ORACLE18_2_2);
+        final File siardProject = ResourcesLoader.loadResource(SiardProjectExamples.SIMPLE_TEAMS_EXAMPLE_ORACLE18_2_2);
 
         // when
         SiardToDb siardToDb = new SiardToDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
-                "-u:" + "MY_TEST",
+                "-u:" + "IT_USER",
                 "-p:" + "password",
                 "-s:" + siardProject.getPath()
         });
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
-                "-u:" + "MY_TEST",
+                "-u:" + "IT_USER",
                 "-p:" + "password",
                 "-s:" + zippedDownloadedProjectFileTempFolder.getRoot().toString()
         });

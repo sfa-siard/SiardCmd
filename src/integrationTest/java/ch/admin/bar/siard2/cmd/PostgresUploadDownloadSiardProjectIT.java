@@ -1,6 +1,7 @@
 package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.cmd.utils.ResourcesLoader;
+import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,7 +24,7 @@ public class PostgresUploadDownloadSiardProjectIT {
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
         // given
-        final File siardProject = ResourcesLoader.loadResource(ResourcesLoader.DVD_RENTAL_2_1_SIARD);
+        final File siardProject = ResourcesLoader.loadResource(SiardProjectExamples.DVD_RENTAL_2_1_SIARD);
 
         // when
         SiardToDb siardToDb = new SiardToDb(new String[]{
