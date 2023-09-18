@@ -2,29 +2,25 @@ package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.cmd.utils.ResourcesLoader;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.Db2Container;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@Slf4j
-public class MySql5UploadDownloadSiardProjectIT {
+public class Db2UploadDownloadSiardProjectIT {
 
     @Rule
     public TemporaryFolder zippedDownloadedProjectFileTempFolder = new TemporaryFolder();
 
     @Rule
-    public MySQLContainer<?> db = new MySQLContainer<>(DockerImageName.parse("mysql:5.6.51"))
-            .withUsername("root")
-            .withPassword("test")
-            .withCommand("--max-allowed-packet=1G --innodb_log_file_size=256M");
+    public Db2Container db = new Db2Container(DockerImageName.parse("ibmcom/db2:11.5.8.0"))
+            .acceptLicense();
 
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
@@ -35,15 +31,15 @@ public class MySql5UploadDownloadSiardProjectIT {
         SiardToDb siardToDb = new SiardToDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
-                "-u:" + "root",
-                "-p:" + "test",
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
                 "-s:" + siardProject.getPath()
         });
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
-                "-u:" + "root",
-                "-p:" + "test",
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
                 "-s:" + zippedDownloadedProjectFileTempFolder.getRoot().toString()
         });
 

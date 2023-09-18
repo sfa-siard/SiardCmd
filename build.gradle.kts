@@ -15,21 +15,15 @@ plugins {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-
-    //toolchain {
-    //    languageVersion.set(JavaLanguageVersion.of(8))
-    //}
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
     mavenCentral()
 }
 
 sourceSets {
     create("integrationTest") {
         java.srcDir("src/integrationTest/java")
-        //resources.srcDir("src/integrationTest/resources") --> If active, then the following error occurs: "Entry siard-projects/xxx.siard is a duplicate but no duplicate handling strategy has been set."
         compileClasspath += sourceSets["main"].output + configurations["testRuntimeClasspath"]
         runtimeClasspath += output + compileClasspath + sourceSets["test"].runtimeClasspath
     }
@@ -38,14 +32,13 @@ sourceSets {
 dependencies {
     implementation(fileTree("lib") { include("*.jar") })
 
-    // Use JUnit test framework.
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.testcontainers:testcontainers:1.19.0")
     testImplementation("org.testcontainers:mssqlserver:1.19.0")
     testImplementation("org.testcontainers:postgresql:1.19.0")
     testImplementation("org.testcontainers:mysql:1.19.0")
     testImplementation("org.testcontainers:oracle-xe:1.19.0")
-
+    testImplementation("org.testcontainers:db2:1.19.0")
 }
 
 /**

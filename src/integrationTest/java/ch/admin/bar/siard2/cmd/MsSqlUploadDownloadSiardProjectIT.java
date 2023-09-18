@@ -7,6 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class MsSqlUploadDownloadSiardProjectIT {
     public TemporaryFolder zippedDownloadedProjectFileTempFolder = new TemporaryFolder();
 
     @Rule
-    public MSSQLServerContainer db = new MSSQLServerContainer()
+    public MSSQLServerContainer<?> db = new MSSQLServerContainer<>(DockerImageName.parse("mcr.microsoft.com/mssql/server:2017-CU12"))
             .acceptLicense();
 
     @Test

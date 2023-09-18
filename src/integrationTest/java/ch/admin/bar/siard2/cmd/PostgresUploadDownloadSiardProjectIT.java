@@ -19,7 +19,7 @@ public class PostgresUploadDownloadSiardProjectIT {
     public TemporaryFolder zippedDownloadedProjectFileTempFolder = new TemporaryFolder();
 
     @Rule
-    public PostgreSQLContainer db = new PostgreSQLContainer<>(DockerImageName.parse("postgres:9.6.12"));
+    public PostgreSQLContainer<?> db = new PostgreSQLContainer<>(DockerImageName.parse("postgres:9.6.12"));
 
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {

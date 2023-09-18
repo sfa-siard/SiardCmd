@@ -24,15 +24,11 @@ public class OracleUploadDownloadSiardProjectIT {
     public final TemporaryFolder zippedDownloadedProjectFileTempFolder = new TemporaryFolder();
 
     @Rule
-    public final OracleContainer db;
-
-    public OracleUploadDownloadSiardProjectIT() {
-        db = new OracleContainer("gvenzl/oracle-xe:21-slim-faststart")
-                .withLogConsumer(new ConsoleLogConsumer())
-                .withCopyFileToContainer(
-                        MountableFile.forHostPath(ResourcesLoader.loadResource(SqlScripts.Oracle.CREATE_USER_WITH_ALL_PRIVILEGES).toPath()),
-                        "/container-entrypoint-initdb.d/00_create_user.sql");
-    }
+    public final OracleContainer db = new OracleContainer("gvenzl/oracle-xe:21-slim-faststart")
+            .withLogConsumer(new ConsoleLogConsumer())
+            .withCopyFileToContainer(
+                    MountableFile.forHostPath(ResourcesLoader.loadResource(SqlScripts.Oracle.CREATE_USER_WITH_ALL_PRIVILEGES).toPath()),
+                    "/container-entrypoint-initdb.d/00_create_user.sql");
 
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
