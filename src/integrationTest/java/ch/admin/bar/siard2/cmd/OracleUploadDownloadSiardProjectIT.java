@@ -3,6 +3,7 @@ package ch.admin.bar.siard2.cmd;
 import ch.admin.bar.siard2.cmd.utils.ConsoleLogConsumer;
 import ch.admin.bar.siard2.cmd.utils.ResourcesLoader;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
+import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -29,7 +30,7 @@ public class OracleUploadDownloadSiardProjectIT {
         db = new OracleContainer("gvenzl/oracle-xe:21-slim-faststart")
                 .withLogConsumer(new ConsoleLogConsumer())
                 .withCopyFileToContainer(
-                        MountableFile.forHostPath(ResourcesLoader.loadResource(ResourcesLoader.ORACLE_INIT).toPath()),
+                        MountableFile.forHostPath(ResourcesLoader.loadResource(SqlScripts.Oracle.CREATE_USER_WITH_ALL_PRIVILEGES).toPath()),
                         "/container-entrypoint-initdb.d/00_create_user.sql");
     }
 
