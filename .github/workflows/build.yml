@@ -24,6 +24,8 @@ jobs:
           distribution: 'adopt'
       - name: Run Tests for specific issues
         run: ./gradlew test --tests ch.admin.bar.siard2.cmd.issues.*
+      - name: Run integration tests
+        run: ./gradlew integrationTest
 
 
 
