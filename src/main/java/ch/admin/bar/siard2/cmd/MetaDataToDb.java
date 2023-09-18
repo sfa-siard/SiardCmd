@@ -371,10 +371,17 @@ public class MetaDataToDb
     sbSql.append(")");
     /* now execute it */
     _il.event(sbSql.toString());
-    Statement stmt = _dmd.getConnection().createStatement();
-    stmt.setQueryTimeout(_iQueryTimeoutSeconds);
-    stmt.executeUpdate(sbSql.toString());
-    stmt.close();
+
+    try {
+      Statement stmt = _dmd.getConnection().createStatement();
+      stmt.setQueryTimeout(_iQueryTimeoutSeconds);
+      stmt.executeUpdate(sbSql.toString());
+      stmt.close();
+    } catch (Exception ex) {
+      System.out.println("Failed SQL statement:\n" + sbSql);
+      throw ex;
+    }
+
     /* record names of created table and columns */
     Set<QualifiedId> setCreated = getTables();
     setCreated.removeAll(setBefore);

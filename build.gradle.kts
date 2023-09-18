@@ -35,6 +35,8 @@ dependencies {
     testImplementation("org.testcontainers:mssqlserver:1.19.0")
     testImplementation("org.testcontainers:postgresql:1.19.0")
     testImplementation("org.testcontainers:mysql:1.19.0")
+    testImplementation("org.testcontainers:oracle-xe:1.19.0")
+
 }
 
 /**

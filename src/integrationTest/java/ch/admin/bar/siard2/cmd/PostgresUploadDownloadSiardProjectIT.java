@@ -21,9 +21,9 @@ public class PostgresUploadDownloadSiardProjectIT {
     public PostgreSQLContainer db = new PostgreSQLContainer<>(DockerImageName.parse("postgres:9.6.12"));
 
     @Test
-    public void uploadAndDownload_expectNoExceptions() throws IOException, InterruptedException, SQLException, ClassNotFoundException {
+    public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
         // given
-        final File siardProject = ResourcesLoader.loadResource(ResourcesLoader.SAMPLE_DATALINK_2_2_SIARD);
+        final File siardProject = ResourcesLoader.loadResource(ResourcesLoader.DVD_RENTAL_2_1_SIARD);
 
         // when
         SiardToDb siardToDb = new SiardToDb(new String[]{
