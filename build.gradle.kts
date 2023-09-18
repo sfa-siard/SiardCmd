@@ -54,7 +54,7 @@ dependencies {
  *  This is a workaround until EnterUtils is fixed.
  */
 tasks.register<Copy>("copyManifest") {
-    from(layout.projectDirectory.file("src/main/META-INF/MANIFEST.MF"))
+    from(layout.projectDirectory.file("src/main/resources/META-INF/MANIFEST.MF"))
     into(layout.buildDirectory.dir("tmp/jar"))
 }
 
@@ -64,6 +64,7 @@ task<Test>("integrationTest") {
     testClassesDirs = sourceSets["integrationTest"].output.classesDirs
     classpath = sourceSets["integrationTest"].runtimeClasspath
     mustRunAfter(tasks["test"])
+    dependsOn(tasks["copyManifest"])
     useJUnit()
 }
 
