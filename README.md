@@ -89,10 +89,3 @@ SiardCmd 2.1.58 has been built and tested with JAVA JDK 1.8, 9, and 10.
 
 More information about the build process can be found in
 [./doc/manual/developer/build.html](./doc/manual/developer/build.html).
-
-
-## IDE
-
-The project can be opened in Eclipse and Intellij - both are optional.
-
-

@@ -19,8 +19,8 @@ services:
       - 1521:1521
   mssql:
     build:
-      context: ./docker/mssql
-      dockerfile: Dockerfile
+      context: ../mssql
+      dockerfile: ../mssql/Dockerfile
     environment:
       ACCEPT_EULA: Y
       SA_PASSWORD: Yukon900
@@ -40,8 +40,8 @@ services:
       - 3306:3306
   db2:
     build:
-      context: ./docker/db2
-      dockerfile: Dockerfile
+      context: ../db2
+      dockerfile: ../db2/Dockerfile
     environment:
       LICENSE: accept
       DB2INSTANCE: db2inst1
