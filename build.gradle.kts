@@ -96,3 +96,50 @@ task<Test>("integrationTest") {
     mustRunAfter(tasks["test"])
     useJUnit()
 }
+
+task<Zip>("packDeliverables") {
+    description = "Creates ZIP-file which contains all deliverables"
+    group = "release"
+
+    val versionedProjectName = "${project.name}-${project.version}"
+
+    archiveFileName.set("${versionedProjectName}.zip")
+    destinationDirectory.set(layout.projectDirectory.dir("dir"))
+
+    from(layout.projectDirectory.dir("doc")) {
+        into("doc")
+        exclude("/manual/developer")
+    }
+    from(layout.projectDirectory.dir("etc")) {
+        into("etc")
+        exclude("debug.properties")
+    }
+    from(layout.projectDirectory.dir("lib")) {
+        into("lib")
+        exclude(
+                "*-test.jar",
+                "hamcrest-core-1.3.jar"
+        )
+    }
+    from(layout.buildDirectory.file("libs/${versionedProjectName}.jar")) {
+        into("lib")
+        rename("${versionedProjectName}.jar", "${project.name}.jar")
+    }
+    from(layout.projectDirectory.dir("testfiles")) {
+        into("testfiles")
+        include("sample.siard")
+    }
+    from(layout.projectDirectory) {
+        include(
+                "LICENSE.txt",
+                "RELEASE.txt"
+        )
+    }
+    from(layout.projectDirectory.dir("bin")) {
+        include("*.sh")
+        fileMode = 0b111101101 // = 755 (needs to be defined in binary format https://github.com/gradle/kotlin-dsl-samples/issues/1412)
+    }
+    from(layout.projectDirectory.dir("bin")) {
+        exclude("*.sh")
+    }
+}
