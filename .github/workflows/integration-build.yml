@@ -7,13 +7,13 @@ on:
   push:
     branches:
       - main
-      - feature/*
-      - issue/*
   pull_request:
     branches: [ main ]
+  schedule:
+    - cron: "0 0 * * *" # end of the day
 
 jobs:
-  test-issues:
+  execute-unitand-integration-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -26,6 +26,3 @@ jobs:
         run: ./gradlew test
       - name: Run integration tests
         run: ./gradlew integrationTest
-
-
-

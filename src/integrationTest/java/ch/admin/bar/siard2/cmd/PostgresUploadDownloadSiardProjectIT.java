@@ -24,7 +24,7 @@ public class PostgresUploadDownloadSiardProjectIT {
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
         // given
-        final File siardProject = ResourcesLoader.loadResource(SiardProjectExamples.DVD_RENTAL_2_1_SIARD);
+        final File siardProject = ResourcesLoader.loadResource(SiardProjectExamples.SAMPLE_DATALINK_2_2_SIARD);
 
         // when
         SiardToDb siardToDb = new SiardToDb(new String[]{
