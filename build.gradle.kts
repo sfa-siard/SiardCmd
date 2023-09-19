@@ -100,11 +100,12 @@ task<Test>("integrationTest") {
 task<Zip>("packDeliverables") {
     description = "Creates ZIP-file which contains all deliverables"
     group = "release"
+    dependsOn(tasks["build"])
 
     val versionedProjectName = "${project.name}-${project.version}"
 
     archiveFileName.set("${versionedProjectName}.zip")
-    destinationDirectory.set(layout.projectDirectory.dir("dir"))
+    destinationDirectory.set(layout.buildDirectory.dir("deliverables"))
 
     from(layout.projectDirectory.dir("doc")) {
         into("doc")
