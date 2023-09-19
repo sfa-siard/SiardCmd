@@ -7,9 +7,9 @@
  */
 
 plugins {
-    // Apply the java-library plugin for API and implementation separation.
     `java-library`
     id("io.freefair.lombok") version "6.5.0"
+    id("pl.allegro.tech.build.axion-release") version "1.14.3"
 }
 
 java {
@@ -20,6 +20,8 @@ java {
 repositories {
     mavenCentral()
 }
+
+version = scmVersion.version
 
 sourceSets {
     create("integrationTest") {
@@ -41,14 +43,49 @@ dependencies {
     testImplementation("org.testcontainers:db2:1.19.0")
 }
 
-/**
- *  ManifestAttributes (from enterutils.jar) expects the manifest file to sit in some weird places. The copyManifest task
- *  makes sure that the file is located at the correct location.
- *  This is a workaround until EnterUtils is fixed.
- */
-tasks.register<Copy>("copyManifest") {
-    from(layout.projectDirectory.file("src/main/resources/META-INF/MANIFEST.MF"))
-    into(layout.buildDirectory.dir("tmp/jar"))
+tasks.withType(Jar::class) {
+    manifest {
+        attributes["Manifest-Version"] = "1.0"
+        attributes["Created-By"] = "Hartwig Thomas, Enter AG, Rüti ZH, Switzerland; Puzzle ITC GmbH, Switzerland"
+        attributes["Specification-Title"] = "SIARD CMD"
+        attributes["Specification-Version"] = "2.2"
+        attributes["Specification-Vendor"] = "Swiss Federal Archives, Berne, Switzerland"
+        attributes["Implementation-Title"] = "SIARD CMD"
+        attributes["Implementation-Version"] = archiveVersion
+        attributes["Implementation-Vendor"] = "Swiss Federal Archives, Berne, Switzerland"
+        attributes["Class-Path"] = "siardapi.jar " +
+                "Zip64File.jar " +
+                "xsdlib-2010.1.jar " +
+                "woodstox-core-lgpl-4.1.2.jar " +
+                "woodstox-msv-rng-datatype-20020414.jar " +
+                "activation-1.1.1.jar " +
+                "jaxb-api.jar " +
+                "jaxb-core.jar " +
+                "jaxb-impl.jar " +
+                "msv-core-2010.2.jar " +
+                "stax2-api-3.1.1.jar " +
+                "jdbcaccess.jar " +
+                "jackcess-2.1.6a.jar " +
+                "commons-lang-2.6.jar " +
+                "commons-logging-1.1.3.jar " +
+                "jdbcpostgres.jar " +
+                "postgresql-42.2.5.jar " +
+                "jdbcdb2.jar " +
+                "db2jcc4.jar " +
+                "jdbcmysql.jar " +
+                "mysql-connector-java-8.0.18.jar " +
+                "jdbcoracle.jar " +
+                "ojdbc6.jar " +
+                "xdb6.jar " +
+                "xmlparserv2.jar " +
+                "jdbcmssql.jar " +
+                "sqljdbc41.jar " +
+                "jts-1.14.jar   " +
+                "jdbcbase.jar " +
+                "enterutils.jar " +
+                "antlr-runtime-4.5.2.jar " +
+                "tika-app-2.8.0.jar"
+    }
 }
 
 task<Test>("integrationTest") {
@@ -57,10 +94,5 @@ task<Test>("integrationTest") {
     testClassesDirs = sourceSets["integrationTest"].output.classesDirs
     classpath = sourceSets["integrationTest"].runtimeClasspath
     mustRunAfter(tasks["test"])
-    dependsOn(tasks["copyManifest"])
     useJUnit()
-}
-
-tasks.test {
-    dependsOn("copyManifest")
 }
