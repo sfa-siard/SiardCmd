@@ -4,7 +4,6 @@ import ch.admin.bar.siard2.cmd.utils.ConsoleLogConsumer;
 import ch.admin.bar.siard2.cmd.utils.ResourcesLoader;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@Slf4j
 public class OracleUploadDownloadSiardProjectIT {
 
 

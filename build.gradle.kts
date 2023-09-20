@@ -14,7 +14,6 @@ val generatedResourcesDir = Files.createDirectories(File("${buildDir}/generated/
 
 plugins {
     `java-library`
-    id("io.freefair.lombok") version "6.5.0"
     id("pl.allegro.tech.build.axion-release") version "1.14.3"
 }
 
@@ -97,8 +96,6 @@ tasks.withType(Jar::class) {
 
 tasks {
     processResources {
-        // Depend on output of the task to create properties,
-        // so the properties file will be part of the Java resources.
         from(generatedResourcesDir)
     }
 }

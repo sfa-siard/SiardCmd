@@ -5,9 +5,7 @@ import ch.admin.bar.siard2.api.MetaSchema;
 import ch.admin.bar.siard2.api.MetaTable;
 import ch.admin.bar.siard2.api.primary.ArchiveImpl;
 import ch.admin.bar.siard2.cmd.SiardFromDb;
-import ch.admin.bar.siard2.cmd.utils.ResourcesLoader;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
-import lombok.val;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -18,7 +16,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class DuplicatedExtendedPropertiesIT {
 

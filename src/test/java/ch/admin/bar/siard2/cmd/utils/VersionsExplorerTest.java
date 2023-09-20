@@ -1,7 +1,6 @@
 package ch.admin.bar.siard2.cmd.utils;
 
 
-import lombok.val;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -12,7 +11,7 @@ public class VersionsExplorerTest {
         // given
 
         // when
-        val siardVersion = VersionsExplorer.INSTANCE.getSiardVersion();
+        String siardVersion = VersionsExplorer.INSTANCE.getSiardVersion();
 
         // then
         Assert.assertNotNull(siardVersion);
@@ -23,7 +22,7 @@ public class VersionsExplorerTest {
         // given
 
         // when
-        val appVersion = VersionsExplorer.INSTANCE.getAppVersion();
+        String appVersion = VersionsExplorer.INSTANCE.getAppVersion();
 
         // then
         Assert.assertNotNull(appVersion);
