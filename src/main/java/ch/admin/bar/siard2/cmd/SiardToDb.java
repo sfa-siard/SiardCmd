@@ -10,15 +10,25 @@ Created    : 24.03.2008, Hartwig Thomas, Enter AG, Zurich
 
 package ch.admin.bar.siard2.cmd;
 
-import java.io.*;
-import java.sql.*;
-import java.util.*;
-import ch.enterag.utils.*;
-import ch.enterag.utils.cli.*;
-import ch.enterag.utils.configuration.ManifestAttributes;
-import ch.enterag.utils.logging.*;
-import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.api.primary.*;
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import ch.admin.bar.siard2.api.Archive;
+import ch.admin.bar.siard2.api.MetaData;
+import ch.admin.bar.siard2.api.MetaSchema;
+import ch.admin.bar.siard2.api.primary.ArchiveImpl;
+import ch.admin.bar.siard2.cmd.utils.VersionsExplorer;
+import ch.enterag.utils.EU;
+import ch.enterag.utils.ProgramInfo;
+import ch.enterag.utils.cli.Arguments;
+import ch.enterag.utils.logging.IndentLogger;
 
 /*====================================================================*/
 /** Loads the data from a siard file to a database instance.
@@ -39,12 +49,10 @@ public class SiardToDb
   ====================================================================*/
   /** logger */  
   private static IndentLogger _il = IndentLogger.getIndentLogger(SiardFromDb.class.getName());
-  /** manifest */
-  private static final ManifestAttributes MF = ManifestAttributes.getInstance(SiardToDb.class); 
   /** info */
   private static ProgramInfo _pi = ProgramInfo.getProgramInfo(
-  		"SIARD Suite",MF.getSpecificationVersion(),
-      "SiardToDb",MF.getImplementationVersion(),
+  		"SIARD Suite", VersionsExplorer.INSTANCE.getSiardVersion(),
+      "SiardToDb",VersionsExplorer.INSTANCE.getAppVersion(),
       "Program to load database content from a .siard file",
   		"Swiss Federal Archives, Berne, Switzerland, 2008-2016",
       Arrays.asList((new String[] {"Hartwig Thomas, Enter AG, Rüti ZH, Switzerland",

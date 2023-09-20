@@ -5,17 +5,28 @@ Created    : 29.08.2016, Hartwig Thomas, Enter AG, Rüti ZH
 
 package ch.admin.bar.siard2.cmd;
 
-import java.io.*;
-import java.net.*;
-import java.sql.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Arrays;
 
-import ch.enterag.utils.*;
-import ch.enterag.utils.cli.*;
-import ch.enterag.utils.configuration.*;
-import ch.enterag.utils.logging.*;
-import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.api.primary.*;
+import ch.admin.bar.siard2.api.Archive;
+import ch.admin.bar.siard2.api.MetaColumn;
+import ch.admin.bar.siard2.api.MetaSchema;
+import ch.admin.bar.siard2.api.MetaTable;
+import ch.admin.bar.siard2.api.primary.ArchiveImpl;
+import ch.admin.bar.siard2.cmd.utils.VersionsExplorer;
+import ch.enterag.utils.EU;
+import ch.enterag.utils.ProgramInfo;
+import ch.enterag.utils.cli.Arguments;
+import ch.enterag.utils.logging.IndentLogger;
 
 
 /**
@@ -30,11 +41,10 @@ public class SiardFromDb {
     public static final int iRETURN_FATAL = 12;
 
     private static IndentLogger _il = IndentLogger.getIndentLogger(SiardFromDb.class.getName());
-    private static final ManifestAttributes MF = ManifestAttributes.getInstance(SiardFromDb.class);
     private static ProgramInfo _pi = ProgramInfo.getProgramInfo("SIARD Suite",
-                                                                MF.getSpecificationVersion(),
+                                                                VersionsExplorer.INSTANCE.getSiardVersion(),
                                                                 "SiardFromDb",
-                                                                MF.getImplementationVersion(),
+                                                                VersionsExplorer.INSTANCE.getAppVersion(),
                                                                 "Program to store database content in a .siard file",
                                                                 "Swiss Federal Archives, Berne, Switzerland, 2008-2016",
                                                                 Arrays.asList((new String[]{"Hartwig Thomas, Enter AG, Rüti ZH, Switzerland", "Andreas Voss, Swiss Federal Archives, Berne, Switzerland", "Anders Bo Nielsen, Danish National Archives, Denmark", "Claire Röthlisberger-Jourdan, KOST, Berne, Switzerland"})),
