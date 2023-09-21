@@ -29,7 +29,7 @@ jobs:
       - name: Show current application version
         run: ./gradlew cV
       - name: Execute Gradle build
-        run: ./gradlew packDeliverables
+        run: ./gradlew packDeliverables --info
       - name: upload deliverables
         uses: actions/upload-artifact@v3
         with:
