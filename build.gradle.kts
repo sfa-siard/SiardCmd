@@ -8,9 +8,13 @@ import java.util.*
  * For more details take a look at the 'Building Java & JVM projects' chapter in the Gradle
  * User Manual available at https://docs.gradle.org/7.3.2/userguide/building_java_projects.html
  */
+version = scmVersion.version
 val siardVersion = "2.2"
+val versionedProjectName = "${project.name}-${scmVersion.version}"
 
+val jarFile = File("$buildDir/libs/${versionedProjectName}.jar")
 val generatedResourcesDir = Files.createDirectories(File("${buildDir}/generated/resources").toPath())
+val deliverablesDir = Files.createDirectories(File("${buildDir}/deliverables").toPath())
 
 plugins {
     `java-library`
@@ -25,8 +29,6 @@ java {
 repositories {
     mavenCentral()
 }
-
-version = scmVersion.version
 
 sourceSets {
     create("integrationTest") {
@@ -114,10 +116,8 @@ task<Zip>("packDeliverables") {
     group = "release"
     dependsOn(tasks["build"])
 
-    val versionedProjectName = "${project.name}-${project.version}"
-
     archiveFileName.set("${versionedProjectName}.zip")
-    destinationDirectory.set(layout.buildDirectory.dir("deliverables"))
+    destinationDirectory.set(deliverablesDir.toFile())
 
     from(layout.projectDirectory.dir("doc")) {
         into("doc")
@@ -134,7 +134,7 @@ task<Zip>("packDeliverables") {
                 "hamcrest-core-1.3.jar"
         )
     }
-    from(layout.buildDirectory.file("libs/${versionedProjectName}.jar")) {
+    from(jarFile) {
         into("lib")
         rename("${versionedProjectName}.jar", "${project.name}.jar")
     }
@@ -154,6 +154,15 @@ task<Zip>("packDeliverables") {
     }
     from(layout.projectDirectory.dir("bin")) {
         exclude("*.sh")
+    }
+
+    doLast {
+        /*
+        Copy the build jar file without version information (for easier integration in other projects)
+        to the deliverables-directory for easier upload as artefact to GitHub.
+         */
+        val jarWithoutVersionFile = deliverablesDir.resolve("${project.name}.jar").toFile()
+        jarFile.copyTo(jarWithoutVersionFile, overwrite = true)
     }
 }
 
