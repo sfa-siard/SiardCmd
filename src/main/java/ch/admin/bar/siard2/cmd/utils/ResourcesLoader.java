@@ -1,6 +1,7 @@
 package ch.admin.bar.siard2.cmd.utils;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Optional;
 
@@ -25,6 +26,15 @@ public class ResourcesLoader {
 
         return urlToResource.map(url -> new File(url.getFile()))
                 .filter(File::exists)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Resource \"%s\" not found", resource)));
+    }
+
+    public static InputStream loadResourceAsStream(final String resource) {
+        final Optional<InputStream> urlToResource = Optional.ofNullable(ResourcesLoader.class
+                .getClassLoader()
+                .getResourceAsStream(resource));
+
+        return urlToResource
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Resource \"%s\" not found", resource)));
     }
 }
