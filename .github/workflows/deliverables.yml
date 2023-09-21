@@ -7,6 +7,8 @@ on:
   push:
     tags:
       - v*.**
+    branches:
+      - feature/integration-tests-with-testcontainers # TODO Just temporary for testing this GitHub action
 
 jobs:
   build:
