@@ -1,4 +1,4 @@
-name: Create standalone deliverables
+name: Create and upload deliverables
 
 env:
   PROJECT_NAME: siardcmd
@@ -7,8 +7,6 @@ on:
   push:
     tags:
       - v*.**
-    branches:
-      - feature/integration-tests-with-testcontainers # TODO Just temporary for testing this GitHub action
 
 jobs:
   build:
@@ -29,9 +27,10 @@ jobs:
       - name: Show current application version
         run: ./gradlew cV
       - name: Execute Gradle build
-        run: ./gradlew packDeliverables --info
+        run: ./gradlew packDeliverables
       - name: upload deliverables
         uses: actions/upload-artifact@v3
         with:
+          name: ${{ env.NAME_TAG }}
           path: build/deliverables/
           if-no-files-found: error

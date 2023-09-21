@@ -1,6 +1,6 @@
 package ch.admin.bar.siard2.cmd;
 
-import ch.admin.bar.siard2.cmd.utils.ResourcesLoader;
+import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -24,7 +24,7 @@ public class PostgresUploadDownloadSiardProjectIT {
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
         // given
-        final File siardProject = ResourcesLoader.loadResource(SiardProjectExamples.SAMPLE_DATALINK_2_2_SIARD);
+        final File siardProject = TestResourcesResolver.loadResource(SiardProjectExamples.SAMPLE_DATALINK_2_2_SIARD);
 
         // when
         SiardToDb siardToDb = new SiardToDb(new String[]{

@@ -3,7 +3,8 @@ package ch.admin.bar.siard2.cmd.utils;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class ResourcesLoaderTest {
 
@@ -11,14 +12,15 @@ public class ResourcesLoaderTest {
     private static final String NOT_EXISTING_RESOURCE = "mot-existing-dummy-resource.txt";
 
     @Test
-    public void loadResource_withExistingResource_expectNoException() {
+    public void loadResource_withExistingResource_expectNoException() throws IOException {
         // given
 
         // when
-        File file = ResourcesLoader.loadResource(EXISTING_RESOURCE);
+        InputStream is = ResourcesLoader.loadResource(EXISTING_RESOURCE);
 
         // then
-        Assertions.assertThat(file).exists();
+        Assertions.assertThat(is).isNotEmpty();
+        is.close();
     }
 
     @Test
@@ -26,7 +28,7 @@ public class ResourcesLoaderTest {
         // given
 
         // when
-        Throwable throwable = Assertions.catchThrowable(() -> ResourcesLoader.loadResource(NOT_EXISTING_RESOURCE));
+        Throwable throwable = Assertions.catchThrowable(() -> ResourcesLoader.loadResource(NOT_EXISTING_RESOURCE).close());
 
         // then
         Assertions.assertThat(throwable).hasMessageContainingAll("", "not found");

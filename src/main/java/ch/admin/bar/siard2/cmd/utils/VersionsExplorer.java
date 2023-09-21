@@ -1,8 +1,10 @@
 package ch.admin.bar.siard2.cmd.utils;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.Properties;
+
+import static ch.admin.bar.siard2.cmd.utils.ResourcesLoader.loadResource;
 
 /**
  * This class provides version information about the application.
@@ -37,14 +39,13 @@ public class VersionsExplorer {
     }
 
     private Properties loadProperties() {
-        try {
+        try (InputStream resource = loadResource("versions.properties")) {
             final Properties versionsProperties = new Properties();
-            versionsProperties.load(ResourcesLoader.loadResourceAsStream("versions.properties"));
+            versionsProperties.load(resource);
 
             return versionsProperties;
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 }

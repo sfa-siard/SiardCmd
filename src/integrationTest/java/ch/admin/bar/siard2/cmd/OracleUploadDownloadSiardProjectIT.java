@@ -1,7 +1,7 @@
 package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.cmd.utils.ConsoleLogConsumer;
-import ch.admin.bar.siard2.cmd.utils.ResourcesLoader;
+import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import org.junit.Assert;
@@ -25,13 +25,13 @@ public class OracleUploadDownloadSiardProjectIT {
     public final OracleContainer db = new OracleContainer("gvenzl/oracle-xe:21-slim-faststart")
             .withLogConsumer(new ConsoleLogConsumer())
             .withCopyFileToContainer(
-                    MountableFile.forHostPath(ResourcesLoader.loadResource(SqlScripts.Oracle.CREATE_USER_WITH_ALL_PRIVILEGES).toPath()),
+                    MountableFile.forHostPath(TestResourcesResolver.loadResource(SqlScripts.Oracle.CREATE_USER_WITH_ALL_PRIVILEGES).toPath()),
                     "/container-entrypoint-initdb.d/00_create_user.sql");
 
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
         // given
-        final File siardProject = ResourcesLoader.loadResource(SiardProjectExamples.SIMPLE_TEAMS_EXAMPLE_ORACLE18_2_2);
+        final File siardProject = TestResourcesResolver.loadResource(SiardProjectExamples.SIMPLE_TEAMS_EXAMPLE_ORACLE18_2_2);
 
         // when
         SiardToDb siardToDb = new SiardToDb(new String[]{
