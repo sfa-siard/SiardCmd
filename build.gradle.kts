@@ -96,12 +96,6 @@ tasks.withType(Jar::class) {
     }
 }
 
-tasks {
-    processResources {
-        from(generatedResourcesDir)
-    }
-}
-
 task<Test>("integrationTest") {
     description = "Runs the integration tests"
     group = "verification"
@@ -167,7 +161,7 @@ task<Zip>("packDeliverables") {
 }
 
 task("createVersionsPropertiesFile") {
-    description = "Creates ZIP-file which contains all deliverables"
+    description = "Creates a properties file which contains all needed versions information"
     group = "build"
 
     val file = generatedResourcesDir.resolve("versions.properties").toFile()
@@ -180,12 +174,21 @@ task("createVersionsPropertiesFile") {
         file.writer().use { writer ->
             val properties = Properties()
             properties["SIARD-Version"] = siardVersion
-            properties["App-Version"] = project.version.toString()
+            properties["App-Version"] = "${project.version}"
             properties.store(writer, null)
+
+            logger.info("$file successfully generated (SIARD: $siardVersion, App: ${project.version})")
         }
     }
 }
 
-tasks.named("processResources") {
-    dependsOn("createVersionsPropertiesFile")
+tasks {
+    compileJava {
+        dependsOn("createVersionsPropertiesFile")
+    }
+
+    processResources {
+        from(generatedResourcesDir)
+        logger.info("$generatedResourcesDir added to processed resources")
+    }
 }
