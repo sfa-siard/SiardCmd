@@ -1,7 +1,8 @@
 package ch.admin.bar.siard2.cmd;
 
-import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
+import ch.admin.bar.siard2.cmd.utils.TemporaryFolderPreserver;
+import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchiveComparer;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -28,7 +29,7 @@ public class MySql5UploadDownloadSiardProjectIT {
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
         // given
-        final File siardProject = TestResourcesResolver.loadResource(SiardProjectExamples.SIMPLE_TEAMS_EXAMPLE_ORACLE18_2_2);
+        final File siardProject = TestResourcesResolver.loadResource(SiardProjectExamples.SIMPLE_TEAMS_EXAMPLE_MYSQL5_2_2);
 
         // when
         SiardToDb siardToDb = new SiardToDb(new String[]{
@@ -50,10 +51,15 @@ public class MySql5UploadDownloadSiardProjectIT {
         Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
 
+        TemporaryFolderPreserver.builder()
+                .caller(this.getClass())
+                .tempFolder(zippedDownloadedProjectFileTempFolder)
+                .filename(siardProject.getName())
+                .preserve();
+
         SiardArchiveComparer.builder()
                 .pathToExpectedArchive(siardProject)
                 .pathToActualArchive(zippedDownloadedProjectFileTempFolder.getRoot())
-                .build()
                 .compare();
     }
 }

@@ -1,12 +1,13 @@
 package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.cmd.utils.ConsoleLogConsumer;
-import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
+import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchiveComparer;
 import ch.admin.bar.siard2.cmd.utils.siard.model.PrimaryKey;
 import ch.admin.bar.siard2.cmd.utils.siard.model.SiardMetadata;
+import ch.admin.bar.siard2.cmd.utils.siard.update.UpdateInstruction;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,13 +60,8 @@ public class OracleUploadDownloadSiardProjectIT {
         SiardArchiveComparer.builder()
                 .pathToExpectedArchive(siardProject)
                 .pathToActualArchive(zippedDownloadedProjectFileTempFolder.getRoot())
-                .build()
-                .overrideField(SiardMetadata.class, (metadata) -> metadata.toBuilder()
-                        .dbname(SiardArchiveComparer.IGNORED_PLACEHOLDER)
-                        .build())
-                .overrideField(PrimaryKey.class, (primaryKey) -> primaryKey.toBuilder()
-                        .name(SiardArchiveComparer.IGNORED_PLACEHOLDER)
-                        .build())
+                .updateInstruction(SiardArchiveComparer.IGNORE_DBNAME) // FIXME has value "(...)" after download
+                .updateInstruction(SiardArchiveComparer.IGNORE_PRIMARY_KEY_NAME) // Probably an oracle-restriction (primary key names are generated)
                 .compare();
     }
 }

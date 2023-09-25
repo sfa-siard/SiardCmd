@@ -16,13 +16,11 @@ public class SiardArchiveComparerTest {
         val siardArchive = TestResourcesResolver.loadResource(SiardProjectExamples.SIMPLE_TEAMS_EXAMPLE_ORACLE18_2_2);
 
         // when
-        val comparer = SiardArchiveComparer.builder()
+        // then
+        SiardArchiveComparer.builder()
                 .pathToExpectedArchive(siardArchive)
                 .pathToActualArchive(siardArchive)
-                .build();
-
-        // then
-        comparer.compare();
+                .compare();
     }
 
 }

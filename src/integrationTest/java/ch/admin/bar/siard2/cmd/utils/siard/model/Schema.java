@@ -1,10 +1,11 @@
 package ch.admin.bar.siard2.cmd.utils.siard.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
+import ch.admin.bar.siard2.cmd.utils.siard.update.Updatable;
+import ch.admin.bar.siard2.cmd.utils.siard.update.Updater;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
+import lombok.val;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,36 +13,18 @@ import java.util.stream.Collectors;
 @Value
 @Builder(toBuilder = true)
 @Jacksonized
-public class Schema {
-    SchemaId name;
+public class Schema implements Updatable<Schema> {
+    Id<Schema> name;
     Set<Table> tables;
 
-    public Schema capitalizeValues() {
+    @Override
+    public Schema applyUpdates(Updater updater) {
+        val updatedThis = updater.applyUpdate(this);
+
         return new Schema(
-                name.capitalizeValues(),
+                updatedThis.name.applyUpdates(updater),
                 tables.stream()
-                        .map(Table::capitalizeValues)
-                        .collect(Collectors.toSet())
-        );
-    }
-
-    @Value(staticConstructor = "of")
-    public static class SchemaId {
-        @JsonValue
-        String value;
-
-        @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-        public SchemaId(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
-
-        public SchemaId capitalizeValues() {
-            return SchemaId.of(value.toUpperCase());
-        }
+                        .map(table -> table.applyUpdates(updater))
+                        .collect(Collectors.toSet()));
     }
 }

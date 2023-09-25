@@ -1,26 +1,30 @@
 package ch.admin.bar.siard2.cmd.utils.siard.model;
 
+import ch.admin.bar.siard2.cmd.utils.siard.update.Updater;
+import ch.admin.bar.siard2.cmd.utils.siard.update.Updatable;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
+import lombok.val;
 
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Value
 @Builder(toBuilder = true)
 @Jacksonized
-public class SiardMetadata {
-    String dbname;
+public class SiardMetadata implements Updatable<SiardMetadata> {
+    StringWrapper dbname;
     Set<Schema> schemas;
 
-    public SiardMetadata capitalizeValues() {
+    @Override
+    public SiardMetadata applyUpdates(Updater updater) {
+        val updatedThis = updater.applyUpdate(this);
+
         return new SiardMetadata(
-                dbname.toUpperCase(),
+                updatedThis.dbname.applyUpdates(updater),
                 schemas.stream()
-                        .map(Schema::capitalizeValues)
-                        .collect(Collectors.toSet())
-        );
+                        .map(schema -> schema.applyUpdates(updater))
+                        .collect(Collectors.toSet()));
     }
 }

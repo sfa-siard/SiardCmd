@@ -1,70 +1,54 @@
 package ch.admin.bar.siard2.cmd.utils.siard.model;
 
-import ch.admin.bar.siard2.cmd.utils.siard.model.Column.ColumnId;
-import ch.admin.bar.siard2.cmd.utils.siard.model.Schema.SchemaId;
-import ch.admin.bar.siard2.cmd.utils.siard.model.Table.TableId;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
+import ch.admin.bar.siard2.cmd.utils.siard.update.Updatable;
+import ch.admin.bar.siard2.cmd.utils.siard.update.Updater;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
+import lombok.val;
 
 import java.util.Optional;
 
 @Value
 @Builder(toBuilder = true)
 @Jacksonized
-public class ForeignKey {
-    ForeignKeyId name;
-    SchemaId referencedSchema;
-    TableId referencedTable;
+public class ForeignKey implements Updatable<ForeignKey> {
+    Id<ForeignKey> name;
+    Id<Schema> referencedSchema;
+    Id<Table> referencedTable;
     Reference reference; // TODO Probably a embedded set?
     @Builder.Default
-    Optional<String> deleteAction = Optional.empty();
+    Optional<StringWrapper> deleteAction = Optional.empty();
     @Builder.Default
-    Optional<String> updateAction = Optional.empty();
+    Optional<StringWrapper> updateAction = Optional.empty();
 
-    public ForeignKey capitalizeValues() {
+    @Override
+    public ForeignKey applyUpdates(Updater updater) {
+        val updatedThis = updater.applyUpdate(this);
+
         return new ForeignKey(
-                name.capitalizeValues(),
-                referencedSchema.capitalizeValues(),
-                referencedTable.capitalizeValues(),
-                reference.capitalizeValues(),
-                deleteAction.map(String::toUpperCase),
-                updateAction.map(String::toUpperCase));
-    }
-
-    @Value(staticConstructor = "of")
-    public static class ForeignKeyId {
-        @JsonValue
-        String value;
-
-        @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-        public ForeignKeyId(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
-
-        public ForeignKeyId capitalizeValues() {
-            return ForeignKeyId.of(value.toUpperCase());
-        }
+                updatedThis.name.applyUpdates(updater),
+                updatedThis.referencedSchema.applyUpdates(updater),
+                updatedThis.referencedTable.applyUpdates(updater),
+                updatedThis.reference.applyUpdates(updater),
+                deleteAction.map(s -> s.applyUpdates(updater)),
+                updateAction.map(s -> s.applyUpdates(updater)));
     }
 
     @Value
     @Builder
     @Jacksonized
-    public static class Reference {
-        ColumnId column;
-        ColumnId referenced;
+    public static class Reference implements Updatable<Reference> {
+        Id<Column> column;
+        Id<Column> referenced;
 
-        public Reference capitalizeValues() {
+        @Override
+        public Reference applyUpdates(Updater updater) {
+            val updatedThis = updater.applyUpdate(this);
+
             return new Reference(
-                    column.capitalizeValues(),
-                    referenced.capitalizeValues());
+                    updatedThis.column.applyUpdates(updater),
+                    updatedThis.referenced.applyUpdates(updater));
         }
     }
 }

@@ -10,8 +10,6 @@ import org.junit.Test;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ch.admin.bar.siard2.cmd.utils.siard.update.Updater.UpdateInstruction;
-
 public class UpdaterTest {
 
     private static final DummyA DUMMY_DATA = DummyA.builder()

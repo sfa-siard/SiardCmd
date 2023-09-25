@@ -1,10 +1,8 @@
 package ch.admin.bar.siard2.cmd.utils.siard.update;
 
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Singular;
-import lombok.Value;
 
 import java.util.Optional;
 import java.util.Set;
@@ -30,14 +28,5 @@ public class Updater {
 
         final Function<T, T> overrideNothing = t -> t;
         return overriderOptional.orElse(overrideNothing);
-    }
-
-    @Value
-    @Builder
-    public static class UpdateInstruction<T> {
-        Class<T> clazz;
-
-        @EqualsAndHashCode.Exclude
-        Function<T, T> updater;
     }
 }

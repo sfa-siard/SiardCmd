@@ -2,6 +2,7 @@ package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
+import ch.admin.bar.siard2.cmd.utils.siard.SiardArchiveComparer;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class MsSqlUploadDownloadSiardProjectIT {
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
         // given
-        final File siardProject = TestResourcesResolver.loadResource(SiardProjectExamples.SAMPLE_DATALINK_2_2_SIARD);
+        final File siardProject = TestResourcesResolver.loadResource(SiardProjectExamples.SIMPLE_TEAMS_EXAMPLE_MSSQL2017CU12_2_2);
 
         // when
         SiardToDb siardToDb = new SiardToDb(new String[]{
@@ -46,5 +47,12 @@ public class MsSqlUploadDownloadSiardProjectIT {
         // then
         Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+
+        SiardArchiveComparer.builder()
+                .pathToExpectedArchive(siardProject)
+                .pathToActualArchive(zippedDownloadedProjectFileTempFolder.getRoot())
+                .updateInstruction(SiardArchiveComparer.IGNORE_DBNAME) // FIXME has value "(...)" after download
+                .updateInstruction(SiardArchiveComparer.IGNORE_PRIMARY_KEY_NAME) // Probably a DB-restriction (primary key names are generated)
+                .compare();
     }
 }
