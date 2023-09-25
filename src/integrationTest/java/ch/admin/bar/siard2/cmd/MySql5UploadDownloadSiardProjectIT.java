@@ -2,6 +2,7 @@ package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
+import ch.admin.bar.siard2.cmd.utils.siard.SiardArchiveComparer;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,7 +28,7 @@ public class MySql5UploadDownloadSiardProjectIT {
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
         // given
-        final File siardProject = TestResourcesResolver.loadResource(SiardProjectExamples.SAMPLE_DATALINK_2_2_SIARD);
+        final File siardProject = TestResourcesResolver.loadResource(SiardProjectExamples.SIMPLE_TEAMS_EXAMPLE_ORACLE18_2_2);
 
         // when
         SiardToDb siardToDb = new SiardToDb(new String[]{
@@ -48,5 +49,11 @@ public class MySql5UploadDownloadSiardProjectIT {
         // then
         Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+
+        SiardArchiveComparer.builder()
+                .pathToExpectedArchive(siardProject)
+                .pathToActualArchive(zippedDownloadedProjectFileTempFolder.getRoot())
+                .build()
+                .compare();
     }
 }

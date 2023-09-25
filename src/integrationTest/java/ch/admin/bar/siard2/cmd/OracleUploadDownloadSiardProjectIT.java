@@ -4,6 +4,9 @@ import ch.admin.bar.siard2.cmd.utils.ConsoleLogConsumer;
 import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
+import ch.admin.bar.siard2.cmd.utils.siard.SiardArchiveComparer;
+import ch.admin.bar.siard2.cmd.utils.siard.model.PrimaryKey;
+import ch.admin.bar.siard2.cmd.utils.siard.model.SiardMetadata;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,5 +55,17 @@ public class OracleUploadDownloadSiardProjectIT {
         // then
         Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+
+        SiardArchiveComparer.builder()
+                .pathToExpectedArchive(siardProject)
+                .pathToActualArchive(zippedDownloadedProjectFileTempFolder.getRoot())
+                .build()
+                .overrideField(SiardMetadata.class, (metadata) -> metadata.toBuilder()
+                        .dbname(SiardArchiveComparer.IGNORED_PLACEHOLDER)
+                        .build())
+                .overrideField(PrimaryKey.class, (primaryKey) -> primaryKey.toBuilder()
+                        .name(SiardArchiveComparer.IGNORED_PLACEHOLDER)
+                        .build())
+                .compare();
     }
 }

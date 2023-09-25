@@ -19,6 +19,7 @@ val deliverablesDir = Files.createDirectories(File("${buildDir}/deliverables").t
 plugins {
     `java-library`
     id("pl.allegro.tech.build.axion-release") version "1.14.3"
+    id("io.freefair.lombok") version "6.5.0"
 }
 
 java {
@@ -43,6 +44,13 @@ dependencies {
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
+    testImplementation("org.xmlunit:xmlunit-assertj:2.9.1") // used for comparing siard-archive-files in integration testing
+    testImplementation("org.assertj:assertj-core:3.24.2")
+    testImplementation("net.lingala.zip4j:zip4j:2.11.5") // used for unzip siard-archives in integration testing
+    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.2")
+
+    // testcontainers
     testImplementation("org.testcontainers:testcontainers:1.19.0")
     testImplementation("org.testcontainers:mssqlserver:1.19.0")
     testImplementation("org.testcontainers:postgresql:1.19.0")
