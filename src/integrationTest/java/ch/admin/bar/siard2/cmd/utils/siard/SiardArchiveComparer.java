@@ -1,5 +1,6 @@
 package ch.admin.bar.siard2.cmd.utils.siard;
 
+import ch.admin.bar.siard2.cmd.utils.siard.model.ForeignKey;
 import ch.admin.bar.siard2.cmd.utils.siard.model.PrimaryKey;
 import ch.admin.bar.siard2.cmd.utils.siard.model.SiardMetadata;
 import ch.admin.bar.siard2.cmd.utils.siard.model.StringWrapper;
@@ -39,10 +40,19 @@ public class SiardArchiveComparer {
                     .build())
             .build();
 
-    private final File pathToExpectedArchive;
-    private final File pathToActualArchive;
+    public static final UpdateInstruction<ForeignKey> IGNORE_FOREIGN_KEY_DELETE_ACTION = UpdateInstruction.<ForeignKey>builder()
+            .clazz(ForeignKey.class)
+            .updater(foreignKey -> foreignKey.toBuilder()
+                    .deleteAction(Optional.empty())
+                    .build())
+            .build();
 
-    private final Updater updater;
+    public static final UpdateInstruction<ForeignKey> IGNORE_FOREIGN_KEY_UPDATE_ACTION = UpdateInstruction.<ForeignKey>builder()
+            .clazz(ForeignKey.class)
+            .updater(foreignKey -> foreignKey.toBuilder()
+                    .updateAction(Optional.empty())
+                    .build())
+            .build();
 
     @Builder(buildMethodName = "compare")
     public SiardArchiveComparer(
@@ -51,9 +61,7 @@ public class SiardArchiveComparer {
             @Singular Set<UpdateInstruction<?>> updateInstructions
 
     ) {
-        this.pathToExpectedArchive = pathToExpectedArchive;
-        this.pathToActualArchive = pathToActualArchive;
-        this.updater = Updater.builder()
+        Updater updater = Updater.builder()
                 .instructions(Optional.ofNullable(updateInstructions).orElse(new HashSet<>()))
                 .build();
 

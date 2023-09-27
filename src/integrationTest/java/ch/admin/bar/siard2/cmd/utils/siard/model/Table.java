@@ -28,11 +28,11 @@ public class Table implements Updatable<Table> {
 
         return new Table(
                 updatedThis.name.applyUpdates(updater),
-                columns.stream()
+                updatedThis.columns.stream()
                         .map(column -> column.applyUpdates(updater))
                         .collect(Collectors.toSet()),
                 updatedThis.primaryKey.applyUpdates(updater),
-                foreignKeys.stream()
+                updatedThis.foreignKeys.stream()
                         .map(foreignKey -> foreignKey.applyUpdates(updater))
                         .collect(Collectors.toSet()));
     }

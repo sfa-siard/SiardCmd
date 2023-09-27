@@ -31,8 +31,8 @@ public class ForeignKey implements Updatable<ForeignKey> {
                 updatedThis.referencedSchema.applyUpdates(updater),
                 updatedThis.referencedTable.applyUpdates(updater),
                 updatedThis.reference.applyUpdates(updater),
-                deleteAction.map(s -> s.applyUpdates(updater)),
-                updateAction.map(s -> s.applyUpdates(updater)));
+                updatedThis.deleteAction.map(s -> s.applyUpdates(updater)),
+                updatedThis.updateAction.map(s -> s.applyUpdates(updater)));
     }
 
     @Value

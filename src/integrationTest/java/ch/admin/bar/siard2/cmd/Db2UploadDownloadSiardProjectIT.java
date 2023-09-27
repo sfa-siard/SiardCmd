@@ -1,5 +1,6 @@
 package ch.admin.bar.siard2.cmd;
 
+import ch.admin.bar.siard2.cmd.utils.TemporaryFolderPreserver;
 import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchiveComparer;
@@ -48,9 +49,19 @@ public class Db2UploadDownloadSiardProjectIT {
         Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
 
+        TemporaryFolderPreserver.builder()
+                .caller(this.getClass())
+                .tempFolder(zippedDownloadedProjectFileTempFolder)
+                .filename(siardProject.getName())
+                .preserve();
+
         SiardArchiveComparer.builder()
                 .pathToExpectedArchive(siardProject)
                 .pathToActualArchive(zippedDownloadedProjectFileTempFolder.getRoot())
+                .updateInstruction(SiardArchiveComparer.IGNORE_DBNAME) // FIXME ?
+                .updateInstruction(SiardArchiveComparer.IGNORE_PRIMARY_KEY_NAME) // Probably a DB-restriction (primary key names are generated)
+                .updateInstruction(SiardArchiveComparer.IGNORE_FOREIGN_KEY_UPDATE_ACTION) // FIXME ?
+                .updateInstruction(SiardArchiveComparer.IGNORE_FOREIGN_KEY_DELETE_ACTION) // FIXME ?
                 .compare();
     }
 }

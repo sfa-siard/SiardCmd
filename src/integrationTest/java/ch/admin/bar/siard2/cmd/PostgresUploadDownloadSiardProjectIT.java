@@ -1,5 +1,6 @@
 package ch.admin.bar.siard2.cmd;
 
+import ch.admin.bar.siard2.cmd.utils.TemporaryFolderPreserver;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchiveComparer;
 import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
@@ -47,10 +48,16 @@ public class PostgresUploadDownloadSiardProjectIT {
         Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
 
+        TemporaryFolderPreserver.builder()
+                .caller(this.getClass())
+                .tempFolder(zippedDownloadedProjectFileTempFolder)
+                .filename(siardProject.getName())
+                .preserve();
+
         SiardArchiveComparer.builder()
                 .pathToExpectedArchive(siardProject)
                 .pathToActualArchive(zippedDownloadedProjectFileTempFolder.getRoot())
-                .updateInstruction(SiardArchiveComparer.IGNORE_DBNAME) // FIXME Probably a bug
+                .updateInstruction(SiardArchiveComparer.IGNORE_DBNAME) // FIXME ?
                 .compare();
     }
 }

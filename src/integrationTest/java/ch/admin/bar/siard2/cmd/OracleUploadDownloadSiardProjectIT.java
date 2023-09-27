@@ -3,11 +3,9 @@ package ch.admin.bar.siard2.cmd;
 import ch.admin.bar.siard2.cmd.utils.ConsoleLogConsumer;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
+import ch.admin.bar.siard2.cmd.utils.TemporaryFolderPreserver;
 import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchiveComparer;
-import ch.admin.bar.siard2.cmd.utils.siard.model.PrimaryKey;
-import ch.admin.bar.siard2.cmd.utils.siard.model.SiardMetadata;
-import ch.admin.bar.siard2.cmd.utils.siard.update.UpdateInstruction;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,10 +55,16 @@ public class OracleUploadDownloadSiardProjectIT {
         Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
 
+        TemporaryFolderPreserver.builder()
+                .caller(this.getClass())
+                .tempFolder(zippedDownloadedProjectFileTempFolder)
+                .filename(siardProject.getName())
+                .preserve();
+
         SiardArchiveComparer.builder()
                 .pathToExpectedArchive(siardProject)
                 .pathToActualArchive(zippedDownloadedProjectFileTempFolder.getRoot())
-                .updateInstruction(SiardArchiveComparer.IGNORE_DBNAME) // FIXME has value "(...)" after download
+                .updateInstruction(SiardArchiveComparer.IGNORE_DBNAME) // FIXME ?
                 .updateInstruction(SiardArchiveComparer.IGNORE_PRIMARY_KEY_NAME) // Probably an oracle-restriction (primary key names are generated)
                 .compare();
     }

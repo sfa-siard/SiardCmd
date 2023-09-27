@@ -23,7 +23,7 @@ public class SiardMetadata implements Updatable<SiardMetadata> {
 
         return new SiardMetadata(
                 updatedThis.dbname.applyUpdates(updater),
-                schemas.stream()
+                updatedThis.schemas.stream()
                         .map(schema -> schema.applyUpdates(updater))
                         .collect(Collectors.toSet()));
     }

@@ -23,7 +23,7 @@ public class Schema implements Updatable<Schema> {
 
         return new Schema(
                 updatedThis.name.applyUpdates(updater),
-                tables.stream()
+                updatedThis.tables.stream()
                         .map(table -> table.applyUpdates(updater))
                         .collect(Collectors.toSet()));
     }
