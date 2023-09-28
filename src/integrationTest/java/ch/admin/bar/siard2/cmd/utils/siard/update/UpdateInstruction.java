@@ -11,4 +11,8 @@ import java.util.function.Function;
 public class UpdateInstruction<T> {
     @NonNull Class<T> clazz;
     @NonNull Function<T, T> updater;
+
+    @NonNull
+    @Builder.Default
+    String description = "unknown";
 }

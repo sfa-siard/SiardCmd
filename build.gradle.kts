@@ -44,9 +44,8 @@ dependencies {
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
-    testImplementation("org.xmlunit:xmlunit-assertj:2.9.1") // used for comparing siard-archive-files in integration testing
+    testImplementation("io.chandler:ZipInputStreamPatch64:1.0.0") // needed because of a bug in java.util.zip (see https://github.com/cjgriscom/ZipInputStreamPatch64)
     testImplementation("org.assertj:assertj-core:3.24.2")
-    testImplementation("net.lingala.zip4j:zip4j:2.11.5") // used for unzip siard-archives in integration testing
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.2")
 

@@ -20,7 +20,7 @@ public class TestResourcesResolver {
      * @return A File object representing the existing resource.
      * @throws IllegalArgumentException if the specified resource does not exist.
      */
-    public static File loadResource(final String resource) {
+    public static File resolve(final String resource) {
         final Optional<URL> urlToResource = Optional.ofNullable(TestResourcesResolver.class
                 .getClassLoader()
                 .getResource(resource));
