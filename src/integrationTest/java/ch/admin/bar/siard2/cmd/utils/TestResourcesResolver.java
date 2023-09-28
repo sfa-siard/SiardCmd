@@ -7,7 +7,7 @@ import java.util.Optional;
 /**
  * Helper class for resolving class-path-resources in tests.
  * <p>
- * Caution: Does not working in packed jar-archives!
+ * Caution: Does not work in packed jar-archives!
  */
 public class TestResourcesResolver {
     private TestResourcesResolver() {

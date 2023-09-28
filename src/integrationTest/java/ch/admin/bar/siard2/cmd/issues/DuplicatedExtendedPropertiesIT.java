@@ -10,6 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +24,7 @@ public class DuplicatedExtendedPropertiesIT {
     public TemporaryFolder tmpFolder = new TemporaryFolder();
 
     @Rule
-    public MSSQLServerContainer mssqlserver = (MSSQLServerContainer) new MSSQLServerContainer()
+    public MSSQLServerContainer db = new MSSQLServerContainer<>(DockerImageName.parse("mcr.microsoft.com/mssql/server:2017-CU12"))
             .acceptLicense()
             .withInitScript(SqlScripts.MsSql.DUPLICATE_EXTENDED_PROPERTIES);
 
@@ -34,9 +35,9 @@ public class DuplicatedExtendedPropertiesIT {
 
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
-                "-j:" + mssqlserver.getJdbcUrl(),
-                "-u:" + mssqlserver.getUsername(),
-                "-p:" + mssqlserver.getPassword(),
+                "-j:" + db.getJdbcUrl(),
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
                 "-s:" + archiveLocation
         });
 
