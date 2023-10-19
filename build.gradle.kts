@@ -19,6 +19,7 @@ val deliverablesDir = Files.createDirectories(File("${buildDir}/deliverables").t
 plugins {
     `java-library`
     id("pl.allegro.tech.build.axion-release") version "1.14.3"
+    id("io.freefair.lombok") version "6.5.0"
 }
 
 java {
@@ -43,6 +44,12 @@ dependencies {
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
+    testImplementation("io.chandler:ZipInputStreamPatch64:1.0.0") // needed because of a bug in java.util.zip (see https://github.com/cjgriscom/ZipInputStreamPatch64)
+    testImplementation("org.assertj:assertj-core:3.24.2")
+    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.2")
+
+    // testcontainers
     testImplementation("org.testcontainers:testcontainers:1.19.0")
     testImplementation("org.testcontainers:mssqlserver:1.19.0")
     testImplementation("org.testcontainers:postgresql:1.19.0")

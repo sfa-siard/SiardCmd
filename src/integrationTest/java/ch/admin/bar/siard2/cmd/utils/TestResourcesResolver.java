@@ -7,7 +7,7 @@ import java.util.Optional;
 /**
  * Helper class for resolving class-path-resources in tests.
  * <p>
- * Caution: Does not working in packed jar-archives!
+ * Caution: Does not work in packed jar-archives!
  */
 public class TestResourcesResolver {
     private TestResourcesResolver() {
@@ -20,7 +20,7 @@ public class TestResourcesResolver {
      * @return A File object representing the existing resource.
      * @throws IllegalArgumentException if the specified resource does not exist.
      */
-    public static File loadResource(final String resource) {
+    public static File resolve(final String resource) {
         final Optional<URL> urlToResource = Optional.ofNullable(TestResourcesResolver.class
                 .getClassLoader()
                 .getResource(resource));
