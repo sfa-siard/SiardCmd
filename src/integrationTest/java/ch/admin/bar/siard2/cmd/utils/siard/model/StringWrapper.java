@@ -24,7 +24,7 @@ public class StringWrapper implements Updatable<StringWrapper> {
 
     @Override
     public StringWrapper applyUpdates(Updater updater) {
-        val updatedThis = updater.applyUpdate(this);
+       return updater.applyUpdate(this);
 
         return updatedThis;
     }
