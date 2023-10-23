@@ -5,7 +5,6 @@ import ch.admin.bar.siard2.cmd.utils.siard.update.Updater;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Value;
-import lombok.val;
 
 @Value(staticConstructor = "of")
 public class StringWrapper implements Updatable<StringWrapper> {
@@ -25,7 +24,5 @@ public class StringWrapper implements Updatable<StringWrapper> {
     @Override
     public StringWrapper applyUpdates(Updater updater) {
        return updater.applyUpdate(this);
-
-        return updatedThis;
     }
 }
