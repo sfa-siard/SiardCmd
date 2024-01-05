@@ -82,7 +82,7 @@ public class SiardToDb
   private Connection _conn = null;
   
   private int _iReturn = iRETURN_WARNING;
-  int getReturn() { return _iReturn; }
+  public int getReturn() { return _iReturn; }
   
   /*====================================================================
   methods
@@ -247,7 +247,7 @@ public class SiardToDb
   ====================================================================*/
 	/*------------------------------------------------------------------*/
 	/** runs main program of SiardFromDb. */
-	SiardToDb(String asArgs[])
+	public SiardToDb(String asArgs[])
 	  throws IOException, SQLException
   {
 	  super();

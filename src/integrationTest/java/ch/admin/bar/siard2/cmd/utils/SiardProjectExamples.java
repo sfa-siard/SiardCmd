@@ -2,6 +2,9 @@ package ch.admin.bar.siard2.cmd.utils;
 
 public class SiardProjectExamples {
 
+    public final static String ISSUE_31 = "siard-projects/2_2/issue-31_case-sensitive-cloumn-names.siard";
+
+
     /**
      * Complex example. TODO: Describe example and use-cases.
      * <p>
