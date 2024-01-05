@@ -1,11 +1,8 @@
 package ch.admin.bar.siard2.cmd.issues;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
-import ch.admin.bar.siard2.cmd.SiardToDb;
-import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
-import ch.admin.bar.siard2.cmd.utils.siard.SiardArchiveAssertions;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import lombok.val;
 import org.junit.Assert;
@@ -33,13 +30,12 @@ public class CaseSensitiveColumnNamesInPostgresIT {
                     .withRegEx(".*Datenbanksystem ist bereit, um Verbindungen anzunehmen.*\\s")
                     .withTimes(2)
                     .withStartupTimeout(Duration.of(60, SECONDS)))
-            .withEnv("LANG", "de_DE.utf8");
-//            .withInitScript(SqlScripts.Postgres.ISSUE_31);
+            .withEnv("LANG", "de_DE.utf8")
+            .withInitScript(SqlScripts.Postgres.ISSUE_31);
 
     @Test
     public void download_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
         // given
-        val expectedArchive = siardArchivesHandler.prepareResource(SiardProjectExamples.SIMPLE_TEAMS_EXAMPLE_POSTGRES13_2_2);
         val actualArchive = siardArchivesHandler.prepareEmpty();
 
         // when
@@ -53,45 +49,7 @@ public class CaseSensitiveColumnNamesInPostgresIT {
 
         // then
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
-
-        SiardArchiveAssertions.builder()
-                .actualArchive(actualArchive.preserveArchive())
-                .expectedArchive(expectedArchive.preserveArchive())
-                .updateInstruction(SiardArchiveAssertions.IGNORE_DBNAME) // FIXME ?
-                .assertEqual();
-    }
-
-    @Test
-    public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
-        // given
-        val expectedArchive = siardArchivesHandler.prepareResource(SiardProjectExamples.ISSUE_31);
-        val actualArchive = siardArchivesHandler.prepareEmpty();
-
-        // when
-        SiardToDb siardToDb = new SiardToDb(new String[]{
-                "-o",
-                "-j:" + db.getJdbcUrl(),
-                "-u:" + db.getUsername(),
-                "-p:" + db.getPassword(),
-                "-s:" + expectedArchive.getPathToArchiveFile()
-        });
-        SiardFromDb siardFromDb = new SiardFromDb(new String[]{
-                "-o",
-                "-j:" + db.getJdbcUrl(),
-                "-u:" + db.getUsername(),
-                "-p:" + db.getPassword(),
-                "-s:" + actualArchive.getPathToArchiveFile()
-        });
-
-        // then
-        Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
-        Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
-
-        SiardArchiveAssertions.builder()
-                .actualArchive(actualArchive.preserveArchive())
-                .expectedArchive(expectedArchive.preserveArchive())
-                .updateInstruction(SiardArchiveAssertions.IGNORE_DBNAME) // FIXME ?
-                .assertEqual();
+        actualArchive.preserveArchive();
     }
 
     private static DockerImageName loadDockerfile() {

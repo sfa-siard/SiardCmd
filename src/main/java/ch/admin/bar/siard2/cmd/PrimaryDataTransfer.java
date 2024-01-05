@@ -15,6 +15,7 @@ import ch.enterag.utils.logging.*;
 import ch.enterag.sqlparser.*;
 import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.*;
+import lombok.val;
 
 /*====================================================================*/
 /** Opens a record set to a database for up- or download.
@@ -83,6 +84,8 @@ public class PrimaryDataTransfer
     sbSql.append("\r\n FROM "+qiTable.format());
     /* execute query */
     _il.event(sbSql.toString());
+
+    val sql = sbSql.toString();
     
     int iHoldability = ResultSet.HOLD_CURSORS_OVER_COMMIT;
     if (sm == null)
