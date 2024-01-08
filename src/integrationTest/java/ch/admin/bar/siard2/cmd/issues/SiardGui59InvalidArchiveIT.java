@@ -51,5 +51,15 @@ public class SiardGui59InvalidArchiveIT {
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
 
         actualArchive.preserveArchive();
+
+        SiardArchiveAssertions.builder()
+                .expectedArchive(expectedArchive)
+                .actualArchive(actualArchive)
+                .updateInstruction(SiardArchiveAssertions.IGNORE_DBNAME) // FIXME ?
+                .updateInstruction(SiardArchiveAssertions.IGNORE_PRIMARY_KEY_NAME) // Probably a DB-restriction (primary key names are generated)
+                .updateInstruction(SiardArchiveAssertions.IGNORE_FOREIGN_KEY_UPDATE_ACTION) // FIXME https://github.com/sfa-siard/SiardGui/issues/58
+                .updateInstruction(SiardArchiveAssertions.IGNORE_FOREIGN_KEY_DELETE_ACTION) // FIXME https://github.com/sfa-siard/SiardGui/issues/58
+                .updateInstruction(SiardArchiveAssertions.IGNORE_COLUMN_NULLABLE_FLAG) // FIXME https://github.com/sfa-siard/SiardGui/issues/55
+                .assertEqual();
     }
 }
