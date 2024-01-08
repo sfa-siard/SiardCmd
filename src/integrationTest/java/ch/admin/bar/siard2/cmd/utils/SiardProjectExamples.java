@@ -65,4 +65,11 @@ public class SiardProjectExamples {
 
     private SiardProjectExamples() {
     }
+
+    public static class Issues {
+        /**
+         * See: https://github.com/users/sfa-siard/projects/1?pane=issue&itemId=24666714
+         */
+        public final static String SIARD_GUI_59 = "siard-projects/issues/siardgui59/0_1-3_Northwind_simple_220913_B5_2d1.siard";
+    }
 }
