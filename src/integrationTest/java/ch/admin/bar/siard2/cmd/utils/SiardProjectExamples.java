@@ -2,6 +2,8 @@ package ch.admin.bar.siard2.cmd.utils;
 
 public class SiardProjectExamples {
 
+    public final static String ISSUE_SIARDGUI_58 = "siard-projects/issues/siardgui58/issue-siardgui58-sql-script-download.siard";
+
     /**
      * Complex example. TODO: Describe example and use-cases.
      * <p>
