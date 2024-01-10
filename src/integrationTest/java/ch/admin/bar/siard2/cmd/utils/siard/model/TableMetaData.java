@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 @Value
 @Builder(toBuilder = true)
 @Jacksonized
-public class Table implements Updatable<Table> {
-    Id<Table> name;
+public class TableMetaData implements Updatable<TableMetaData> {
+    Id<TableMetaData> name;
     @Builder.Default
     Set<Column> columns = new HashSet<>();
 
@@ -28,11 +28,13 @@ public class Table implements Updatable<Table> {
     @Builder.Default
     Set<ForeignKey> foreignKeys = new HashSet<>();
 
+    FolderId folder;
+
     @Override
-    public Table applyUpdates(Updater updater) {
+    public TableMetaData applyUpdates(Updater updater) {
         val updatedThis = updater.applyUpdate(this);
 
-        return new Table(
+        return new TableMetaData(
                 updatedThis.name.applyUpdates(updater),
                 updatedThis.columns.stream()
                         .map(column -> column.applyUpdates(updater))
@@ -40,6 +42,7 @@ public class Table implements Updatable<Table> {
                 updatedThis.primaryKey.map(primaryKey -> primaryKey.applyUpdates(updater)),
                 updatedThis.foreignKeys.stream()
                         .map(foreignKey -> foreignKey.applyUpdates(updater))
-                        .collect(Collectors.toSet()));
+                        .collect(Collectors.toSet()),
+                updatedThis.folder.applyUpdates(updater));
     }
 }

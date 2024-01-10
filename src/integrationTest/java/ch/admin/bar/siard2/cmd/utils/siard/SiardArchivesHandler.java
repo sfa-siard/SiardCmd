@@ -1,6 +1,11 @@
 package ch.admin.bar.siard2.cmd.utils.siard;
 
+import ch.admin.bar.siard2.cmd.utils.siard.model.FolderId;
+import ch.admin.bar.siard2.cmd.utils.siard.model.SiardArchive;
 import ch.admin.bar.siard2.cmd.utils.siard.model.SiardMetadata;
+import ch.admin.bar.siard2.cmd.utils.siard.model.content.SiardContent;
+import ch.admin.bar.siard2.cmd.utils.siard.model.content.Table;
+import ch.admin.bar.siard2.cmd.utils.siard.model.content.TableContent;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -9,6 +14,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.Value;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.rules.ExternalResource;
@@ -19,6 +25,9 @@ import org.junit.runners.model.Statement;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static ch.admin.bar.siard2.cmd.utils.TestResourcesResolver.resolve;
 
@@ -123,6 +132,31 @@ public class SiardArchivesHandler extends ExternalResource {
             return xmlMapper.readValue(metadataFile, SiardMetadata.class);
         }
 
+        public SiardArchive explore() {
+            val metadata = exploreMetadata();
+            val content = exploreContent();
+
+            return new SiardArchive(metadata, content);
+        }
+
+        private SiardContent exploreContent() {
+            val tableXmlFiles = findTableXmlFiles();
+
+            val tables = tableXmlFiles.stream()
+                    .map(file -> {
+                        val tableContent = deserialize(file.getFile(), TableContent.class);
+                        return Table.builder()
+                                .schemaFolder(file.getSchemaFolder())
+                                .tableFolder(file.getTableFolder())
+                                .tableContent(tableContent)
+                                .build();
+
+                    })
+                    .collect(Collectors.toList());
+
+            return new SiardContent(tables);
+        }
+
         @SneakyThrows
         public SiardArchiveExplorer preserveArchive() {
             val filename = pathToArchiveFile.getName();
@@ -145,8 +179,44 @@ public class SiardArchivesHandler extends ExternalResource {
             return this;
         }
 
+        @SneakyThrows
+        private <T> T deserialize(final File file, final Class<T> clazz) {
+            return xmlMapper.readValue(file, clazz);
+        }
+
         private File findMetadataFile() {
             return findFile("/header/metadata.xml");
+        }
+
+        @Value
+        @Builder
+        private static class TableXmlFile {
+            @NonNull FolderId schemaFolder;
+            @NonNull FolderId tableFolder;
+            @NonNull File file;
+        }
+
+        private List<TableXmlFile> findTableXmlFiles() {
+            val files = Arrays.stream(findFile("/content").listFiles())
+                    .filter(File::isDirectory)
+                    .flatMap(schemaDir -> Arrays.stream(schemaDir.listFiles()))
+                    .filter(File::isDirectory)
+                    .flatMap(tableDir -> Arrays.stream(tableDir.listFiles()))
+                    .filter(file -> file.getName().endsWith(".xml"))
+                    .collect(Collectors.toList());
+
+            return files.stream()
+                    .map(file -> {
+                        val tableDir = file.getParentFile();
+                        val schemaDir = tableDir.getParentFile();
+
+                        return TableXmlFile.builder()
+                                .schemaFolder(FolderId.of(schemaDir.getName()))
+                                .tableFolder(FolderId.of(tableDir.getName()))
+                                .file(file)
+                                .build();
+                    })
+                    .collect(Collectors.toList());
         }
 
         private File findFile(String fileInSiardArchive) {

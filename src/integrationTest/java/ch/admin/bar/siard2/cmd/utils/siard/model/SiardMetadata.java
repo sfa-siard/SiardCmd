@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Jacksonized
 public class SiardMetadata implements Updatable<SiardMetadata> {
     StringWrapper dbname;
-    Set<Schema> schemas;
+    Set<SchemaMetaData> schemas;
 
     @Override
     public SiardMetadata applyUpdates(Updater updater) {

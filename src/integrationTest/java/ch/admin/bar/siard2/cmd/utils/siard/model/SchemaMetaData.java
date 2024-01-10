@@ -13,18 +13,20 @@ import java.util.stream.Collectors;
 @Value
 @Builder(toBuilder = true)
 @Jacksonized
-public class Schema implements Updatable<Schema> {
-    Id<Schema> name;
-    Set<Table> tables;
+public class SchemaMetaData implements Updatable<SchemaMetaData> {
+    Id<SchemaMetaData> name;
+    Set<TableMetaData> tables;
+    FolderId folder;
 
     @Override
-    public Schema applyUpdates(Updater updater) {
+    public SchemaMetaData applyUpdates(Updater updater) {
         val updatedThis = updater.applyUpdate(this);
 
-        return new Schema(
+        return new SchemaMetaData(
                 updatedThis.name.applyUpdates(updater),
                 updatedThis.tables.stream()
                         .map(table -> table.applyUpdates(updater))
-                        .collect(Collectors.toSet()));
+                        .collect(Collectors.toSet()),
+                updatedThis.folder.applyUpdates(updater));
     }
 }

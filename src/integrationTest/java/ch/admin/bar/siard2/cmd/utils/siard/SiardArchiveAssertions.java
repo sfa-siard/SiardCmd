@@ -1,11 +1,15 @@
 package ch.admin.bar.siard2.cmd.utils.siard;
 
+import ch.admin.bar.siard2.cmd.utils.StringUtils;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler.SiardArchiveExplorer;
+import ch.admin.bar.siard2.cmd.utils.siard.assertions.ContentAssertions;
 import ch.admin.bar.siard2.cmd.utils.siard.model.Column;
 import ch.admin.bar.siard2.cmd.utils.siard.model.ForeignKey;
 import ch.admin.bar.siard2.cmd.utils.siard.model.PrimaryKey;
 import ch.admin.bar.siard2.cmd.utils.siard.model.SiardMetadata;
 import ch.admin.bar.siard2.cmd.utils.siard.model.StringWrapper;
+import ch.admin.bar.siard2.cmd.utils.siard.model.content.TableCell;
+import ch.admin.bar.siard2.cmd.utils.siard.model.content.TableContent;
 import ch.admin.bar.siard2.cmd.utils.siard.update.UpdateInstruction;
 import ch.admin.bar.siard2.cmd.utils.siard.update.Updater;
 import lombok.Builder;
@@ -81,6 +85,14 @@ public class SiardArchiveAssertions {
             .description("Ignore the nullable flag of columns")
             .build();
 
+    public static final UpdateInstruction<TableCell> TRIM_TABLE_CELL_CONTENT = UpdateInstruction.<TableCell>builder()
+            .clazz(TableCell.class)
+            .updater(tableCell -> tableCell.toBuilder()
+                    .value(StringUtils.trim(tableCell.getValue(), 50))
+                    .build())
+            .description("Trim the content of table cells to max. 50 chars")
+            .build();
+
     private final Set<UpdateInstruction<?>> updateInstructions;
 
     @Builder(buildMethodName = "assertEqual")
@@ -96,35 +108,43 @@ public class SiardArchiveAssertions {
                 .instructions(this.updateInstructions)
                 .build();
 
-        val expectedMetadata = expectedArchive
-                .exploreMetadata()
+        expectedArchive.explore();
+
+        val expected = expectedArchive
+                .explore()
                 .applyUpdates(updater);
-        val actualMetadata = actualArchive
-                .exploreMetadata()
+        val actual = actualArchive
+                .explore()
                 .applyUpdates(updater);
+
 
         // columns
         Assertions
-                .assertThat(extractQualifiedColumns(actualMetadata))
+                .assertThat(extractQualifiedColumns(actual.getSiardMetadata()))
                 .as("Columns of SIARD archives are not equal" + createAppliedUpdateInstructionsText())
-                .isEqualTo(extractQualifiedColumns(expectedMetadata));
+                .isEqualTo(extractQualifiedColumns(expected.getSiardMetadata()));
 
         // primary keys
         Assertions
-                .assertThat(extractQualifiedPrimaryKeys(actualMetadata))
+                .assertThat(extractQualifiedPrimaryKeys(actual.getSiardMetadata()))
                 .as("Primary keys of SIARD archives are not equal" + createAppliedUpdateInstructionsText())
-                .isEqualTo(extractQualifiedPrimaryKeys(expectedMetadata));
+                .isEqualTo(extractQualifiedPrimaryKeys(expected.getSiardMetadata()));
 
         // foreign keys
         Assertions
-                .assertThat(extractQualifiedForeignKeys(actualMetadata))
+                .assertThat(extractQualifiedForeignKeys(actual.getSiardMetadata()))
                 .as("Foreign keys of SIARD archives are not equal" + createAppliedUpdateInstructionsText())
-                .isEqualTo(extractQualifiedForeignKeys(expectedMetadata));
+                .isEqualTo(extractQualifiedForeignKeys(expected.getSiardMetadata()));
 
+        // content
+        ContentAssertions.builder()
+                .actual(actual)
+                .expected(expected)
+                .assertEqual();
 
-        Assertions.assertThat(actualMetadata)
+        Assertions.assertThat(actual)
                 .as("SIARD archives are not equal")
-                .isEqualTo(expectedMetadata);
+                .isEqualTo(expected);
     }
 
     private static List<Qualifier<Column>> extractQualifiedColumns(final SiardMetadata siardMetadata) {

@@ -14,8 +14,8 @@ import java.util.Optional;
 @Jacksonized
 public class ForeignKey implements Updatable<ForeignKey> {
     Id<ForeignKey> name;
-    Id<Schema> referencedSchema;
-    Id<Table> referencedTable;
+    Id<SchemaMetaData> referencedSchema;
+    Id<TableMetaData> referencedTable;
     Reference reference; // TODO Probably a embedded set?
     @Builder.Default
     Optional<StringWrapper> deleteAction = Optional.empty();
