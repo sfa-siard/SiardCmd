@@ -1,6 +1,7 @@
 package ch.admin.bar.siard2.cmd.utils.siard;
 
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler.SiardArchiveExplorer;
+import ch.admin.bar.siard2.cmd.utils.siard.model.Column;
 import ch.admin.bar.siard2.cmd.utils.siard.model.ForeignKey;
 import ch.admin.bar.siard2.cmd.utils.siard.model.PrimaryKey;
 import ch.admin.bar.siard2.cmd.utils.siard.model.SiardMetadata;
@@ -10,13 +11,17 @@ import ch.admin.bar.siard2.cmd.utils.siard.update.Updater;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;
+import lombok.Value;
 import lombok.val;
 import org.assertj.core.api.Assertions;
 
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class is used to test the equality of two SIARD archives. Currently, only a few nodes from the header/metadata.xml files
@@ -68,6 +73,16 @@ public class SiardArchiveAssertions {
             .description("Ignore all foreign-key update-actions")
             .build();
 
+    public static final UpdateInstruction<Column> IGNORE_COLUMN_NULLABLE_FLAG = UpdateInstruction.<Column>builder()
+            .clazz(Column.class)
+            .updater(column -> column.toBuilder()
+                    .nullable(Optional.empty())
+                    .build())
+            .description("Ignore the nullable flag of columns")
+            .build();
+
+    private final Set<UpdateInstruction<?>> updateInstructions;
+
     @Builder(buildMethodName = "assertEqual")
     public SiardArchiveAssertions(
             @NonNull SiardArchiveExplorer expectedArchive,
@@ -75,10 +90,10 @@ public class SiardArchiveAssertions {
             @Singular Set<UpdateInstruction<?>> updateInstructions
 
     ) {
-        val nonNullableUpdateInstructions = Optional.ofNullable(updateInstructions).orElse(new HashSet<>());
+        this.updateInstructions = Optional.ofNullable(updateInstructions).orElse(new HashSet<>());
 
         val updater = Updater.builder()
-                .instructions(nonNullableUpdateInstructions)
+                .instructions(this.updateInstructions)
                 .build();
 
         val expectedMetadata = expectedArchive
@@ -88,12 +103,91 @@ public class SiardArchiveAssertions {
                 .exploreMetadata()
                 .applyUpdates(updater);
 
+        // columns
+        Assertions
+                .assertThat(extractQualifiedColumns(actualMetadata))
+                .as("Columns of SIARD archives are not equal" + createAppliedUpdateInstructionsText())
+                .isEqualTo(extractQualifiedColumns(expectedMetadata));
+
+        // primary keys
+        Assertions
+                .assertThat(extractQualifiedPrimaryKeys(actualMetadata))
+                .as("Primary keys of SIARD archives are not equal" + createAppliedUpdateInstructionsText())
+                .isEqualTo(extractQualifiedPrimaryKeys(expectedMetadata));
+
+        // foreign keys
+        Assertions
+                .assertThat(extractQualifiedForeignKeys(actualMetadata))
+                .as("Foreign keys of SIARD archives are not equal" + createAppliedUpdateInstructionsText())
+                .isEqualTo(extractQualifiedForeignKeys(expectedMetadata));
+
+
         Assertions.assertThat(actualMetadata)
-                .as(String.format(
-                        "SIARD archives are not equal. Applied update instructions:\n%s\n",
-                        nonNullableUpdateInstructions.stream()
-                                .map(updateInstruction -> " - " + updateInstruction.getDescription())
-                                .collect(Collectors.joining("\n"))))
+                .as("SIARD archives are not equal")
                 .isEqualTo(expectedMetadata);
+    }
+
+    private static List<Qualifier<Column>> extractQualifiedColumns(final SiardMetadata siardMetadata) {
+        return siardMetadata.getSchemas().stream()
+                .flatMap(schema -> schema.getTables().stream()
+                        .flatMap(table -> table.getColumns().stream()
+                                .map(column -> new Qualifier<>(
+                                        String.format("%s.%s.%s",
+                                                table.getName(),
+                                                schema.getName(),
+                                                column.getName()),
+                                        column))))
+                .sorted(Comparator.comparing(Qualifier::getQualifier))
+                .collect(Collectors.toList());
+    }
+
+    private static List<Qualifier<PrimaryKey>> extractQualifiedPrimaryKeys(final SiardMetadata siardMetadata) {
+        return siardMetadata.getSchemas().stream()
+                .flatMap(schema -> schema.getTables().stream()
+                        .flatMap(table -> stream(table.getPrimaryKey())
+                                .map(primaryKey -> new Qualifier<>(
+                                        String.format("%s.%s.%s->%s",
+                                                table.getName(),
+                                                schema.getName(),
+                                                primaryKey.getName(),
+                                                primaryKey.getColumn()),
+                                        primaryKey))))
+                .sorted(Comparator.comparing(Qualifier::getQualifier))
+                .collect(Collectors.toList());
+    }
+
+    private static List<Qualifier<ForeignKey>> extractQualifiedForeignKeys(final SiardMetadata siardMetadata) {
+        return siardMetadata.getSchemas().stream()
+                .flatMap(schema -> schema.getTables().stream()
+                        .flatMap(table -> table.getForeignKeys().stream()
+                                .map(foreignKey -> new Qualifier<>(
+                                        String.format("%s.%s.%s",
+                                                table.getName(),
+                                                schema.getName(),
+                                                foreignKey.getName()),
+                                        foreignKey
+                                ))))
+                .sorted(Comparator.comparing(Qualifier::getQualifier))
+                .collect(Collectors.toList());
+    }
+
+    private String createAppliedUpdateInstructionsText() {
+        return String.format(
+                "\nApplied update instructions:\n%s\n",
+                updateInstructions.stream()
+                        .map(updateInstruction -> " - " + updateInstruction.getDescription())
+                        .collect(Collectors.joining("\n")));
+    }
+
+    private static <T> Stream<T> stream(final Optional<T> optional) {
+        return optional
+                .map(Stream::of)
+                .orElseGet(Stream::empty);
+    }
+
+    @Value
+    private static class Qualifier<T> {
+        String qualifier;
+        T value;
     }
 }
