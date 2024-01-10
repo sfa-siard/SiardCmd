@@ -93,13 +93,13 @@ public class SiardArchiveAssertions {
                 .instructions(Optional.ofNullable(updateInstructions).orElse(new HashSet<>()))
                 .build();
 
-        expectedArchive.explore();
+        expectedArchive.readArchive();
 
         val expected = expectedArchive
-                .explore()
+                .readArchive()
                 .applyUpdates(updater);
         val actual = actualArchive
-                .explore()
+                .readArchive()
                 .applyUpdates(updater);
 
         MetadataAssertions.builder()

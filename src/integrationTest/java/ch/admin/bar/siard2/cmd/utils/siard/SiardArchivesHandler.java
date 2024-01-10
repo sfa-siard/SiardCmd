@@ -3,6 +3,8 @@ package ch.admin.bar.siard2.cmd.utils.siard;
 import ch.admin.bar.siard2.cmd.utils.siard.model.SiardArchive;
 import ch.admin.bar.siard2.cmd.utils.siard.model.content.ContentReader;
 import ch.admin.bar.siard2.cmd.utils.siard.model.header.MetadataReader;
+import ch.admin.bar.siard2.cmd.utils.siard.utils.ContentExplorer;
+import ch.admin.bar.siard2.cmd.utils.siard.utils.MetadataExplorer;
 import ch.admin.bar.siard2.cmd.utils.siard.utils.Unzipper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -113,7 +115,7 @@ public class SiardArchivesHandler extends ExternalResource {
         @NonNull
         private final String testName;
 
-        public SiardArchive explore() {
+        public SiardArchive readArchive() {
             if (!isArchiveAvailable()) {
                 throw new IllegalStateException("No SIARD archive is available");
             }
@@ -125,6 +127,14 @@ public class SiardArchivesHandler extends ExternalResource {
             val content = new ContentReader(pathToExtractingDirectory).read();
 
             return new SiardArchive(metadata, content);
+        }
+
+        public MetadataExplorer exploreMetadata() {
+            return new MetadataExplorer(readArchive());
+        }
+
+        public ContentExplorer exploreContent() {
+            return new ContentExplorer(readArchive());
         }
 
         @SneakyThrows

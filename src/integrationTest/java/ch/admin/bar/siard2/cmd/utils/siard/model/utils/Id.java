@@ -28,4 +28,8 @@ public class Id<T> implements Updatable<Id<T>> {
 
         return Id.of(updatedThis.value.applyUpdates(updater));
     }
+
+    public static <T> Id<T> of(String value) {
+        return new Id<>(StringWrapper.of(value));
+    }
 }

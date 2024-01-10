@@ -5,6 +5,7 @@ import ch.admin.bar.siard2.cmd.utils.siard.model.utils.Id;
 import ch.admin.bar.siard2.cmd.utils.siard.model.utils.StringWrapper;
 import ch.admin.bar.siard2.cmd.utils.siard.update.Updatable;
 import ch.admin.bar.siard2.cmd.utils.siard.update.Updater;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Builder;
 import lombok.NonNull;
@@ -41,8 +42,9 @@ public class Metadata implements Updatable<Metadata> {
     @Jacksonized
     public static class Schema implements Updatable<Schema> {
         Id<Schema> name;
-        Set<Table> tables;
         FolderId folder;
+        Set<Type> types;
+        Set<Table> tables;
 
         @Override
         public Schema applyUpdates(Updater updater) {
@@ -50,10 +52,14 @@ public class Metadata implements Updatable<Metadata> {
 
             return new Schema(
                     updatedThis.name.applyUpdates(updater),
+                    updatedThis.folder.applyUpdates(updater),
+                    updatedThis.types.stream()
+                            .map(type -> type.applyUpdates(updater))
+                            .collect(Collectors.toSet()),
                     updatedThis.tables.stream()
                             .map(table -> table.applyUpdates(updater))
-                            .collect(Collectors.toSet()),
-                    updatedThis.folder.applyUpdates(updater));
+                            .collect(Collectors.toSet())
+                    );
         }
     }
 
@@ -75,6 +81,10 @@ public class Metadata implements Updatable<Metadata> {
 
         FolderId folder;
 
+        @NonNull
+        @Builder.Default
+        Optional<StringWrapper> description = Optional.empty();
+
         @Override
         public Table applyUpdates(Updater updater) {
             val updatedThis = updater.applyUpdate(this);
@@ -88,7 +98,9 @@ public class Metadata implements Updatable<Metadata> {
                     updatedThis.foreignKeys.stream()
                             .map(foreignKey -> foreignKey.applyUpdates(updater))
                             .collect(Collectors.toSet()),
-                    updatedThis.folder.applyUpdates(updater));
+                    updatedThis.folder.applyUpdates(updater),
+                    updatedThis.description.map(description -> description.applyUpdates(updater))
+            );
         }
     }
 
@@ -102,13 +114,23 @@ public class Metadata implements Updatable<Metadata> {
         @Builder.Default
         Optional<Boolean> nullable = Optional.empty();
 
+        @NonNull
+        @Builder.Default
+        Optional<Id<Schema>> typeSchema = Optional.empty();
+
+        @NonNull
+        @Builder.Default
+        Optional<Id<Type>> typeName = Optional.empty();
+
         @Override
         public Column applyUpdates(Updater updater) {
             val updatedThis = updater.applyUpdate(this);
 
             return new Column(
                     updatedThis.name.applyUpdates(updater),
-                    updatedThis.nullable
+                    updatedThis.nullable,
+                    updatedThis.typeSchema.map(typeId -> typeId.applyUpdates(updater)),
+                    updatedThis.typeName.map(typeId -> typeId.applyUpdates(updater))
             );
         }
     }
@@ -171,6 +193,35 @@ public class Metadata implements Updatable<Metadata> {
             return new Reference(
                     updatedThis.column.applyUpdates(updater),
                     updatedThis.referenced.applyUpdates(updater));
+        }
+    }
+
+    @Value
+    @Builder
+    @Jacksonized
+    public static class Type implements Updatable<Type> {
+        @NonNull Id<Type> name;
+        @NonNull Category category;
+        @NonNull Boolean instantiable;
+
+        @JsonProperty("final")
+        @NonNull
+        Boolean finalFlag;
+
+        public enum Category {
+            distinct,
+            udt
+        }
+
+        @Override
+        public Type applyUpdates(Updater updater) {
+            val updatedThis = updater.applyUpdate(this);
+
+            return new Type(
+                    updatedThis.name.applyUpdates(updater),
+                    updatedThis.category,
+                    updatedThis.instantiable,
+                    updatedThis.finalFlag);
         }
     }
 }

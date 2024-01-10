@@ -33,6 +33,7 @@ public class MetadataReaderTest {
 
         Assertions.assertThat(result.getSchemas()).isNotEmpty();
         result.getSchemas().forEach(schema -> {
+            Assertions.assertThat(schema.getTypes()).isNotEmpty();
             Assertions.assertThat(schema.getTables()).isNotEmpty();
             schema.getTables().forEach(table -> Assertions.assertThat(table.getColumns()).isNotEmpty());
         });
