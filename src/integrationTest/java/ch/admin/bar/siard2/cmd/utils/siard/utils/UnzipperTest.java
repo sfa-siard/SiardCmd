@@ -1,4 +1,4 @@
-package ch.admin.bar.siard2.cmd.utils.siard;
+package ch.admin.bar.siard2.cmd.utils.siard.utils;
 
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;

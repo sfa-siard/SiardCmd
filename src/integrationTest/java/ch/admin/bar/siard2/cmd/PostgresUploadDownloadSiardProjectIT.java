@@ -1,7 +1,7 @@
 package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
-import ch.admin.bar.siard2.cmd.utils.siard.SiardArchiveAssertions;
+import ch.admin.bar.siard2.cmd.utils.siard.assertions.SiardArchiveAssertions;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import lombok.val;
 import org.junit.Assert;

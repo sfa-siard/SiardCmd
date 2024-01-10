@@ -1,4 +1,4 @@
-package ch.admin.bar.siard2.cmd.utils.siard;
+package ch.admin.bar.siard2.cmd.utils.siard.utils;
 
 import io.chandler.zip.patch64.ZipInputStreamPatch64;
 import lombok.RequiredArgsConstructor;

@@ -1,9 +1,9 @@
 package ch.admin.bar.siard2.cmd.utils.siard.utils;
 
-import ch.admin.bar.siard2.cmd.utils.siard.model.FolderId;
-import ch.admin.bar.siard2.cmd.utils.siard.model.QualifiedTableId;
+import ch.admin.bar.siard2.cmd.utils.siard.model.utils.FolderId;
+import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedTableId;
 import ch.admin.bar.siard2.cmd.utils.siard.model.SiardArchive;
-import ch.admin.bar.siard2.cmd.utils.siard.model.content.Table;
+import ch.admin.bar.siard2.cmd.utils.siard.model.content.Content;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
@@ -28,14 +28,14 @@ public class ContentExplorer {
                 .collect(Collectors.toSet());
     }
 
-    public Optional<Table> tryFindTable(final QualifiedTableId tableId) {
+    public Optional<Content.Table> tryFindTable(final QualifiedTableId tableId) {
         return tableDataMappings.stream()
                 .filter(tableDataMapping -> tableDataMapping.getTableId().equals(tableId))
                 .findAny()
                 .map(TableDataMapping::getTable);
     }
 
-    public Table findTable(final QualifiedTableId tableId) {
+    public Content.Table findTable(final QualifiedTableId tableId) {
         return tryFindTable(tableId)
                 .orElseThrow(() -> new IllegalArgumentException(String.format(
                         "No table with id %s found. Available tables are: %s",
@@ -67,6 +67,6 @@ public class ContentExplorer {
         @NonNull QualifiedTableId tableId;
         @NonNull FolderId schemaFolder; // FIXME: Not really needed
         @NonNull FolderId tableFolder; // FIXME: Not really needed
-        @NonNull Table table;
+        @NonNull Content.Table table;
     }
 }

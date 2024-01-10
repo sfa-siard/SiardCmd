@@ -1,31 +1,30 @@
-package ch.admin.bar.siard2.cmd.utils.siard.model;
+package ch.admin.bar.siard2.cmd.utils.siard.model.utils;
 
-import ch.admin.bar.siard2.cmd.utils.siard.update.Updater;
 import ch.admin.bar.siard2.cmd.utils.siard.update.Updatable;
+import ch.admin.bar.siard2.cmd.utils.siard.update.Updater;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Value;
 import lombok.val;
 
 @Value(staticConstructor = "of")
-public class Id<T> implements Updatable<Id<T>> {
+public class FolderId implements Updatable<FolderId> {
     @JsonValue
-    StringWrapper value;
+    String value;
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public Id(StringWrapper value) {
+    public FolderId(String value) {
         this.value = value;
     }
 
     @Override
     public String toString() {
-        return value.toString();
+        return value;
     }
 
     @Override
-    public Id<T> applyUpdates(Updater updater) {
+    public FolderId applyUpdates(Updater updater) {
         val updatedThis = updater.applyUpdate(this);
-
-        return Id.of(updatedThis.value.applyUpdates(updater));
+        return updatedThis;
     }
 }
