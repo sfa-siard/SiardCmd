@@ -23,8 +23,11 @@ import java.util.stream.Collectors;
 @Jacksonized
 @JacksonXmlRootElement(localName = "siardArchive")
 public class Metadata implements Updatable<Metadata> {
-    StringWrapper dbname;
-    Set<Schema> schemas;
+    @NonNull StringWrapper dbname;
+
+    @NonNull
+    @Builder.Default
+    Set<Schema> schemas = new HashSet<>();
 
     @Override
     public Metadata applyUpdates(Updater updater) {
@@ -41,10 +44,16 @@ public class Metadata implements Updatable<Metadata> {
     @Builder(toBuilder = true)
     @Jacksonized
     public static class Schema implements Updatable<Schema> {
-        Id<Schema> name;
-        FolderId folder;
-        Set<Type> types;
-        Set<Table> tables;
+        @NonNull Id<Schema> name;
+        @NonNull FolderId folder;
+
+        @NonNull
+        @Builder.Default
+        Set<Type> types = new HashSet<>();
+
+        @NonNull
+        @Builder.Default
+        Set<Table> tables = new HashSet<>();
 
         @Override
         public Schema applyUpdates(Updater updater) {
@@ -59,7 +68,7 @@ public class Metadata implements Updatable<Metadata> {
                     updatedThis.tables.stream()
                             .map(table -> table.applyUpdates(updater))
                             .collect(Collectors.toSet())
-                    );
+            );
         }
     }
 
