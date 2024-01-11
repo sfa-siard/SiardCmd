@@ -50,7 +50,7 @@ public class PostgresUploadDownloadSiardProjectIT {
         SiardArchiveAssertions.builder()
                 .actualArchive(actualArchive)
                 .expectedArchive(expectedArchive.preserveArchive())
-                .updateInstruction(SiardArchiveAssertions.IGNORE_DBNAME) // FIXME ?
+                .assertionModifier(SiardArchiveAssertions.IGNORE_DBNAME) // FIXME ?
                 .assertEqual();
     }
 }
