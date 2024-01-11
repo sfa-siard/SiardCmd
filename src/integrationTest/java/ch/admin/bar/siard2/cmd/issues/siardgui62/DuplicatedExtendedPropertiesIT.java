@@ -51,6 +51,6 @@ public class DuplicatedExtendedPropertiesIT {
                         .schemaId(Id.of("dbo"))
                         .tableId(Id.of("testtable"))
                         .build());
-        Assertions.assertThat(metadataTable.getDescription().map(StringWrapper::getValue)).contains("Caption.| Descriptionn.");
+        Assertions.assertThat(metadataTable.getDescription().map(StringWrapper::getValue)).contains("Caption.| Description.");
     }
 }

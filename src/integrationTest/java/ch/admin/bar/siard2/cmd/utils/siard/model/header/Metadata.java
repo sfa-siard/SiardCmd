@@ -121,7 +121,7 @@ public class Metadata implements Updatable<Metadata> {
 
         @NonNull
         @Builder.Default
-        Optional<Boolean> nullable = Optional.empty();
+        Boolean nullable = true; // from the SIARD 2.2 spec. p.20: "No indication of <nullable> implies <nullable>true</nullable>"
 
         @NonNull
         @Builder.Default
