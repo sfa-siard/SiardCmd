@@ -19,11 +19,11 @@ public class ContentReaderTest {
     @Test
     public void read_expectNoExceptions() throws IOException {
         // given
-        val unziper = new Unzipper(
+        val unzipper = new Unzipper(
                 TestResourcesResolver.resolve(SiardProjectExamples.SAMPLE_DATALINK_2_2_SIARD),
                 temporaryFolder.getRoot());
 
-        val contentReader = new ContentReader(unziper.unzip());
+        val contentReader = new ContentReader(unzipper.unzip());
 
         // when
         val result = contentReader.read();

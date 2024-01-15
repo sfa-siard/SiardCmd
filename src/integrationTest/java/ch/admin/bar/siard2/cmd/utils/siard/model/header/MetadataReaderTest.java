@@ -19,11 +19,11 @@ public class MetadataReaderTest {
     @Test
     public void read_expectNoExceptions() throws IOException {
         // given
-        val unziper = new Unzipper(
+        val unzipper = new Unzipper(
                 TestResourcesResolver.resolve(SiardProjectExamples.SAMPLE_DATALINK_2_2_SIARD),
                 temporaryFolder.getRoot());
 
-        val metadataReader = new MetadataReader(unziper.unzip());
+        val metadataReader = new MetadataReader(unzipper.unzip());
 
         // when
         val result = metadataReader.read();

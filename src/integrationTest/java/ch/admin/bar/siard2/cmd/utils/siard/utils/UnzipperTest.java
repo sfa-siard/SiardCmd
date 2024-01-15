@@ -19,10 +19,10 @@ public class UnzipperTest {
     public void unzip_expectUnzippedArchive() throws IOException {
         // given
         val siardArchive = TestResourcesResolver.resolve(SiardProjectExamples.SIMPLE_TEAMS_EXAMPLE_ORACLE18_2_2);
-        val unziper = new Unzipper(siardArchive, temporaryFolder.getRoot());
+        val unzipper = new Unzipper(siardArchive, temporaryFolder.getRoot());
 
         // when
-        val unzippedSiardArchive = unziper.unzip();
+        val unzippedSiardArchive = unzipper.unzip();
 
         // then
         Assertions.assertThat(unzippedSiardArchive).exists();
