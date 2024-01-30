@@ -28,19 +28,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SiardArchiveAssertions {
 
-    public static final StringWrapper IGNORED_PLACEHOLDER = StringWrapper.of("IGNORED");
+    private static final StringWrapper IGNORED_PLACEHOLDER = StringWrapper.of("IGNORED");
 
     public static final AssertionModifier IGNORE_METADATA = () -> "Ignore metadata of SIARD archives";
 
     public static final AssertionModifier IGNORE_CONTENT = () -> "Ignore content of SIARD archives";
-
-    public static final AssertionModifier IGNORE_CASE_OF_STRINGS = UpdateInstructionAssertionModifier.builder()
-            .description("Ignore the case of all strings")
-            .updateInstruction(UpdateInstruction.<StringWrapper>builder()
-                    .clazz(StringWrapper.class)
-                    .updater(stringWrapper -> StringWrapper.of(stringWrapper.getValue().toUpperCase()))
-                    .build())
-            .build();
 
     public static final AssertionModifier IGNORE_DBNAME = UpdateInstructionAssertionModifier.builder()
             .description("Ignore the DB name")

@@ -24,7 +24,6 @@ public class FolderId implements Updatable<FolderId> {
 
     @Override
     public FolderId applyUpdates(Updater updater) {
-        val updatedThis = updater.applyUpdate(this);
-        return updatedThis;
+        return updater.applyUpdate(this);
     }
 }

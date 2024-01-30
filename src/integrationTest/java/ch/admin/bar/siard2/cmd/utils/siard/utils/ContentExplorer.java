@@ -14,11 +14,9 @@ import java.util.stream.Collectors;
 
 public class ContentExplorer {
 
-    private final SiardArchive siardArchive;
     private final Set<TableDataMapping> tableDataMappings;
 
     public ContentExplorer(final SiardArchive siardArchive) {
-        this.siardArchive = siardArchive;
         this.tableDataMappings = findMappings(siardArchive);
     }
 
