@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public class MetadataExplorer {
+
     private final SiardArchive siardArchive;
 
     public Optional<Metadata.Schema> tryFindBySchemaId(final Id<Metadata.Schema> id) {

@@ -19,11 +19,28 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * This class is used to test the equality of two SIARD archives. Currently, only a few nodes from the header/metadata.xml files
- * are compared. For further information, please refer to the {@link ch.admin.bar.siard2.cmd.utils.siard.model} package.
+ * This class is used to test the equality of two SIARD archives. Currently, not all data is compared. For further
+ * information, please refer to the {@link ch.admin.bar.siard2.cmd.utils.siard.model} package.
  * <p>
- * Individual fields can be excluded from the equality check using {@link UpdateInstruction}s (in fact, they are not excluded
- * but set to the same value through the {@link UpdateInstruction}).
+ * Individual assertion checks can be deactivated using {@link AssertionModifier}s.
+ * </p>
+ * <p>
+ * Example usage:
+ * <pre>{@code
+ * SiardArchiveExplorer expectedArchive = SiardArchivesHandler.prepareResource("path/to/existing.siard");
+ * SiardArchiveExplorer actualArchive = SiardArchivesHandler.prepareEmpty();
+ *
+ * // download the actual SIARD-archive to actualArchive.getPathToArchiveFile()
+ *
+ * SiardArchiveAssertions.builder()
+ *                 .expectedArchive(expectedArchive)
+ *                 .actualArchive(actualArchive)
+ *                 .assertionModifier(SiardArchiveAssertions.IGNORE_DBNAME)
+ *                 .assertionModifier(SiardArchiveAssertions.IGNORE_PRIMARY_KEY_NAME)
+ *                 ...
+ *                 .assertEqual()
+ * }</pre>
+ * </p>
  */
 @Slf4j
 public class SiardArchiveAssertions {

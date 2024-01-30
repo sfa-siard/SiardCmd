@@ -51,6 +51,10 @@ public class SiardArchivesHandler extends ExternalResource {
                 .configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
     }
 
+    /**
+     * Prepares a SIARD archive explorer for the provided SIARD archive resource. The returned
+     * {@link SiardArchiveExplorer} can be used immediately after this method call (data is available).
+     */
     @SneakyThrows
     public SiardArchiveExplorer prepareResource(String resource) {
         final File pathToArchive = resolve(resource);
@@ -59,6 +63,11 @@ public class SiardArchivesHandler extends ExternalResource {
         return createExplorer(pathToArchive, pathToExtracted);
     }
 
+    /**
+     * Prepares a SIARD archive explorer for which the data is not yet available. The returned
+     * {@link SiardArchiveExplorer} can NOT be used immediately after this method call. The SIARD archive
+     * needs to be downloaded/copied first to the {@link SiardArchiveExplorer#getPathToArchiveFile()} location.
+     */
     @SneakyThrows
     public SiardArchiveExplorer prepareEmpty() {
         final File pathToArchive = temporaryFolder.newFolder();
@@ -98,6 +107,13 @@ public class SiardArchivesHandler extends ExternalResource {
                 .build();
     }
 
+    /**
+     * A builder class for simplifying the exploration of SIARD archives. This includes extraction, deserialization,
+     * and browsing of the data.
+     * <p/>
+     * Please use the {@link SiardArchivesHandler#prepareResource(String)} or the
+     * {@link SiardArchivesHandler#prepareEmpty()} method to create a new {@link SiardArchiveExplorer} instance.
+     */
     @Builder
     @RequiredArgsConstructor
     public static class SiardArchiveExplorer {
@@ -115,6 +131,9 @@ public class SiardArchivesHandler extends ExternalResource {
         @NonNull
         private final String testName;
 
+        /**
+         * Extracts the SIARD archive (if not done before) and deserializes the data into the returned {@link SiardArchive} instance.
+         */
         public SiardArchive readArchive() {
             if (!isArchiveAvailable()) {
                 throw new IllegalStateException("No SIARD archive is available");
@@ -129,14 +148,26 @@ public class SiardArchivesHandler extends ExternalResource {
             return new SiardArchive(metadata, content);
         }
 
+        /**
+         * Extracts the SIARD archive (if not done before) and deserializes the data. Wraps the data into a
+         * {@link MetadataExplorer} instance which provides methods to search the metadata of that data.
+         */
         public MetadataExplorer exploreMetadata() {
             return new MetadataExplorer(readArchive());
         }
 
+        /**
+         * Extracts the SIARD archive (if not done before) and deserializes the data. Wraps the data into a
+         * {@link ContentExplorer} instance which provides methods to search the content of that data.
+         */
         public ContentExplorer exploreContent() {
             return new ContentExplorer(readArchive());
         }
 
+        /**
+         * Preserves the SIARD archive by copying it to the test-outputs-directory. This is useful if a test does
+         * download a SIARD archive and the downloaded data should be preserved for  analytics reasons.
+         */
         @SneakyThrows
         public SiardArchiveExplorer preserveArchive() {
             val filename = pathToArchiveFile.getName();

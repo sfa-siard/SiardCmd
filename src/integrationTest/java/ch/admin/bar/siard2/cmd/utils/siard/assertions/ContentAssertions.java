@@ -12,7 +12,7 @@ import org.assertj.core.api.Assertions;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
-public class ContentAssertions {
+class ContentAssertions {
 
     private static final int MAX_DISPLAYED_ROWS = 100;
 

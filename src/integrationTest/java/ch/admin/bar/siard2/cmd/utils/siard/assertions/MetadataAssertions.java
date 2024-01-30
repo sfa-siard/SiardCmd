@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class MetadataAssertions {
+class MetadataAssertions {
     @Builder(buildMethodName = "assertEqual")
     public MetadataAssertions(
             @NonNull Metadata expected,
