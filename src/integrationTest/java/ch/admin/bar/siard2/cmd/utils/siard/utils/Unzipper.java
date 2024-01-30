@@ -1,4 +1,4 @@
-package ch.admin.bar.siard2.cmd.utils.siard;
+package ch.admin.bar.siard2.cmd.utils.siard.utils;
 
 import io.chandler.zip.patch64.ZipInputStreamPatch64;
 import lombok.RequiredArgsConstructor;
@@ -10,12 +10,27 @@ import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+/**
+ * Utility class for extracting the contents of a ZIP archive.
+ * <p>
+ * Usage example:
+ * <pre>{@code
+ * File zipFile = new File("path/to/archive.zip");
+ * File extractionDirectory = new File("path/to/extract");
+ * Unzipper unzipper = new Unzipper(zipFile, extractionDirectory);
+ * unzipper.unzip();
+ * }</pre>
+ * </p>
+ */
 @RequiredArgsConstructor
 public class Unzipper {
 
     private final File pathToArchive;
     private final File extractTo;
 
+    /**
+     * Unzips the contents of the ZIP archive to the specified directory.
+     */
     public File unzip() throws IOException {
         final byte[] buffer = new byte[1024];
         final ZipInputStream zis = new ZipInputStreamPatch64(Files.newInputStream(pathToArchive.toPath()));

@@ -1,4 +1,4 @@
-package ch.admin.bar.siard2.cmd.utils.siard.model;
+package ch.admin.bar.siard2.cmd.utils.siard.model.utils;
 
 import ch.admin.bar.siard2.cmd.utils.siard.update.Updatable;
 import ch.admin.bar.siard2.cmd.utils.siard.update.Updater;

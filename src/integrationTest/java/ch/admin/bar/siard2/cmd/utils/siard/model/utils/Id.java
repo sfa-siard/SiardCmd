@@ -1,4 +1,4 @@
-package ch.admin.bar.siard2.cmd.utils.siard.model;
+package ch.admin.bar.siard2.cmd.utils.siard.model.utils;
 
 import ch.admin.bar.siard2.cmd.utils.siard.update.Updater;
 import ch.admin.bar.siard2.cmd.utils.siard.update.Updatable;
@@ -27,5 +27,9 @@ public class Id<T> implements Updatable<Id<T>> {
         val updatedThis = updater.applyUpdate(this);
 
         return Id.of(updatedThis.value.applyUpdates(updater));
+    }
+
+    public static <T> Id<T> of(String value) {
+        return new Id<>(StringWrapper.of(value));
     }
 }
