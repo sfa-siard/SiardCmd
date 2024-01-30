@@ -70,7 +70,7 @@ public class SiardArchivesHandler extends ExternalResource {
      */
     @SneakyThrows
     public SiardArchiveExplorer prepareEmpty() {
-        final File pathToArchive = temporaryFolder.newFolder();
+        final File pathToArchive = File.createTempFile("temp", ".siard", temporaryFolder.getRoot());
         final File pathToExtracted = temporaryFolder.newFolder();
 
         return createExplorer(pathToArchive, pathToExtracted);
