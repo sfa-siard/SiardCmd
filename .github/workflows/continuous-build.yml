@@ -13,11 +13,41 @@ jobs:
   execute-unit-tests:
     runs-on: ubuntu-latest
     steps:
+      - name: Initialize Energy Estimation
+        uses: green-coding-solutions/eco-ci-energy-estimation@v2 # use hash or @vX here (See note below)
+        with:
+          task: start-measurement
+
       - uses: actions/checkout@v2
+
+      - name: Checkout Repo Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v2 # use hash or @vX here (See note below)
+        with:
+          task: get-measurement
+          label: 'repo checkout'
+
       - name: Set up JDK 8
         uses: actions/setup-java@v2
         with:
           java-version: '8'
           distribution: 'adopt'
+
+      - name: Setup Java Measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v2 # use hash or @vX here (See note below)
+        with:
+          task: get-measurement
+          label: 'java setup'
+
       - name: Run unit tests
         run: ./gradlew test
+
+      - name: Tests measurement
+        uses: green-coding-solutions/eco-ci-energy-estimation@v2 # use hash or @vX here (See note below)
+        with:
+          task: get-measurement
+          label: 'unit tests'
+
+      - name: Show Energy Results
+        uses: green-coding-solutions/eco-ci-energy-estimation@v2 # use hash or @vX here (See note below)
+        with:
+          task: display-results
