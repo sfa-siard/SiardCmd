@@ -2,9 +2,8 @@ package ch.admin.bar.siard2.cmd.issues.siardgui58;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
 import ch.admin.bar.siard2.cmd.SiardToDb;
-import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
-import ch.admin.bar.siard2.cmd.utils.siard.SiardArchiveAssertions;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
+import ch.admin.bar.siard2.cmd.utils.siard.assertions.SiardArchiveAssertions;
 import lombok.val;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -17,6 +16,8 @@ import java.sql.SQLException;
 
 public class MissingForeignKeyActionsUploadDownloadIT {
 
+    public final static String TABLE_WITH_FOREIGN_KEY_ACTIONS = "issues/siardgui58/table-with-forign-key-actions.siard";
+
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
@@ -26,7 +27,7 @@ public class MissingForeignKeyActionsUploadDownloadIT {
     @Test
     public void uploadAndDownload_expectEqualArchives() throws IOException, SQLException, ClassNotFoundException {
         // given
-        val expectedArchive = siardArchivesHandler.prepareResource(SiardProjectExamples.ISSUE_SIARDGUI_58);
+        val expectedArchive = siardArchivesHandler.prepareResource(TABLE_WITH_FOREIGN_KEY_ACTIONS);
         val actualArchive = siardArchivesHandler.prepareEmpty();
 
         // when
@@ -52,7 +53,7 @@ public class MissingForeignKeyActionsUploadDownloadIT {
         SiardArchiveAssertions.builder()
                 .actualArchive(actualArchive)
                 .expectedArchive(expectedArchive.preserveArchive())
-                .updateInstruction(SiardArchiveAssertions.IGNORE_DBNAME) // FIXME ?
+                .assertionModifier(SiardArchiveAssertions.IGNORE_DBNAME)
                 .assertEqual();
     }
 }

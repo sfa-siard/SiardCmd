@@ -1,15 +1,7 @@
 package ch.admin.bar.siard2.cmd.utils;
 
 public class SqlScripts {
-
-    public static class MsSql {
-    }
-
     public static class Oracle {
         public final static String CREATE_USER_WITH_ALL_PRIVILEGES = "config/oracle/00_create_user.sql";
-    }
-
-    public static class Postgres {
-        public final static String ISSUE_SIARDGUI_58 = "config/postgres/issue-siardgui58.sql";
     }
 }

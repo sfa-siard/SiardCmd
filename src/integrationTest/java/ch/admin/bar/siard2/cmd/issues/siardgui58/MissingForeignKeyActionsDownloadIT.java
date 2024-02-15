@@ -1,7 +1,6 @@
 package ch.admin.bar.siard2.cmd.issues.siardgui58;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
-import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import lombok.val;
 import org.junit.Assert;
@@ -15,12 +14,14 @@ import java.sql.SQLException;
 
 public class MissingForeignKeyActionsDownloadIT {
 
+    public final static String CREATE_TABLE_WITH_FOREIGN_KEY_ACTIONS = "issues/siardgui58/create-table-with-forign-key-actions.sql";
+
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
     public PostgreSQLContainer<?> db = new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"))
-            .withInitScript(SqlScripts.Postgres.ISSUE_SIARDGUI_58);
+            .withInitScript(CREATE_TABLE_WITH_FOREIGN_KEY_ACTIONS);
 
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
