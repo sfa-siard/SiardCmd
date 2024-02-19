@@ -7,8 +7,8 @@ import ch.admin.bar.siard2.api.*;
 public class ArchiveMapping
 {
   private Map<String,SchemaMapping> _mapSchemas = new HashMap<String,SchemaMapping>();
-  SchemaMapping getSchemaMapping(String sSchemaName) { return _mapSchemas.get(sSchemaName); }
-  String getMappedSchemaName(String sSchemaName) { return getSchemaMapping(sSchemaName).getMappedSchemaName(); }
+  public SchemaMapping getSchemaMapping(String sSchemaName) { return _mapSchemas.get(sSchemaName); }
+  public String getMappedSchemaName(String sSchemaName) { return getSchemaMapping(sSchemaName).getMappedSchemaName(); }
   
   private ArchiveMapping(boolean bSupportsArrays, boolean bSupportsUdts,
     Map<String,String> mapSchemas, MetaData md,

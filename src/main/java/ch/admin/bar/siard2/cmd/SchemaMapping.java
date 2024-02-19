@@ -7,10 +7,10 @@ import ch.admin.bar.siard2.api.*;
 public class SchemaMapping extends Mapping
 {
   private String _sMappedSchemaName = null;
-  String getMappedSchemaName() { return _sMappedSchemaName; }
+  public String getMappedSchemaName() { return _sMappedSchemaName; }
   public void setMappedSchemaName(String sMappedSchemaName) { _sMappedSchemaName = sMappedSchemaName; }
   private Map<String,TableMapping> _mapTables = new HashMap<String, TableMapping>();
-  TableMapping getTableMapping(String sTableName) { return _mapTables.get(sTableName); }
+  public TableMapping getTableMapping(String sTableName) { return _mapTables.get(sTableName); }
   String getMappedTableName(String sTableName) { return getTableMapping(sTableName).getMappedTableName(); }
   private Map<String,TypeMapping> _mapTypes = new HashMap<String, TypeMapping>();
   TypeMapping getTypeMapping(String sTypeName) { return _mapTypes.get(sTypeName); }
