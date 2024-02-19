@@ -178,8 +178,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
                       .table(mt.getName())
                       .build())
               .idEncoder(new IdEncoder())
-              .columnIdMapper(_am)
-              .tableIdMapper(_am)
+              .idMapper(_am)
               .build();
 
       val sql = sqlGenerator.create(ListAssembler.assemble(mt.getMetaForeignKeys(), mt::getMetaForeignKey));

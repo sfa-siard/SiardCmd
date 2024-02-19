@@ -1,8 +1,7 @@
 package ch.admin.bar.siard2.cmd.sql;
 
 import ch.admin.bar.siard2.api.MetaForeignKey;
-import ch.admin.bar.siard2.cmd.mapping.ColumnIdMapper;
-import ch.admin.bar.siard2.cmd.mapping.TableIdMapper;
+import ch.admin.bar.siard2.cmd.mapping.IdMapper;
 import ch.admin.bar.siard2.cmd.model.QualifiedColumnId;
 import ch.admin.bar.siard2.cmd.model.QualifiedTableId;
 import lombok.Data;
@@ -22,13 +21,11 @@ public class CreateForeignKeySqlGeneratorTest {
             .schema("schema_name")
             .build();
 
-    private final TableIdMapper tableIdMapperMock = Mockito.mock(TableIdMapper.class);
-    private final ColumnIdMapper columnIdMapper = Mockito.mock(ColumnIdMapper.class);
+    private final IdMapper idMapperMock = new IdMapperMockFactory().create();
 
     private final CreateForeignKeySqlGenerator createForeignKeySqlGenerator = CreateForeignKeySqlGenerator.builder()
             .tableId(QUALIFIED_TABLE_ID)
-            .tableIdMapper(tableIdMapperMock)
-            .columnIdMapper(columnIdMapper)
+            .idMapper(idMapperMock)
             .idEncoder(new IdEncoder())
             .build();
 
@@ -36,44 +33,26 @@ public class CreateForeignKeySqlGeneratorTest {
     @Test
     public void createConstraintStatement_withSingleColumnPrimaryKey_expectValidSqlStatement() {
         // given
-        val siardMetaDataFactory = new SiardForeignKeyDataFactory();
-
-        Mockito.when(tableIdMapperMock.map(Mockito.any())).then(invocationOnMock -> {
-            final QualifiedTableId orig = invocationOnMock.getArgument(0);
-
-            return orig.toBuilder()
-                    .schema(orig.getSchema() + "_mapped")
-                    .table(orig.getTable() + "_mapped")
-                    .build();
-        });
-        Mockito.when(columnIdMapper.map(Mockito.any())).then(invocationOnMock -> {
-            final QualifiedColumnId orig = invocationOnMock.getArgument(0);
-
-            return orig.toBuilder()
-                    .schema(orig.getSchema() + "_mapped")
-                    .table(orig.getTable() + "_mapped")
-                    .column(orig.getColumn() + "_mapped")
-                    .build();
-        });
+        val siardMetaDataFactory = new MetaForeignKeyMockFactory();
 
         // when
         val result = createForeignKeySqlGenerator.create(Arrays.asList(siardMetaDataFactory.create()));
 
         Assertions.assertThat(result)
                 .isEqualTo(String.format(
-                        "ALTER TABLE \"%s_mapped\".\"%s_mapped\" " +
+                        "ALTER TABLE \"%s\".\"%s\" " +
                                 "ADD CONSTRAINT %s " +
-                                "FOREIGN KEY (\"%s_mapped\") " +
-                                "REFERENCES \"%s_mapped\".\"%s_mapped\" (\"%s_mapped\") " +
+                                "FOREIGN KEY (\"%s\") " +
+                                "REFERENCES \"%s\".\"%s\" (\"%s\") " +
                                 "ON DELETE %s " +
                                 "ON UPDATE %s",
-                        QUALIFIED_TABLE_ID.getSchema(),
-                        QUALIFIED_TABLE_ID.getTable(),
+                        QUALIFIED_TABLE_ID.getSchema() + IdMapperMockFactory.ADDED_SUFFIX,
+                        QUALIFIED_TABLE_ID.getTable() + IdMapperMockFactory.ADDED_SUFFIX,
                         siardMetaDataFactory.getName(),
-                        siardMetaDataFactory.getReferences().get(0).getColumn(),
-                        siardMetaDataFactory.getReferencedSchema(),
-                        siardMetaDataFactory.getReferencedTable(),
-                        siardMetaDataFactory.getReferences().get(0).getReferenced(),
+                        siardMetaDataFactory.getReferences().get(0).getColumn() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory.getReferencedSchema() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory.getReferencedTable() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory.getReferences().get(0).getReferenced() + IdMapperMockFactory.ADDED_SUFFIX,
                         siardMetaDataFactory.getDeleteAction(),
                         siardMetaDataFactory.getUpdateAction()
                 ));
@@ -82,50 +61,32 @@ public class CreateForeignKeySqlGeneratorTest {
     @Test
     public void createConstraintStatement_withMultiColumnsPrimaryKey_expectValidSqlStatement() {
         // given
-        val siardMetaDataFactory = new SiardForeignKeyDataFactory()
+        val siardMetaDataFactory = new MetaForeignKeyMockFactory()
                 .addReference()
                 .addReference();
-
-        Mockito.when(tableIdMapperMock.map(Mockito.any())).then(invocationOnMock -> {
-            final QualifiedTableId orig = invocationOnMock.getArgument(0);
-
-            return orig.toBuilder()
-                    .schema(orig.getSchema() + "_mapped")
-                    .table(orig.getTable() + "_mapped")
-                    .build();
-        });
-        Mockito.when(columnIdMapper.map(Mockito.any())).then(invocationOnMock -> {
-            final QualifiedColumnId orig = invocationOnMock.getArgument(0);
-
-            return orig.toBuilder()
-                    .schema(orig.getSchema() + "_mapped")
-                    .table(orig.getTable() + "_mapped")
-                    .column(orig.getColumn() + "_mapped")
-                    .build();
-        });
 
         // when
         val result = createForeignKeySqlGenerator.create(Arrays.asList(siardMetaDataFactory.create()));
 
         Assertions.assertThat(result)
                 .isEqualTo(String.format(
-                        "ALTER TABLE \"%s_mapped\".\"%s_mapped\" " +
+                        "ALTER TABLE \"%s\".\"%s\" " +
                                 "ADD CONSTRAINT %s " +
-                                "FOREIGN KEY (\"%s_mapped\", \"%s_mapped\", \"%s_mapped\") " +
-                                "REFERENCES \"%s_mapped\".\"%s_mapped\" (\"%s_mapped\", \"%s_mapped\", \"%s_mapped\") " +
+                                "FOREIGN KEY (\"%s\", \"%s\", \"%s\") " +
+                                "REFERENCES \"%s\".\"%s\" (\"%s\", \"%s\", \"%s\") " +
                                 "ON DELETE %s " +
                                 "ON UPDATE %s",
-                        QUALIFIED_TABLE_ID.getSchema(),
-                        QUALIFIED_TABLE_ID.getTable(),
+                        QUALIFIED_TABLE_ID.getSchema() + IdMapperMockFactory.ADDED_SUFFIX,
+                        QUALIFIED_TABLE_ID.getTable() + IdMapperMockFactory.ADDED_SUFFIX,
                         siardMetaDataFactory.getName(),
-                        siardMetaDataFactory.getReferences().get(0).getColumn(),
-                        siardMetaDataFactory.getReferences().get(1).getColumn(),
-                        siardMetaDataFactory.getReferences().get(2).getColumn(),
-                        siardMetaDataFactory.getReferencedSchema(),
-                        siardMetaDataFactory.getReferencedTable(),
-                        siardMetaDataFactory.getReferences().get(0).getReferenced(),
-                        siardMetaDataFactory.getReferences().get(1).getReferenced(),
-                        siardMetaDataFactory.getReferences().get(2).getReferenced(),
+                        siardMetaDataFactory.getReferences().get(0).getColumn() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory.getReferences().get(1).getColumn() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory.getReferences().get(2).getColumn() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory.getReferencedSchema() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory.getReferencedTable() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory.getReferences().get(0).getReferenced() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory.getReferences().get(1).getReferenced() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory.getReferences().get(2).getReferenced() + IdMapperMockFactory.ADDED_SUFFIX,
                         siardMetaDataFactory.getDeleteAction(),
                         siardMetaDataFactory.getUpdateAction()
                 ));
@@ -134,73 +95,81 @@ public class CreateForeignKeySqlGeneratorTest {
     @Test
     public void createConstraintStatement_withMultipleForeignKeysWithSingleColumnPrimaryKey_expectValidSqlStatement() {
         // given
-        val siardMetaDataFactory1 = new SiardForeignKeyDataFactory();
-        val siardMetaDataFactory2 = new SiardForeignKeyDataFactory();
-
-        Mockito.when(tableIdMapperMock.map(Mockito.any())).then(invocationOnMock -> {
-            final QualifiedTableId orig = invocationOnMock.getArgument(0);
-
-            return orig.toBuilder()
-                    .schema(orig.getSchema() + "_mapped")
-                    .table(orig.getTable() + "_mapped")
-                    .build();
-        });
-        Mockito.when(columnIdMapper.map(Mockito.any())).then(invocationOnMock -> {
-            final QualifiedColumnId orig = invocationOnMock.getArgument(0);
-
-            return orig.toBuilder()
-                    .schema(orig.getSchema() + "_mapped")
-                    .table(orig.getTable() + "_mapped")
-                    .column(orig.getColumn() + "_mapped")
-                    .build();
-        });
+        val siardMetaDataFactory1 = new MetaForeignKeyMockFactory();
+        val siardMetaDataFactory2 = new MetaForeignKeyMockFactory();
 
         // when
         val result = createForeignKeySqlGenerator.create(Arrays.asList(
                 siardMetaDataFactory1.create(),
                 siardMetaDataFactory2.create()
-                ));
+        ));
 
         Assertions.assertThat(result)
                 .isEqualTo(String.format(
-                        "ALTER TABLE \"%s_mapped\".\"%s_mapped\" " +
+                        "ALTER TABLE \"%s\".\"%s\" " +
 
                                 "ADD CONSTRAINT %s " +
-                                "FOREIGN KEY (\"%s_mapped\") " +
-                                "REFERENCES \"%s_mapped\".\"%s_mapped\" (\"%s_mapped\") " +
+                                "FOREIGN KEY (\"%s\") " +
+                                "REFERENCES \"%s\".\"%s\" (\"%s\") " +
                                 "ON DELETE %s " +
                                 "ON UPDATE %s, " +
 
                                 "ADD CONSTRAINT %s " +
-                                "FOREIGN KEY (\"%s_mapped\") " +
-                                "REFERENCES \"%s_mapped\".\"%s_mapped\" (\"%s_mapped\") " +
+                                "FOREIGN KEY (\"%s\") " +
+                                "REFERENCES \"%s\".\"%s\" (\"%s\") " +
                                 "ON DELETE %s " +
                                 "ON UPDATE %s",
-                        QUALIFIED_TABLE_ID.getSchema(),
-                        QUALIFIED_TABLE_ID.getTable(),
+                        QUALIFIED_TABLE_ID.getSchema() + IdMapperMockFactory.ADDED_SUFFIX,
+                        QUALIFIED_TABLE_ID.getTable() + IdMapperMockFactory.ADDED_SUFFIX,
 
                         siardMetaDataFactory1.getName(),
-                        siardMetaDataFactory1.getReferences().get(0).getColumn(),
-                        siardMetaDataFactory1.getReferencedSchema(),
-                        siardMetaDataFactory1.getReferencedTable(),
-                        siardMetaDataFactory1.getReferences().get(0).getReferenced(),
+                        siardMetaDataFactory1.getReferences().get(0).getColumn() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory1.getReferencedSchema() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory1.getReferencedTable() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory1.getReferences().get(0).getReferenced() + IdMapperMockFactory.ADDED_SUFFIX,
                         siardMetaDataFactory1.getDeleteAction(),
                         siardMetaDataFactory1.getUpdateAction(),
 
                         siardMetaDataFactory2.getName(),
-                        siardMetaDataFactory2.getReferences().get(0).getColumn(),
-                        siardMetaDataFactory2.getReferencedSchema(),
-                        siardMetaDataFactory2.getReferencedTable(),
-                        siardMetaDataFactory2.getReferences().get(0).getReferenced(),
+                        siardMetaDataFactory2.getReferences().get(0).getColumn() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory2.getReferencedSchema() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory2.getReferencedTable() + IdMapperMockFactory.ADDED_SUFFIX,
+                        siardMetaDataFactory2.getReferences().get(0).getReferenced() + IdMapperMockFactory.ADDED_SUFFIX,
                         siardMetaDataFactory2.getDeleteAction(),
                         siardMetaDataFactory2.getUpdateAction()
                 ));
     }
 
+    private static class IdMapperMockFactory {
+        public static final String ADDED_SUFFIX = "_mapped";
 
+        public IdMapper create() {
+            val mock = Mockito.mock(IdMapper.class);
+
+            Mockito.when(mock.map(Mockito.any(QualifiedTableId.class))).then(invocationOnMock -> {
+                final QualifiedTableId orig = invocationOnMock.getArgument(0);
+
+                return orig.toBuilder()
+                        .schema(orig.getSchema() + ADDED_SUFFIX)
+                        .table(orig.getTable() + ADDED_SUFFIX)
+                        .build();
+            });
+            Mockito.when(mock.map(Mockito.any(QualifiedColumnId.class))).then(invocationOnMock -> {
+                final QualifiedColumnId orig = invocationOnMock.getArgument(0);
+
+                return orig.toBuilder()
+                        .schema(orig.getSchema() + ADDED_SUFFIX)
+                        .table(orig.getTable() + ADDED_SUFFIX)
+                        .column(orig.getColumn() + ADDED_SUFFIX)
+                        .build();
+            });
+
+            return mock;
+        }
+    }
 
     @Data
-    private static class SiardForeignKeyDataFactory {
+    private static class MetaForeignKeyMockFactory {
 
         private static int instancesCounter = 0;
 
@@ -213,12 +182,12 @@ public class CreateForeignKeySqlGeneratorTest {
 
         List<Reference> references = new ArrayList<>();
 
-        public SiardForeignKeyDataFactory() {
+        public MetaForeignKeyMockFactory() {
             instancesCounter++;
             addReference();
         }
 
-        public SiardForeignKeyDataFactory addReference() {
+        public MetaForeignKeyMockFactory addReference() {
             references.add(new Reference());
             return this;
         }
