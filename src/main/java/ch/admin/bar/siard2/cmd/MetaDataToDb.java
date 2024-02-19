@@ -21,6 +21,7 @@ import ch.enterag.sqlparser.*;
 import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.*;
 import ch.admin.bar.siard2.api.generated.*;
+import lombok.val;
 
 /*====================================================================*/
 /** Transfers meta data from databases to SIARD files and back.
@@ -371,6 +372,9 @@ public class MetaDataToDb
     sbSql.append(")");
     /* now execute it */
     _il.event(sbSql.toString());
+
+    val sql = sbSql.toString();
+    System.out.println(sql);
 
     try {
       Statement stmt = _dmd.getConnection().createStatement();

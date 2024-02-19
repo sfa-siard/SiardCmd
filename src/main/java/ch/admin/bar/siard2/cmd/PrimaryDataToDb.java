@@ -8,18 +8,12 @@ Created    : 01.09.2016, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.cmd;
 
-import java.io.*;
-import java.math.*;
-import java.sql.*;
-import java.util.*;
-
 import ch.admin.bar.siard2.api.Archive;
 import ch.admin.bar.siard2.api.Cell;
 import ch.admin.bar.siard2.api.Field;
 import ch.admin.bar.siard2.api.MetaColumn;
 import ch.admin.bar.siard2.api.MetaData;
 import ch.admin.bar.siard2.api.MetaField;
-import ch.admin.bar.siard2.api.MetaForeignKey;
 import ch.admin.bar.siard2.api.MetaSchema;
 import ch.admin.bar.siard2.api.MetaTable;
 import ch.admin.bar.siard2.api.MetaType;
@@ -29,12 +23,40 @@ import ch.admin.bar.siard2.api.RecordDispenser;
 import ch.admin.bar.siard2.api.Schema;
 import ch.admin.bar.siard2.api.Table;
 import ch.admin.bar.siard2.api.Value;
-import ch.enterag.utils.*;
-import ch.enterag.utils.background.*;
-import ch.enterag.utils.logging.*;
-import ch.enterag.sqlparser.*;
-import ch.enterag.sqlparser.identifier.*;
-import ch.admin.bar.siard2.api.generated.*;
+import ch.admin.bar.siard2.api.generated.CategoryType;
+import ch.admin.bar.siard2.cmd.model.QualifiedTableId;
+import ch.admin.bar.siard2.cmd.sql.CreateForeignKeySqlGenerator;
+import ch.admin.bar.siard2.cmd.sql.IdEncoder;
+import ch.admin.bar.siard2.cmd.utils.ListAssembler;
+import ch.enterag.sqlparser.SqlLiterals;
+import ch.enterag.sqlparser.identifier.QualifiedId;
+import ch.enterag.utils.EU;
+import ch.enterag.utils.StopWatch;
+import ch.enterag.utils.background.Progress;
+import ch.enterag.utils.logging.IndentLogger;
+import lombok.val;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Writer;
+import java.math.BigDecimal;
+import java.sql.Array;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.NClob;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.SQLXML;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /*====================================================================*/
 /** Transfers primary data from SIARD files to databases.
@@ -145,49 +167,31 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       }
     }
   } /* addCandidateKeys */
-  
-  public void addForeignKeys(Connection conn, MetaTable mt)
-    throws SQLException
-  {
+
+  public void addForeignKeys(Connection conn, MetaTable mt) throws SQLException {
     _il.enter(mt.getName());
-    if (mt.getMetaForeignKeys() > 0)
-    {
-      SchemaMapping sm = _am.getSchemaMapping(mt.getParentMetaSchema().getName());
-      TableMapping tm = sm.getTableMapping(mt.getName());
-      QualifiedId qiTable = new QualifiedId(null,sm.getMappedSchemaName(),tm.getMappedTableName());
-      String sSql = "ALTER TABLE "+qiTable.format();
-      for (int iForeignKey = 0; iForeignKey < mt.getMetaForeignKeys(); iForeignKey++)
-      {
-        MetaForeignKey mfk = mt.getMetaForeignKey(iForeignKey);
-        StringBuilder sbSql = new StringBuilder(sSql + " ADD CONSTRAINT " + mfk.getName()+" FOREIGN KEY(");
-        SchemaMapping smReferenced = sm;
-        if (mfk.getReferencedSchema() != null)
-          smReferenced = _am.getSchemaMapping(mfk.getReferencedSchema());
-        TableMapping tmReferenced = smReferenced.getTableMapping(mfk.getReferencedTable());
-        QualifiedId qiReferenced = new QualifiedId(null,
-          smReferenced.getMappedSchemaName(),tmReferenced.getMappedTableName());
-        StringBuilder sbReferences = new StringBuilder(" REFERENCES "+qiReferenced.format()+"(");
-        for (int iReference = 0; iReference < mfk.getReferences(); iReference++)
-        {
-          if (iReference > 0)
-          {
-            sbSql.append(", ");
-            sbReferences.append(", ");
-          }
-          sbSql.append(tm.getMappedColumnName(mfk.getColumn(iReference)));
-          sbReferences.append(tmReferenced.getMappedColumnName(mfk.getReferenced(iReference)));
-        }
-        sbSql.append(")");
-        sbReferences.append(")");
-        sbSql.append(sbReferences.toString());
-        Statement stmt = conn.createStatement();
-        stmt.setQueryTimeout(_iQueryTimeoutSeconds);
-        stmt.execute(sbSql.toString());
-        stmt.close();
-      }
+
+    if (mt.getMetaForeignKeys() > 0) {
+      val sqlGenerator = CreateForeignKeySqlGenerator.builder()
+              .tableId(QualifiedTableId.builder()
+                      .schema(mt.getParentMetaSchema().getName())
+                      .table(mt.getName())
+                      .build())
+              .idEncoder(new IdEncoder())
+              .columnIdMapper(_am)
+              .tableIdMapper(_am)
+              .build();
+
+      val sql = sqlGenerator.create(ListAssembler.assemble(mt.getMetaForeignKeys(), mt::getMetaForeignKey));
+
+      Statement stmt = conn.createStatement();
+      stmt.setQueryTimeout(_iQueryTimeoutSeconds);
+      stmt.execute(sql);
+      stmt.close();
     }
+
     _il.exit();
-  } /* addForeignKeys */
+  }
   
   private void enableConstraints(MetaSchema ms)
   {
