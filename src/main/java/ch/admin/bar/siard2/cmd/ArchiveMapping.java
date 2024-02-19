@@ -3,9 +3,11 @@ package ch.admin.bar.siard2.cmd;
 import java.io.*;
 import java.util.*;
 import ch.admin.bar.siard2.api.*;
+import ch.admin.bar.siard2.cmd.mapping.ColumnIdMapper;
+import ch.admin.bar.siard2.cmd.model.QualifiedColumnId;
+import lombok.val;
 
-public class ArchiveMapping
-{
+public class ArchiveMapping implements ColumnIdMapper {
   private Map<String,SchemaMapping> _mapSchemas = new HashMap<String,SchemaMapping>();
   public SchemaMapping getSchemaMapping(String sSchemaName) { return _mapSchemas.get(sSchemaName); }
   public String getMappedSchemaName(String sSchemaName) { return getSchemaMapping(sSchemaName).getMappedSchemaName(); }
@@ -35,5 +37,31 @@ public class ArchiveMapping
     return new ArchiveMapping(bSupportsArrays,bSupportsUdts,
       mapSchemas, md, iMaxTableNameLength, iMaxColumnNameLength);
   } /* newInstance */
-  
+
+  @Override
+  public QualifiedColumnId map(QualifiedColumnId origQualifiedColumnId) {
+    val sm = getSchemaMapping(origQualifiedColumnId.getSchema());
+    if (sm == null) {
+      return origQualifiedColumnId;
+    }
+
+    val builder = origQualifiedColumnId.toBuilder()
+            .schema(sm.getMappedSchemaName());
+
+    val tm = sm.getTableMapping(origQualifiedColumnId.getTable());
+    if (tm == null) {
+      return builder.build();
+    }
+
+    builder.table(tm.getMappedTableName());
+
+    val mappedColumnName = tm.getMappedColumnName(origQualifiedColumnId.getColumn());
+    if (mappedColumnName == null) {
+      return builder.build();
+    }
+
+    return builder
+            .column(mappedColumnName)
+            .build();
+  }
 } /* class ArchiveMapping */

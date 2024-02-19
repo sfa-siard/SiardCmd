@@ -1,9 +1,10 @@
 package ch.admin.bar.siard2.cmd.sql;
 
 import ch.admin.bar.siard2.api.MetaForeignKey;
-import ch.admin.bar.siard2.cmd.ArchiveMapping;
-import ch.admin.bar.siard2.cmd.SchemaMapping;
-import ch.admin.bar.siard2.cmd.TableMapping;
+import ch.admin.bar.siard2.cmd.mapping.ColumnIdMapper;
+import ch.admin.bar.siard2.cmd.mapping.TableIdMapper;
+import ch.admin.bar.siard2.cmd.model.QualifiedColumnId;
+import ch.admin.bar.siard2.cmd.model.QualifiedTableId;
 import ch.admin.bar.siard2.cmd.utils.ListAssembler;
 import lombok.Builder;
 import lombok.NonNull;
@@ -16,47 +17,48 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+// TODO FIXME Match-Type currently not supported
 @Slf4j
 @RequiredArgsConstructor
-public class TableDependantStatementGenerator {
+@Builder
+public class CreateForeignKeySqlGenerator {
 
-    private final String schemaName;
-    private final String tableName;
+    @NonNull private final QualifiedTableId tableId;
 
-    private final ArchiveMapping archiveMapping;
+    @NonNull private final TableIdMapper tableIdMapper;
+    @NonNull private final ColumnIdMapper columnIdMapper;
+    @NonNull private final IdEncoder idEncoder;
 
-    // String createForeignKeyQuery = "ALTER TABLE deine_tabelle "
-    //                    + "ADD CONSTRAINT fk_foreign_key_name "
-    //                    + "FOREIGN KEY (spalte_in_deiner_tabelle) "
-    //                    + "REFERENCES referenzierte_tabelle (referenzierte_spalte) "
-    //                    + "ON DELETE CASCADE "
-    //                    + "ON UPDATE CASCADE";
-    private String createConstraintStatement(final MetaForeignKey foreignKeyMetaData) {
+    public String create(final MetaForeignKey foreignKeyMetaData) {
         if (foreignKeyMetaData.getReferences() == 0) {
+            log.error("SIARD metadata for foreign-key {} has no references and will be ignored.", foreignKeyMetaData.getName());
             return "";
         }
 
         val references = resolveReferences(foreignKeyMetaData);
 
         val referencedTable = references.stream()
-                .map(foreignKeyReference -> String.format(
-                        "%s.%s",
-                        foreignKeyReference.getReferenced().getSchema(),
-                        foreignKeyReference.getReferenced().getTable()))
+                .map(foreignKeyReference -> foreignKeyReference.getReferenced().getQualifiedTableId())
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No references found"));
 
-        val sb = new StringBuilder("ADD CONSTRAINT ").append(foreignKeyMetaData.getName())
-                .append(" FOREIGN KEY(")
+        val mappedTableId = tableIdMapper.map(tableId);
+
+        val sb = new StringBuilder()
+                .append("ALTER TABLE ")
+                .append(idEncoder.encodeKeySensitive(mappedTableId))
+                .append(" ADD CONSTRAINT ")
+                .append(foreignKeyMetaData.getName())
+                .append(" FOREIGN KEY (")
                 .append(references.stream()
-                        .map(foreignKeyReference -> foreignKeyReference.getColumn().getColumn())
+                        .map(foreignKeyReference -> idEncoder.encodeKeySensitive(foreignKeyReference.getColumn().getColumn()))
                         .collect(Collectors.joining(", ")))
-                .append(")")
+                .append(") ")
                 .append("REFERENCES ")
-                .append(referencedTable)
+                .append(idEncoder.encodeKeySensitive(referencedTable))
                 .append(" (")
                 .append(references.stream()
-                        .map(foreignKeyReference -> foreignKeyReference.getReferenced().getColumn())
+                        .map(foreignKeyReference -> idEncoder.encodeKeySensitive(foreignKeyReference.getReferenced().getColumn()))
                         .collect(Collectors.joining(", ")))
                 .append(")");
 
@@ -66,6 +68,8 @@ public class TableDependantStatementGenerator {
 
         Optional.ofNullable(foreignKeyMetaData.getUpdateAction())
                 .ifPresent(action -> sb.append(" ON UPDATE ").append(action));
+
+        log.error("SQL statement for creating foreign-key {}: {}", foreignKeyMetaData.getName(), sb);
 
         return sb.toString();
     }
@@ -81,8 +85,7 @@ public class TableDependantStatementGenerator {
                             .build();
 
                     val column = QualifiedColumnId.builder()
-                            .schema(schemaName)
-                            .table(tableName)
+                            .qualifiedTable(tableId)
                             .column(foreignKeyMetaData.getColumn(index))
                             .build();
 
@@ -99,19 +102,8 @@ public class TableDependantStatementGenerator {
 
     private ForeignKeyReference resolveMappings(ForeignKeyReference origForeignKeyReference) {
         return origForeignKeyReference.toBuilder()
-                .column(resolveMappings(origForeignKeyReference.getColumn()))
-                .referenced(resolveMappings(origForeignKeyReference.getReferenced()))
-                .build();
-    }
-
-    private QualifiedColumnId resolveMappings(QualifiedColumnId origQualifiedColumnId) {
-        final SchemaMapping sm = archiveMapping.getSchemaMapping(origQualifiedColumnId.getSchema());  // TODO FIXME can return null
-        final TableMapping tm = sm.getTableMapping(origQualifiedColumnId.getTable());  // TODO FIXME can return null
-
-        return origQualifiedColumnId.toBuilder()
-                .schema(sm.getMappedSchemaName())
-                .table(tm.getMappedTableName())
-                .column(tm.getMappedColumnName(origQualifiedColumnId.getColumn())) // TODO FIXME can return null
+                .column(columnIdMapper.map(origForeignKeyReference.getColumn()))
+                .referenced(columnIdMapper.map(origForeignKeyReference.getReferenced()))
                 .build();
     }
 
@@ -120,13 +112,5 @@ public class TableDependantStatementGenerator {
     private static class ForeignKeyReference {
         @NonNull QualifiedColumnId column;
         @NonNull QualifiedColumnId referenced;
-    }
-
-    @Value
-    @Builder(toBuilder = true)
-    private static class QualifiedColumnId {
-        @NonNull String schema;
-        @NonNull String table;
-        @NonNull String column;
     }
 }

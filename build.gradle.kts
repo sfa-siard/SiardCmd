@@ -48,6 +48,7 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.2")
+    testImplementation("org.mockito:mockito-core:4.11.0") // latest version which supports java 8
 
     // testcontainers
     testImplementation("org.testcontainers:testcontainers:1.19.0")
