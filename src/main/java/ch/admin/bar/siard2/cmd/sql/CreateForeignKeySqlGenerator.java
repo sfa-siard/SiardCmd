@@ -86,7 +86,7 @@ public class CreateForeignKeySqlGenerator {
         sb.append(" ")
                 .append(addConstraintStatements);
 
-        log.debug("SQL statement for creating foreign-keys: {}", sb);
+        log.info("SQL statement for creating foreign-keys: {}", sb);
 
         return sb.toString();
     }
@@ -126,8 +126,6 @@ public class CreateForeignKeySqlGenerator {
 
         Optional.ofNullable(foreignKeyMetaData.getUpdateAction())
                 .ifPresent(action -> sb.append(" ON UPDATE ").append(action));
-
-        log.error("SQL statement for creating foreign-key {}: {}", foreignKeyMetaData.getName(), sb);
 
         return sb.toString();
     }

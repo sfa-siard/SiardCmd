@@ -65,7 +65,10 @@ class MetadataAssertions {
                                                 table.getName(),
                                                 schema.getName(),
                                                 primaryKey.getName(),
-                                                primaryKey.getColumn()),
+                                                primaryKey.getColumns().stream()
+                                                        .map(columnId -> columnId.getValue().getValue())
+                                                        .sorted()
+                                                        .collect(Collectors.joining(";"))),
                                         primaryKey))))
                 .sorted(Comparator.comparing(Qualifier::getQualifier))
                 .collect(Collectors.toList());

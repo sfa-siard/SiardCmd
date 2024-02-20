@@ -1,5 +1,7 @@
-package ch.admin.bar.siard2.cmd;
+package ch.admin.bar.siard2.cmd.usecases.keys;
 
+import ch.admin.bar.siard2.cmd.SiardFromDb;
+import ch.admin.bar.siard2.cmd.SiardToDb;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import ch.admin.bar.siard2.cmd.utils.siard.assertions.SiardArchiveAssertions;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
@@ -15,6 +17,12 @@ import java.sql.SQLException;
 
 public class MsSqlUploadDownloadSiardProjectIT {
 
+    /**
+     * Output of {@link MsSqlDownloadSiardProjectIT}
+     */
+    public final static String SIMPLE_TEAMS_EXAMPLE = "usecases/keys/simple-teams-example_mssql.siard";
+
+
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
@@ -25,7 +33,7 @@ public class MsSqlUploadDownloadSiardProjectIT {
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
         // given
-        val expectedArchive = siardArchivesHandler.prepareResource(SiardProjectExamples.SIMPLE_TEAMS_EXAMPLE_MSSQL2017CU12_2_2);
+        val expectedArchive = siardArchivesHandler.prepareResource(SIMPLE_TEAMS_EXAMPLE);
         val actualArchive = siardArchivesHandler.prepareEmpty();
 
         // when
@@ -52,7 +60,6 @@ public class MsSqlUploadDownloadSiardProjectIT {
                 .expectedArchive(expectedArchive)
                 .actualArchive(actualArchive)
                 .assertionModifier(SiardArchiveAssertions.IGNORE_DBNAME) // FIXME ?
-                .assertionModifier(SiardArchiveAssertions.IGNORE_PRIMARY_KEY_NAME) // Probably a DB-restriction (primary key names are generated)
                 .assertEqual();
     }
 }

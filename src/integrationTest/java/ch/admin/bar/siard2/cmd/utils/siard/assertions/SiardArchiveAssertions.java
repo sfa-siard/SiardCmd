@@ -3,6 +3,7 @@ package ch.admin.bar.siard2.cmd.utils.siard.assertions;
 import ch.admin.bar.siard2.cmd.utils.CastHelper;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler.SiardArchiveExplorer;
 import ch.admin.bar.siard2.cmd.utils.siard.model.header.Metadata;
+import ch.admin.bar.siard2.cmd.utils.siard.model.utils.Id;
 import ch.admin.bar.siard2.cmd.utils.siard.model.utils.StringWrapper;
 import ch.admin.bar.siard2.cmd.utils.siard.update.UpdateInstruction;
 import ch.admin.bar.siard2.cmd.utils.siard.update.Updater;
@@ -67,7 +68,7 @@ public class SiardArchiveAssertions {
                     UpdateInstruction.<Metadata.PrimaryKey>builder()
                             .clazz(Metadata.PrimaryKey.class)
                             .updater(primaryKey -> primaryKey.toBuilder()
-                                    .name(SiardArchiveAssertions.IGNORED_PLACEHOLDER)
+                                    .name(Id.of(SiardArchiveAssertions.IGNORED_PLACEHOLDER))
                                     .build())
                             .build())
             .build();

@@ -4,6 +4,7 @@ import ch.admin.bar.siard2.cmd.utils.siard.model.SiardArchive;
 import ch.admin.bar.siard2.cmd.utils.siard.model.header.Metadata;
 import ch.admin.bar.siard2.cmd.utils.siard.model.utils.Id;
 import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedColumnId;
+import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedForeignKeyId;
 import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedTableId;
 import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedTypeId;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,23 @@ public class MetadataExplorer {
         return tryFindBySchemaId(qualifiedId.getSchemaId())
                 .flatMap(schema -> schema.getTypes().stream()
                         .filter(type -> type.getName().equals(qualifiedId.getTypeId()))
+                        .findAny());
+    }
+
+    public Optional<Metadata.PrimaryKey> tryFindPrimaryKey(final QualifiedTableId tableId) {
+        return tryFindByTableId(tableId)
+                .flatMap(Metadata.Table::getPrimaryKey);
+    }
+
+    public Metadata.ForeignKey findForeignKey(final QualifiedForeignKeyId foreignKeyId) {
+        return tryFindForeignKey(foreignKeyId)
+                .orElseThrow(() -> new IllegalArgumentException("No foreign key with id " + foreignKeyId + " found"));
+    }
+
+    public Optional<Metadata.ForeignKey> tryFindForeignKey(final QualifiedForeignKeyId foreignKeyId) {
+        return tryFindByTableId(foreignKeyId.getQualifiedTableId())
+                .flatMap(table -> table.getForeignKeys().stream()
+                        .filter(foreignKey -> foreignKey.getName().equals(foreignKeyId.getForeignKeyId()))
                         .findAny());
     }
 }
