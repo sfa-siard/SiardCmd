@@ -13,6 +13,8 @@ import java.sql.*;
 import java.text.*;
 import java.util.*;
 import java.util.regex.*;
+
+import ch.admin.bar.siard2.cmd.db.connector.SqlExecutor;
 import ch.enterag.utils.jdbc.*;
 import ch.enterag.utils.EU;
 import ch.enterag.utils.background.*;
@@ -32,14 +34,23 @@ public class MetaDataToDb
 {
   /** logger */  
   private static IndentLogger _il = IndentLogger.getIndentLogger(MetaDataToDb.class.getName());
-  private ArchiveMapping _am = null;
+  private final ArchiveMapping _am;
   public ArchiveMapping getArchiveMapping() { return _am; }
-  private int _iMaxTableNameLength = -1;
-  private int _iMaxColumnNameLength = -1;
+
   private Progress _progress = null;
   private int _iTablesCreated = -1;
   private int _iTables = -1;
   private int _iTablesPercent = -1;
+
+  private final SqlExecutor sqlExecutor;
+
+  // TODO remove ArchiveMapping
+  public MetaDataToDb(final MetaData metaData, final SqlExecutor sqlExecutor, final ArchiveMapping archiveMapping) throws IOException, SQLException {
+    super(sqlExecutor.getDatabaseMetaData(), metaData);
+
+    this.sqlExecutor = sqlExecutor;
+    this._am = archiveMapping;
+  }
 
   /*------------------------------------------------------------------*/
   /** increment the number or tables created, issuing a notification,
@@ -618,7 +629,7 @@ public class MetaDataToDb
     _dmd.getConnection().commit();
     _il.exit();
   } /* upload */
-  
+
   /*------------------------------------------------------------------*/
   /** returns the number of tables that exist in the database and will 
    * be dropped, when upload is executed.
@@ -642,7 +653,7 @@ public class MetaDataToDb
     }
     _il.exit(String.valueOf(iTablesDropped));
     return iTablesDropped;
-  } /* tablesDroppedByUpload */
+  }
 
   /*------------------------------------------------------------------*/
   /** matchAttributes returns true, if the attributes of the given
@@ -833,39 +844,4 @@ public class MetaDataToDb
     _il.exit(String.valueOf(iTypesDropped));
     return iTypesDropped;
   } /* typesDroppedByUpload */
-
-  /*------------------------------------------------------------------*/
-  /** constructor
-   * @param dmd database meta data.
-   * @param md SIARD meta data.
-   * @param mapSchemas schema mapping to be used for upload, or empty or null.
-   * @throws IOException if an I/O error occurred
-   * @throws SQLException if a database error occurred.
-   */
-  private MetaDataToDb(DatabaseMetaData dmd, MetaData md, Map<String,String> mapSchemas)
-    throws IOException, SQLException
-  {
-    super(dmd,md);
-    dmd.getConnection().setAutoCommit(false);
-    _iMaxTableNameLength = _dmd.getMaxTableNameLength();
-    _iMaxColumnNameLength = _dmd.getMaxColumnNameLength();
-    _am = ArchiveMapping.newInstance(supportsArrays(), supportsUdts(), 
-      mapSchemas, _md, _iMaxTableNameLength, _iMaxColumnNameLength);
-  } /* constructor */
-  
-  /*------------------------------------------------------------------*/
-  /** factory
-   * @param dmd database meta data.
-   * @param md SIARD meta data.
-   * @param mapSchemas schema mapping to be used for upload, or null.
-   * @return new instance.
-   * @throws IOException if an I/O error occurred
-   * @throws SQLException if a database error occurred.
-   */
-  public static MetaDataToDb newInstance(DatabaseMetaData dmd, MetaData md, Map<String,String> mapSchemas)
-    throws IOException, SQLException
-  {
-    return new MetaDataToDb(dmd,md,mapSchemas);
-  } /* factory */
-  
-} /* class MetaDataTransfer */
+}

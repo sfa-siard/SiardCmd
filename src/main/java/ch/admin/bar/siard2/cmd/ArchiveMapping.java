@@ -13,7 +13,7 @@ public class ArchiveMapping implements IdMapper {
   public SchemaMapping getSchemaMapping(String sSchemaName) { return _mapSchemas.get(sSchemaName); }
   public String getMappedSchemaName(String sSchemaName) { return getSchemaMapping(sSchemaName).getMappedSchemaName(); }
   
-  private ArchiveMapping(boolean bSupportsArrays, boolean bSupportsUdts,
+  public ArchiveMapping(boolean bSupportsArrays, boolean bSupportsUdts,
     Map<String,String> mapSchemas, MetaData md,
     int iMaxTableNameLength, int iMaxColumnNameLength)
     throws IOException

@@ -24,17 +24,14 @@ import ch.admin.bar.siard2.api.Schema;
 import ch.admin.bar.siard2.api.Table;
 import ch.admin.bar.siard2.api.Value;
 import ch.admin.bar.siard2.api.generated.CategoryType;
-import ch.admin.bar.siard2.cmd.model.QualifiedTableId;
-import ch.admin.bar.siard2.cmd.sql.CreateForeignKeySqlGenerator;
-import ch.admin.bar.siard2.cmd.sql.IdEncoder;
-import ch.admin.bar.siard2.cmd.utils.ListAssembler;
+import ch.admin.bar.siard2.cmd.db.connector.Connector;
+import ch.admin.bar.siard2.cmd.db.connector.SqlExecutor;
 import ch.enterag.sqlparser.SqlLiterals;
 import ch.enterag.sqlparser.identifier.QualifiedId;
 import ch.enterag.utils.EU;
 import ch.enterag.utils.StopWatch;
 import ch.enterag.utils.background.Progress;
 import ch.enterag.utils.logging.IndentLogger;
-import lombok.val;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,6 +69,29 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
   private long _lRecordsUploaded = -1;
   private long _lRecordsTotal = -1;
   private long _lRecordsPercent = -1;
+
+  private final SqlExecutor sqlExecutor;
+
+  /**
+   *
+   * TODO remove Connector and ArchiveMapping
+   *
+   */
+  public PrimaryDataToDb(
+          final Archive archive,
+          final Connector connector,
+          final SqlExecutor sqlExecutor,
+          final ArchiveMapping archiveMapping
+  ) {
+    super(connector.getConnection(),
+            archive,
+            archiveMapping,
+            connector.getDbFeatures().isArraysSupported(),
+            connector.getDbFeatures().isDistinctsSupported(),
+            connector.getDbFeatures().isUdtsSupported());
+
+    this.sqlExecutor = sqlExecutor;
+  }
 
   /*------------------------------------------------------------------*/
   /** increment the number or records uploaded, issuing a notification,
@@ -167,30 +187,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       }
     }
   } /* addCandidateKeys */
-
-  public void addForeignKeys(Connection conn, MetaTable mt) throws SQLException {
-    _il.enter(mt.getName());
-
-    if (mt.getMetaForeignKeys() > 0) {
-      val sqlGenerator = CreateForeignKeySqlGenerator.builder()
-              .tableId(QualifiedTableId.builder()
-                      .schema(mt.getParentMetaSchema().getName())
-                      .table(mt.getName())
-                      .build())
-              .idEncoder(new IdEncoder())
-              .idMapper(_am)
-              .build();
-
-      val sql = sqlGenerator.create(ListAssembler.assemble(mt.getMetaForeignKeys(), mt::getMetaForeignKey));
-
-      Statement stmt = conn.createStatement();
-      stmt.setQueryTimeout(_iQueryTimeoutSeconds);
-      stmt.execute(sql);
-      stmt.close();
-    }
-
-    _il.exit();
-  }
   
   private void enableConstraints(MetaSchema ms)
   {
@@ -200,7 +196,9 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       MetaTable mt = ms.getMetaTable(iTable);
       try { addCandidateKeys(_conn, mt); }
       catch(SQLException se) { System.err.println(EU.getExceptionMessage(se)); }
-      try { addForeignKeys(_conn, mt); }
+      try {
+        sqlExecutor.addForeignKeys(mt);
+      }
       catch(SQLException se) { System.err.println(EU.getExceptionMessage(se)); }
     }
     _il.exit();
@@ -517,41 +515,4 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     _conn.commit();
     _il.exit();
   } /* upload */
-  
-  /*------------------------------------------------------------------*/
-  /** constructor
-   * @param conn database connection.
-   * @param archive SIARD archive.
-   * @param am mapping of names in archive.
-   * @param bSupportsArrays true, if database supports Arrays.
-   * @param bSupportsDistincts true, if database supports DISTINCTs.
-   * @param bSupportsUdts true, if database supports UDTs.
-   * @throws SQLException if a database error occurred.
-   */
-  private PrimaryDataToDb(Connection conn, Archive archive,
-    ArchiveMapping am, boolean bSupportsArrays, boolean bSupportsDistincts, boolean bSupportsUdts)
-    throws SQLException
-  {
-    super(conn,archive,am,bSupportsArrays,bSupportsDistincts,bSupportsUdts);
-    conn.setAutoCommit(false);
-  } /* constructor PrimaryDataTransfer */
-
-  /*------------------------------------------------------------------*/
-  /** factory
-   * @param conn database connection.
-   * @param archive SIARD archive.
-   * @param am mapping of names in archive.
-   * @param bSupportsArrays true, if database supports Arrays.
-   * @param bSupportsDistincts true, if database supports DISTINCTs.
-   * @param bSupportsUdts true, if database supports UDTs.
-   * @return new instance of PrimaryDataTransfer.
-   * @throws SQLException if a database error occurred.
-   */
-  public static PrimaryDataToDb newInstance(Connection conn, Archive archive,
-    ArchiveMapping am, boolean bSupportsArrays, boolean bSupportsDistincts, boolean bSupportsUdts)
-    throws SQLException
-  {
-    return new PrimaryDataToDb(conn, archive, am, bSupportsArrays, bSupportsDistincts, bSupportsUdts);
-  } /* newInstance */
-  
 } /* class PrimaryDataToDb */

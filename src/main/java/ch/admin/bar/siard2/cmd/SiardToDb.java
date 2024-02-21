@@ -13,8 +13,8 @@ package ch.admin.bar.siard2.cmd;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,11 +24,15 @@ import ch.admin.bar.siard2.api.Archive;
 import ch.admin.bar.siard2.api.MetaData;
 import ch.admin.bar.siard2.api.MetaSchema;
 import ch.admin.bar.siard2.api.primary.ArchiveImpl;
+import ch.admin.bar.siard2.cmd.db.connector.ConnectorProperties;
+import ch.admin.bar.siard2.cmd.db.connector.ConnectorsRegistry;
+import ch.admin.bar.siard2.cmd.utils.ListAssembler;
 import ch.admin.bar.siard2.cmd.utils.VersionsExplorer;
 import ch.enterag.utils.EU;
 import ch.enterag.utils.ProgramInfo;
 import ch.enterag.utils.cli.Arguments;
 import ch.enterag.utils.logging.IndentLogger;
+import lombok.val;
 
 /*====================================================================*/
 /** Loads the data from a siard file to a database instance.
@@ -260,57 +264,62 @@ public class SiardToDb
       _archive = ArchiveImpl.newInstance();
       _archive.open(_fileSiard);
       /* open connection */
-      String sError = SiardConnection.getSiardConnection().loadDriver(_sJdbcUrl);
-      if ((sError == null) || (sError.length() == 0))
-      {
-        DriverManager.setLoginTimeout(_iLoginTimeoutSeconds);
-        _conn = DriverManager.getConnection(_sJdbcUrl, _sDatabaseUser, _sDatabasePassword);
-        if ((_conn != null) && (!_conn.isClosed()))
-        {
-          System.out.println("Connected to "+_conn.getMetaData().getURL().toString());
-          _conn.setAutoCommit(false);
-          /* create types and tables */
-          MetaData md = _archive.getMetaData();
-          MetaDataToDb mdtd = MetaDataToDb.newInstance(_conn.getMetaData(),md,_mapSchemas);
-          mdtd.setQueryTimeout(_iQueryTimeoutSeconds);
-          if (_bOverwrite || ((mdtd.tablesDroppedByUpload() == 0) && (mdtd.typesDroppedByUpload() == 0)))
-          {
-            if (!mdtd.supportsUdts())
-            {
-              int iTypesInSiard = 0;
-              for (int iSchema = 0; iSchema < md.getMetaSchemas(); iSchema++)
-              {
-                MetaSchema ms = md.getMetaSchema(iSchema);
-                iTypesInSiard = iTypesInSiard + ms.getMetaTypes();
-              }
-              if (iTypesInSiard > 0)
-                logPrint("Target database does not support UDTs. UDTs will be \"flattened\".\r\n");
-            }
-            mdtd.upload(null);
-            /* upload primary data from DB */
-            PrimaryDataToDb pdtd = PrimaryDataToDb.newInstance(_conn, _archive, 
-              mdtd.getArchiveMapping(), mdtd.supportsArrays(), mdtd.supportsDistincts(), mdtd.supportsUdts());
-            pdtd.setQueryTimeout(_iQueryTimeoutSeconds);
-            pdtd.upload(null);
-          }
-          else
-          {
-            System.err.println("Database objects exist which would be overwritten on upload!");
-            System.err.println("Backup and delete them first or use -o option for overwriting them.");
-            _iReturn = iRETURN_WARNING;
-          }
-          // _conn.commit();
-          _conn.close();
-        }
-        else
-          System.err.println("Connection to "+_conn.getMetaData().getURL().toString()+" failed!");
+
+      val connector = ConnectorsRegistry.INSTANCE.getConnector(ConnectorProperties.builder()
+                      .jdbcUrl(_sJdbcUrl)
+                      .user(_sDatabaseUser)
+                      .password(_sDatabasePassword)
+                      .queryTimeout(Duration.ofSeconds(_iQueryTimeoutSeconds))
+                      .loginTimeout(Duration.ofSeconds(_iLoginTimeoutSeconds))
+              .build());
+
+      val dbFeatures = connector.getDbFeatures();
+
+      val idMapper = new ArchiveMapping(
+              dbFeatures.isArraysSupported(),
+              dbFeatures.isUdtsSupported(),
+              _mapSchemas,
+              _archive.getMetaData(),
+              dbFeatures.getMaxTableNameLength(),
+              dbFeatures.getMaxColumnNameLength());
+
+      val sqlExecutor = connector.createExecutor(idMapper);
+
+      val metaDataToDb = new MetaDataToDb(_archive.getMetaData(), sqlExecutor, idMapper);
+      val primaryDataToDb = new PrimaryDataToDb(_archive, connector, sqlExecutor, idMapper);
+
+      if (!_bOverwrite && ((metaDataToDb.tablesDroppedByUpload() < 0) || (metaDataToDb.typesDroppedByUpload() > 0))) {
+        System.err.println("Database objects exist which would be overwritten on upload!");
+        System.err.println("Backup and delete them first or use -o option for overwriting them.");
+
+        connector.close();
+        _archive.close();
+        _iReturn = iRETURN_WARNING;
+
+        return;
       }
-      else
-        System.err.println("Connection to "+_sJdbcUrl+" not supported ("+sError+")!");
+
+      if (!dbFeatures.isUdtsSupported() && containsUDTs(_archive.getMetaData())) {
+        logPrint("Target database does not support UDTs. UDTs will be \"flattened\".\r\n");
+      }
+
+      metaDataToDb.upload(null);
+      primaryDataToDb.upload(null);
+
+      connector.close();
       _archive.close();
+      _iReturn = iRETURN_OK;
     }
 	  _il.exit();
-  } /* constructor SiardToDb */
+  }
+
+  private boolean containsUDTs(final MetaData metaData) {
+    val nrOfUDTsInSiardArchive = ListAssembler.assemble(metaData.getMetaSchemas(), metaData::getMetaSchema).stream()
+            .mapToInt(MetaSchema::getMetaTypes)
+            .sum();
+
+    return nrOfUDTsInSiardArchive > 0;
+  }
 
   /*====================================================================
   factory
