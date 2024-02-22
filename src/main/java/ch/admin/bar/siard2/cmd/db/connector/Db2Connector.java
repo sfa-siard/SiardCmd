@@ -7,7 +7,6 @@ import ch.admin.bar.siard2.cmd.model.QualifiedTableId;
 import ch.admin.bar.siard2.cmd.sql.CreateForeignKeySqlGenerator;
 import ch.admin.bar.siard2.cmd.sql.IdEncoder;
 import ch.admin.bar.siard2.cmd.utils.ListAssembler;
-import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
 
@@ -16,21 +15,19 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.time.Duration;
 
-
-public class MsSqlConnector extends DefaultConnector {
-
-    public MsSqlConnector(ConnectorProperties properties, Connection connection) {
+public class Db2Connector extends DefaultConnector {
+    public Db2Connector(ConnectorProperties properties, Connection connection) {
         super(properties, connection);
     }
 
     @Override
     public SqlExecutor createExecutor(IdMapper idMapper) {
-        return new MsSqlExecutor(idMapper, connection, dbMetaData, properties.getQueryTimeout());
+        return new Db2Executor(idMapper, connection, dbMetaData, properties.getQueryTimeout());
     }
 
-    public static class MsSqlExecutor extends DefaultSqlExecutor {
+    public static class Db2Executor extends DefaultSqlExecutor {
 
-        public MsSqlExecutor(@NonNull IdMapper idMapper, @NonNull Connection connection, @NonNull DatabaseMetaData databaseMetaData, @NonNull Duration queryTimeout) {
+        public Db2Executor(@NonNull IdMapper idMapper, @NonNull Connection connection, @NonNull DatabaseMetaData databaseMetaData, @NonNull Duration queryTimeout) {
             super(idMapper, connection, databaseMetaData, queryTimeout);
         }
 
@@ -41,6 +38,14 @@ public class MsSqlConnector extends DefaultConnector {
                         .schema(tableMetadata.getParentMetaSchema().getName())
                         .table(tableMetadata.getName())
                         .build();
+
+                /*
+                [CONSTRAINT constraint_name]
+                    FOREIGN KEY (fk1, fk2,...)
+                    REFERENCES parent_table(c1,2,..)
+                        ON UPDATE [ NO ACTION | RESTRICT]
+                        ON DELETE [ NO ACTION | RESTRICT | CASCADE | SET NULL];
+                 */
 
                 val sqlGenerator = CreateForeignKeySqlGenerator.builder()
                         .tableId(QualifiedTableId.builder()

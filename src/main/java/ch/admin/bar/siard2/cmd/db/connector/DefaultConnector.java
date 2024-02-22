@@ -22,15 +22,15 @@ import java.time.Duration;
 
 public class DefaultConnector implements Connector {
 
-    private final ConnectorProperties properties;
+    protected final ConnectorProperties properties;
 
     @Getter
-    private final Connection connection;
+    protected final Connection connection;
 
-    private final DatabaseMetaData dbMetaData;
+    protected final DatabaseMetaData dbMetaData;
 
     @Getter
-    private final DbFeatures dbFeatures;
+    protected final DbFeatures dbFeatures;
 
     @SneakyThrows // TODO
     public DefaultConnector(final ConnectorProperties properties, final Connection connection) {
@@ -62,17 +62,17 @@ public class DefaultConnector implements Connector {
     public static class DefaultSqlExecutor implements SqlExecutor {
 
         @NonNull
-        private final IdMapper idMapper;
+        protected final IdMapper idMapper;
 
         @NonNull
-        private final Connection connection;
+        protected final Connection connection;
 
         @Getter
         @NonNull
-        private final DatabaseMetaData databaseMetaData;
+        protected final DatabaseMetaData databaseMetaData;
 
         @NonNull
-        private final Duration queryTimeout;
+        protected final Duration queryTimeout;
 
         @Override
         public void addForeignKeys(MetaTable tableMetadata) throws SQLException {
@@ -83,6 +83,7 @@ public class DefaultConnector implements Connector {
                                 .table(tableMetadata.getName())
                                 .build())
                         .idEncoder(new IdEncoder())
+                        .referentialActionsMapper(action -> action)
                         .idMapper(idMapper)
                         .build();
 

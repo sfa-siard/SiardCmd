@@ -49,7 +49,7 @@ public class ConnectorsRegistry {
     public static final ConnectorId DB2 = ConnectorId.builder()
             .name("DB/2")
             .jdbcIdentifier("db2")
-            .connectorBuilder(DefaultConnector::new)
+            .connectorBuilder(Db2Connector::new)
             .jdbcDriver(Db2Driver.class)
             .build();
 

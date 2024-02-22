@@ -14,6 +14,7 @@ import lombok.val;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -46,6 +47,9 @@ public class CreateForeignKeySqlGenerator {
     @NonNull
     private final IdMapper idMapper;
 
+    @NonNull
+    private final Function<String, String> referentialActionsMapper;
+
     /**
      * The identifier encoder for encoding keys.
      */
@@ -75,7 +79,7 @@ public class CreateForeignKeySqlGenerator {
 
         val mappedTableId = idMapper.map(tableId);
 
-        val sb = new StringBuilder()
+        val stringBuilder = new StringBuilder()
                 .append("ALTER TABLE ")
                 .append(idEncoder.encodeKeySensitive(mappedTableId));
 
@@ -83,12 +87,26 @@ public class CreateForeignKeySqlGenerator {
                 .map(this::addConstraintStatement)
                 .collect(Collectors.joining(", "));
 
-        sb.append(" ")
+        stringBuilder.append(" ")
                 .append(addConstraintStatements);
 
-        log.info("SQL statement for creating foreign-keys: {}", sb);
+        log.info("SQL statement for creating foreign-keys: {}", stringBuilder);
 
-        return sb.toString();
+        return stringBuilder.toString();
+    }
+
+    public String create(final QualifiedTableId tableId, final MetaForeignKey foreignKeyMetaData) {
+        val mappedTableId = idMapper.map(tableId);
+
+        val stringBuilder = new StringBuilder()
+                .append("ALTER TABLE ")
+                .append(idEncoder.encodeKeySensitive(mappedTableId))
+                .append(" ")
+                .append(addConstraintStatement(foreignKeyMetaData));
+
+        log.info("SQL statement for creating foreign-keys: {}", stringBuilder);
+
+        return stringBuilder.toString();
     }
 
     private String addConstraintStatement(final MetaForeignKey foreignKeyMetaData) {
@@ -104,7 +122,7 @@ public class CreateForeignKeySqlGenerator {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No references found"));
 
-        val sb = new StringBuilder()
+        val stringBuilder = new StringBuilder()
                 .append("ADD CONSTRAINT ")
                 .append(foreignKeyMetaData.getName())
                 .append(" FOREIGN KEY (")
@@ -122,12 +140,14 @@ public class CreateForeignKeySqlGenerator {
 
         // actions
         Optional.ofNullable(foreignKeyMetaData.getDeleteAction())
-                .ifPresent(action -> sb.append(" ON DELETE ").append(action));
+                .ifPresent(action -> stringBuilder.append(" ON DELETE ")
+                        .append(referentialActionsMapper.apply(action)));
 
         Optional.ofNullable(foreignKeyMetaData.getUpdateAction())
-                .ifPresent(action -> sb.append(" ON UPDATE ").append(action));
+                .ifPresent(action -> stringBuilder.append(" ON UPDATE ")
+                        .append(referentialActionsMapper.apply(action)));
 
-        return sb.toString();
+        return stringBuilder.toString();
     }
 
     private List<ForeignKeyReference> resolveReferences(final MetaForeignKey foreignKeyMetaData) {
