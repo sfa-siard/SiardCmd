@@ -45,7 +45,7 @@ public class CreateForeignKeySqlGeneratorTest {
                                 "FOREIGN KEY (\"%s\") " +
                                 "REFERENCES \"%s\".\"%s\" (\"%s\") " +
                                 "ON DELETE %s " +
-                                "ON UPDATE %s",
+                                "ON UPDATE %s;",
                         QUALIFIED_TABLE_ID.getSchema() + IdMapperMockFactory.ADDED_SUFFIX,
                         QUALIFIED_TABLE_ID.getTable() + IdMapperMockFactory.ADDED_SUFFIX,
                         siardMetaDataFactory.getName(),
@@ -75,7 +75,7 @@ public class CreateForeignKeySqlGeneratorTest {
                                 "FOREIGN KEY (\"%s\", \"%s\", \"%s\") " +
                                 "REFERENCES \"%s\".\"%s\" (\"%s\", \"%s\", \"%s\") " +
                                 "ON DELETE %s " +
-                                "ON UPDATE %s",
+                                "ON UPDATE %s;",
                         QUALIFIED_TABLE_ID.getSchema() + IdMapperMockFactory.ADDED_SUFFIX,
                         QUALIFIED_TABLE_ID.getTable() + IdMapperMockFactory.ADDED_SUFFIX,
                         siardMetaDataFactory.getName(),
