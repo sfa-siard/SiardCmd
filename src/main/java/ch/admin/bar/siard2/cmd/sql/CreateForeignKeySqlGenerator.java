@@ -110,7 +110,7 @@ public class CreateForeignKeySqlGenerator {
                 .append(references.stream()
                         .map(foreignKeyReference -> idEncoder.encodeKeySensitive(foreignKeyReference.getReferenced().getColumn()))
                         .collect(Collectors.joining(", ")))
-                .append(")");
+                .append(");");
 
         // actions
         Optional.ofNullable(foreignKeyMetaData.getDeleteAction())
