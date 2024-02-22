@@ -8,6 +8,7 @@ import ch.admin.bar.siard2.cmd.sql.CreateForeignKeySqlGenerator;
 import ch.admin.bar.siard2.cmd.sql.IdEncoder;
 import ch.admin.bar.siard2.cmd.utils.ListAssembler;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.sql.Connection;
@@ -25,6 +26,7 @@ public class Db2Connector extends DefaultConnector {
         return new Db2Executor(idMapper, connection, dbMetaData, properties.getQueryTimeout());
     }
 
+    @Slf4j
     public static class Db2Executor extends DefaultSqlExecutor {
 
         public Db2Executor(@NonNull IdMapper idMapper, @NonNull Connection connection, @NonNull DatabaseMetaData databaseMetaData, @NonNull Duration queryTimeout) {
@@ -39,26 +41,39 @@ public class Db2Connector extends DefaultConnector {
                         .table(tableMetadata.getName())
                         .build();
 
-                /*
-                [CONSTRAINT constraint_name]
-                    FOREIGN KEY (fk1, fk2,...)
-                    REFERENCES parent_table(c1,2,..)
-                        ON UPDATE [ NO ACTION | RESTRICT]
-                        ON DELETE [ NO ACTION | RESTRICT | CASCADE | SET NULL];
-                 */
-
                 val sqlGenerator = CreateForeignKeySqlGenerator.builder()
                         .tableId(QualifiedTableId.builder()
                                 .schema(tableMetadata.getParentMetaSchema().getName())
                                 .table(tableMetadata.getName())
                                 .build())
                         .idEncoder(new IdEncoder())
-                        .referentialActionsMapper(action -> {
-                            // RESTRICT is unknown for MS SQL
-//                            if (ReferentialActionType.fromValue(action).equals(ReferentialActionType.RESTRICT)) {
-//                                return ReferentialActionType.NO_ACTION.value();
-//                            }
-                            return action;
+                        .onUpdateActionMapper(referentialActionType -> {
+                            /*
+                            DB2 does support NO-ACTION and RESTRICT as update action. When you update the row in the
+                            parent key column of the parent table, Db2 rejects the update if there is the corresponding
+                            row exists in the child table for both RESTRICT and NO ACTION option.
+                             */
+                            if (!referentialActionType.equals(ReferentialActionType.RESTRICT)) {
+                                log.warn("Tried to use {} as on-update action (not supported in DB2). Used {} instead.",
+                                        referentialActionType,
+                                        ReferentialActionType.NO_ACTION);
+                                return ReferentialActionType.NO_ACTION;
+                            }
+
+                            return referentialActionType;
+                        })
+                        .onDeleteActionMapper(referentialActionType -> {
+                            /*
+                            DB2 does support NO-ACTION/RESTRICT, CASCADE and SET-NULL as delete action.
+                             */
+                            if (referentialActionType.equals(ReferentialActionType.SET_DEFAULT)) {
+                                log.warn("Tried to use {} as on-delete action (not supported in DB2). Used {} instead.",
+                                        referentialActionType,
+                                        ReferentialActionType.NO_ACTION);
+
+                                return ReferentialActionType.NO_ACTION;
+                            }
+                            return referentialActionType;
                         })
                         .idMapper(idMapper)
                         .build();
@@ -73,27 +88,6 @@ public class Db2Connector extends DefaultConnector {
                     executeSql(sql);
                 }
             }
-        }
-
-        private String getReferentialAction(int iReferentialAction) {
-            ReferentialActionType rat = null;
-            switch (iReferentialAction) {
-                case DatabaseMetaData.importedKeyCascade:
-                    rat = ReferentialActionType.CASCADE;
-                    break;
-                case DatabaseMetaData.importedKeySetNull:
-                    rat = ReferentialActionType.SET_NULL;
-                    break;
-                case DatabaseMetaData.importedKeySetDefault:
-                    rat = ReferentialActionType.SET_DEFAULT;
-                    break;
-                case DatabaseMetaData.importedKeyRestrict:
-                    rat = ReferentialActionType.RESTRICT;
-                    break;
-                case DatabaseMetaData.importedKeyNoAction:
-                    rat = ReferentialActionType.NO_ACTION;
-            }
-            return rat.value();
         }
     }
 }

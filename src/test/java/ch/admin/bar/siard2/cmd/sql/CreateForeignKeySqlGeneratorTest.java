@@ -1,6 +1,7 @@
 package ch.admin.bar.siard2.cmd.sql;
 
 import ch.admin.bar.siard2.api.MetaForeignKey;
+import ch.admin.bar.siard2.api.generated.ReferentialActionType;
 import ch.admin.bar.siard2.cmd.mapping.IdMapper;
 import ch.admin.bar.siard2.cmd.model.QualifiedColumnId;
 import ch.admin.bar.siard2.cmd.model.QualifiedTableId;
@@ -11,7 +12,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CreateForeignKeySqlGeneratorTest {
@@ -36,7 +36,7 @@ public class CreateForeignKeySqlGeneratorTest {
         val siardMetaDataFactory = new MetaForeignKeyMockFactory();
 
         // when
-        val result = createForeignKeySqlGenerator.create(Arrays.asList(siardMetaDataFactory.create()));
+        val result = createForeignKeySqlGenerator.create(QUALIFIED_TABLE_ID, siardMetaDataFactory.create());
 
         Assertions.assertThat(result)
                 .isEqualTo(String.format(
@@ -53,8 +53,8 @@ public class CreateForeignKeySqlGeneratorTest {
                         siardMetaDataFactory.getReferencedSchema() + IdMapperMockFactory.ADDED_SUFFIX,
                         siardMetaDataFactory.getReferencedTable() + IdMapperMockFactory.ADDED_SUFFIX,
                         siardMetaDataFactory.getReferences().get(0).getReferenced() + IdMapperMockFactory.ADDED_SUFFIX,
-                        siardMetaDataFactory.getDeleteAction(),
-                        siardMetaDataFactory.getUpdateAction()
+                        siardMetaDataFactory.getDeleteAction().value(),
+                        siardMetaDataFactory.getUpdateAction().value()
                 ));
     }
 
@@ -66,7 +66,7 @@ public class CreateForeignKeySqlGeneratorTest {
                 .addReference();
 
         // when
-        val result = createForeignKeySqlGenerator.create(Arrays.asList(siardMetaDataFactory.create()));
+        val result = createForeignKeySqlGenerator.create(QUALIFIED_TABLE_ID, siardMetaDataFactory.create());
 
         Assertions.assertThat(result)
                 .isEqualTo(String.format(
@@ -87,56 +87,8 @@ public class CreateForeignKeySqlGeneratorTest {
                         siardMetaDataFactory.getReferences().get(0).getReferenced() + IdMapperMockFactory.ADDED_SUFFIX,
                         siardMetaDataFactory.getReferences().get(1).getReferenced() + IdMapperMockFactory.ADDED_SUFFIX,
                         siardMetaDataFactory.getReferences().get(2).getReferenced() + IdMapperMockFactory.ADDED_SUFFIX,
-                        siardMetaDataFactory.getDeleteAction(),
-                        siardMetaDataFactory.getUpdateAction()
-                ));
-    }
-
-    @Test
-    public void createConstraintStatement_withMultipleForeignKeysWithSingleColumnPrimaryKey_expectValidSqlStatement() {
-        // given
-        val siardMetaDataFactory1 = new MetaForeignKeyMockFactory();
-        val siardMetaDataFactory2 = new MetaForeignKeyMockFactory();
-
-        // when
-        val result = createForeignKeySqlGenerator.create(Arrays.asList(
-                siardMetaDataFactory1.create(),
-                siardMetaDataFactory2.create()
-        ));
-
-        Assertions.assertThat(result)
-                .isEqualTo(String.format(
-                        "ALTER TABLE \"%s\".\"%s\" " +
-
-                                "ADD CONSTRAINT %s " +
-                                "FOREIGN KEY (\"%s\") " +
-                                "REFERENCES \"%s\".\"%s\" (\"%s\") " +
-                                "ON DELETE %s " +
-                                "ON UPDATE %s, " +
-
-                                "ADD CONSTRAINT %s " +
-                                "FOREIGN KEY (\"%s\") " +
-                                "REFERENCES \"%s\".\"%s\" (\"%s\") " +
-                                "ON DELETE %s " +
-                                "ON UPDATE %s",
-                        QUALIFIED_TABLE_ID.getSchema() + IdMapperMockFactory.ADDED_SUFFIX,
-                        QUALIFIED_TABLE_ID.getTable() + IdMapperMockFactory.ADDED_SUFFIX,
-
-                        siardMetaDataFactory1.getName(),
-                        siardMetaDataFactory1.getReferences().get(0).getColumn() + IdMapperMockFactory.ADDED_SUFFIX,
-                        siardMetaDataFactory1.getReferencedSchema() + IdMapperMockFactory.ADDED_SUFFIX,
-                        siardMetaDataFactory1.getReferencedTable() + IdMapperMockFactory.ADDED_SUFFIX,
-                        siardMetaDataFactory1.getReferences().get(0).getReferenced() + IdMapperMockFactory.ADDED_SUFFIX,
-                        siardMetaDataFactory1.getDeleteAction(),
-                        siardMetaDataFactory1.getUpdateAction(),
-
-                        siardMetaDataFactory2.getName(),
-                        siardMetaDataFactory2.getReferences().get(0).getColumn() + IdMapperMockFactory.ADDED_SUFFIX,
-                        siardMetaDataFactory2.getReferencedSchema() + IdMapperMockFactory.ADDED_SUFFIX,
-                        siardMetaDataFactory2.getReferencedTable() + IdMapperMockFactory.ADDED_SUFFIX,
-                        siardMetaDataFactory2.getReferences().get(0).getReferenced() + IdMapperMockFactory.ADDED_SUFFIX,
-                        siardMetaDataFactory2.getDeleteAction(),
-                        siardMetaDataFactory2.getUpdateAction()
+                        siardMetaDataFactory.getDeleteAction().value(),
+                        siardMetaDataFactory.getUpdateAction().value()
                 ));
     }
 
@@ -177,8 +129,8 @@ public class CreateForeignKeySqlGeneratorTest {
         String referencedSchema = instancesCounter + "_foreign_key_referenced_schema";
         String referencedTable = instancesCounter + "_foreign_key_referenced_table";
 
-        String deleteAction = instancesCounter + "_foreign_key_delete_action";
-        String updateAction = instancesCounter + "_foreign_key_update_action";
+        ReferentialActionType deleteAction = ReferentialActionType.NO_ACTION;
+        ReferentialActionType updateAction = ReferentialActionType.CASCADE;
 
         List<Reference> references = new ArrayList<>();
 
@@ -196,8 +148,8 @@ public class CreateForeignKeySqlGeneratorTest {
             val mock = Mockito.mock(MetaForeignKey.class);
 
             Mockito.when(mock.getName()).thenReturn(name);
-            Mockito.when(mock.getDeleteAction()).thenReturn(deleteAction);
-            Mockito.when(mock.getUpdateAction()).thenReturn(updateAction);
+            Mockito.when(mock.getDeleteAction()).thenReturn(deleteAction.value());
+            Mockito.when(mock.getUpdateAction()).thenReturn(updateAction.value());
 
             Mockito.when(mock.getReferencedSchema()).thenReturn(referencedSchema);
             Mockito.when(mock.getReferencedTable()).thenReturn(referencedTable);

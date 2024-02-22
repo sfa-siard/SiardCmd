@@ -1,6 +1,7 @@
 package ch.admin.bar.siard2.cmd.sql;
 
 import ch.admin.bar.siard2.api.MetaForeignKey;
+import ch.admin.bar.siard2.api.generated.ReferentialActionType;
 import ch.admin.bar.siard2.cmd.mapping.IdMapper;
 import ch.admin.bar.siard2.cmd.model.QualifiedColumnId;
 import ch.admin.bar.siard2.cmd.model.QualifiedTableId;
@@ -47,8 +48,13 @@ public class CreateForeignKeySqlGenerator {
     @NonNull
     private final IdMapper idMapper;
 
+    @Builder.Default
     @NonNull
-    private final Function<String, String> referentialActionsMapper;
+    private final Function<ReferentialActionType, ReferentialActionType> onUpdateActionMapper = type -> type;
+
+    @Builder.Default
+    @NonNull
+    private final Function<ReferentialActionType, ReferentialActionType> onDeleteActionMapper = type -> type;
 
     /**
      * The identifier encoder for encoding keys.
@@ -57,7 +63,7 @@ public class CreateForeignKeySqlGenerator {
     private final IdEncoder idEncoder;
 
     /**
-     * Generates SQL statements to create foreign key constraints based on the provided SIARD metadata.
+     * Generates SQL statement to create foreign key constraint based on the provided SIARD metadata.
      *
      * <p>Example:
      * <pre>
@@ -69,51 +75,17 @@ public class CreateForeignKeySqlGenerator {
      * </pre>
      * </p>
      *
-     * @param foreignKeyMetaData List of SIARD metadata for foreign keys.
-     * @return The generated SQL statement for creating foreign key constraints.
+     * @param tableId The qualified identifier of the table for which foreign key constraint is being generated.
+     * @param foreignKeyMetaData SIARD metadata for foreign key.
+     * @return The generated SQL statement for creating foreign key constraint.
      */
-    public String create(final List<MetaForeignKey> foreignKeyMetaData) {
-        if (foreignKeyMetaData.isEmpty()) {
-            return "";
-        }
-
-        val mappedTableId = idMapper.map(tableId);
-
-        val stringBuilder = new StringBuilder()
-                .append("ALTER TABLE ")
-                .append(idEncoder.encodeKeySensitive(mappedTableId));
-
-        val addConstraintStatements = foreignKeyMetaData.stream()
-                .map(this::addConstraintStatement)
-                .collect(Collectors.joining(", "));
-
-        stringBuilder.append(" ")
-                .append(addConstraintStatements);
-
-        log.info("SQL statement for creating foreign-keys: {}", stringBuilder);
-
-        return stringBuilder.toString();
-    }
-
     public String create(final QualifiedTableId tableId, final MetaForeignKey foreignKeyMetaData) {
-        val mappedTableId = idMapper.map(tableId);
-
-        val stringBuilder = new StringBuilder()
-                .append("ALTER TABLE ")
-                .append(idEncoder.encodeKeySensitive(mappedTableId))
-                .append(" ")
-                .append(addConstraintStatement(foreignKeyMetaData));
-
-        log.info("SQL statement for creating foreign-keys: {}", stringBuilder);
-
-        return stringBuilder.toString();
-    }
-
-    private String addConstraintStatement(final MetaForeignKey foreignKeyMetaData) {
         if (foreignKeyMetaData.getReferences() == 0) {
             log.error("SIARD metadata for foreign-key {} has no references and will be ignored.", foreignKeyMetaData.getName());
             return "";
         }
+
+        val mappedTableId = idMapper.map(tableId);
 
         val references = resolveReferences(foreignKeyMetaData);
 
@@ -123,7 +95,9 @@ public class CreateForeignKeySqlGenerator {
                 .orElseThrow(() -> new IllegalStateException("No references found"));
 
         val stringBuilder = new StringBuilder()
-                .append("ADD CONSTRAINT ")
+                .append("ALTER TABLE ")
+                .append(idEncoder.encodeKeySensitive(mappedTableId))
+                .append(" ADD CONSTRAINT ")
                 .append(foreignKeyMetaData.getName())
                 .append(" FOREIGN KEY (")
                 .append(references.stream()
@@ -141,11 +115,13 @@ public class CreateForeignKeySqlGenerator {
         // actions
         Optional.ofNullable(foreignKeyMetaData.getDeleteAction())
                 .ifPresent(action -> stringBuilder.append(" ON DELETE ")
-                        .append(referentialActionsMapper.apply(action)));
+                        .append(onDeleteActionMapper.apply(ReferentialActionType.fromValue(action)).value()));
 
         Optional.ofNullable(foreignKeyMetaData.getUpdateAction())
                 .ifPresent(action -> stringBuilder.append(" ON UPDATE ")
-                        .append(referentialActionsMapper.apply(action)));
+                        .append(onUpdateActionMapper.apply(ReferentialActionType.fromValue(action)).value()));
+
+        log.info("SQL statement for creating foreign-key: {}", stringBuilder);
 
         return stringBuilder.toString();
     }
@@ -188,5 +164,14 @@ public class CreateForeignKeySqlGenerator {
     private static class ForeignKeyReference {
         @NonNull QualifiedColumnId column;
         @NonNull QualifiedColumnId referenced;
+    }
+
+    public static class CreateForeignKeySqlGeneratorBuilder {
+        public CreateForeignKeySqlGeneratorBuilder referentialActionsMapper(final Function<ReferentialActionType, ReferentialActionType> mapper) {
+            onDeleteActionMapper(mapper);
+            onUpdateActionMapper(mapper);
+
+            return this;
+        }
     }
 }

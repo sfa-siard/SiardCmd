@@ -48,12 +48,12 @@ public class MsSqlConnector extends DefaultConnector {
                                 .table(tableMetadata.getName())
                                 .build())
                         .idEncoder(new IdEncoder())
-                        .referentialActionsMapper(action -> {
+                        .referentialActionsMapper(referentialActionType -> {
                             // RESTRICT is unknown for MS SQL
-//                            if (ReferentialActionType.fromValue(action).equals(ReferentialActionType.RESTRICT)) {
-//                                return ReferentialActionType.NO_ACTION.value();
-//                            }
-                            return action;
+                            if (referentialActionType.equals(ReferentialActionType.RESTRICT)) {
+                                return ReferentialActionType.NO_ACTION;
+                            }
+                            return referentialActionType;
                         })
                         .idMapper(idMapper)
                         .build();
@@ -63,32 +63,9 @@ public class MsSqlConnector extends DefaultConnector {
                         tableMetadata::getMetaForeignKey);
 
                 for (val foreignKeyMetaData : foreignKeysMetaData) {
-                    val sql = sqlGenerator.create(tableId, foreignKeyMetaData);
-
-                    executeSql(sql);
+                    executeSql(sqlGenerator.create(tableId, foreignKeyMetaData));
                 }
             }
-        }
-
-        private String getReferentialAction(int iReferentialAction) {
-            ReferentialActionType rat = null;
-            switch (iReferentialAction) {
-                case DatabaseMetaData.importedKeyCascade:
-                    rat = ReferentialActionType.CASCADE;
-                    break;
-                case DatabaseMetaData.importedKeySetNull:
-                    rat = ReferentialActionType.SET_NULL;
-                    break;
-                case DatabaseMetaData.importedKeySetDefault:
-                    rat = ReferentialActionType.SET_DEFAULT;
-                    break;
-                case DatabaseMetaData.importedKeyRestrict:
-                    rat = ReferentialActionType.RESTRICT;
-                    break;
-                case DatabaseMetaData.importedKeyNoAction:
-                    rat = ReferentialActionType.NO_ACTION;
-            }
-            return rat.value();
         }
     }
 }

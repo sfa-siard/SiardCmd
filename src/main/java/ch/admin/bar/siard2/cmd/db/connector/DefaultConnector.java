@@ -1,6 +1,7 @@
 package ch.admin.bar.siard2.cmd.db.connector;
 
 import ch.admin.bar.siard2.api.MetaTable;
+import ch.admin.bar.siard2.api.generated.ReferentialActionType;
 import ch.admin.bar.siard2.cmd.db.features.DbFeatures;
 import ch.admin.bar.siard2.cmd.db.features.DbFeaturesChecker;
 import ch.admin.bar.siard2.cmd.mapping.IdMapper;
@@ -77,19 +78,27 @@ public class DefaultConnector implements Connector {
         @Override
         public void addForeignKeys(MetaTable tableMetadata) throws SQLException {
             if (tableMetadata.getMetaForeignKeys() > 0) {
+                val tableId = QualifiedTableId.builder()
+                        .schema(tableMetadata.getParentMetaSchema().getName())
+                        .table(tableMetadata.getName())
+                        .build();
+
                 val sqlGenerator = CreateForeignKeySqlGenerator.builder()
                         .tableId(QualifiedTableId.builder()
                                 .schema(tableMetadata.getParentMetaSchema().getName())
                                 .table(tableMetadata.getName())
                                 .build())
                         .idEncoder(new IdEncoder())
-                        .referentialActionsMapper(action -> action)
                         .idMapper(idMapper)
                         .build();
 
-                val sql = sqlGenerator.create(ListAssembler.assemble(tableMetadata.getMetaForeignKeys(), tableMetadata::getMetaForeignKey));
+                val foreignKeysMetaData = ListAssembler.assemble(
+                        tableMetadata.getMetaForeignKeys(),
+                        tableMetadata::getMetaForeignKey);
 
-                executeSql(sql);
+                for (val foreignKeyMetaData : foreignKeysMetaData) {
+                    executeSql(sqlGenerator.create(tableId, foreignKeyMetaData));
+                }
             }
         }
 
