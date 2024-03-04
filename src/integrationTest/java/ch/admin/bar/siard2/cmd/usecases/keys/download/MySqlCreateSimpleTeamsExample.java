@@ -14,6 +14,7 @@ import lombok.SneakyThrows;
 import lombok.val;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
+import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MySQLContainer;
 
 import java.io.IOException;
@@ -95,14 +96,14 @@ public class MySqlCreateSimpleTeamsExample {
             .build();
 
     @SneakyThrows
-    public static void executeTest(SiardArchivesHandler siardArchivesHandler, MySQLContainer<?> db) {
+    public static void executeTest(SiardArchivesHandler siardArchivesHandler, String jdbcUrl) {
         // given
         val actualArchive = siardArchivesHandler.prepareEmpty();
 
         // when
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
-                "-j:" + db.getJdbcUrl(),
+                "-j:" + jdbcUrl,
                 "-u:" + "it_user",
                 "-p:" + "it_password",
                 "-s:" + actualArchive.getPathToArchiveFile()
@@ -122,7 +123,7 @@ public class MySqlCreateSimpleTeamsExample {
 
         Assertions.assertThat(metadataExplorer.tryFindPrimaryKey(TEAMS))
                         .contains(Metadata.PrimaryKey.builder()
-                                .name(MY_SQL_PRIMARY_KEY_DEFAULT_NAME) // TEAMS_PRIMARY_KEY.getPrimaryKeyId()
+                                .name(MY_SQL_PRIMARY_KEY_DEFAULT_NAME) // It seems that mysql has a default name for a PK
                                 .columns(CollectionsHelper.setOf(
                                         COLUMN_LOCATION,
                                         COLUMN_TEAM_NAME
@@ -131,13 +132,13 @@ public class MySqlCreateSimpleTeamsExample {
 
         Assertions.assertThat(metadataExplorer.tryFindPrimaryKey(MEMBERS))
                 .contains(Metadata.PrimaryKey.builder()
-                        .name(MY_SQL_PRIMARY_KEY_DEFAULT_NAME) // MEMBERS_PRIMARY_KEY.getPrimaryKeyId()
+                        .name(MY_SQL_PRIMARY_KEY_DEFAULT_NAME) // It seems that mysql has a default name for a PK
                         .columns(CollectionsHelper.setOf(COLUMN_MEMBER_ID))
                         .build());
 
         Assertions.assertThat(metadataExplorer.tryFindPrimaryKey(TEAM_MEMBERS))
                 .contains(Metadata.PrimaryKey.builder()
-                        .name(MY_SQL_PRIMARY_KEY_DEFAULT_NAME) // TEAM_MEMBERS_PRIMARY_KEY.getPrimaryKeyId()
+                        .name(MY_SQL_PRIMARY_KEY_DEFAULT_NAME) // It seems that mysql has a default name for a PK
                         .columns(CollectionsHelper.setOf(COLUMN_TEAM_MEMBERS_ID))
                         .build());
 

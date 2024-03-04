@@ -55,6 +55,8 @@ dependencies {
     testImplementation("org.testcontainers:mssqlserver:1.19.0")
     testImplementation("org.testcontainers:postgresql:1.19.0")
     testImplementation("org.testcontainers:mysql:1.19.0")
+    testImplementation("org.testcontainers:mariadb:1.19.6")
+    testImplementation("org.mariadb.jdbc:mariadb-java-client:2.7.4") // Used by mariadb testcontainer
     testImplementation("org.testcontainers:oracle-xe:1.19.0")
     testImplementation("org.testcontainers:db2:1.19.0")
 }

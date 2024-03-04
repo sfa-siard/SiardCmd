@@ -20,6 +20,6 @@ public class MySql8DownloadSiardProjectIT {
 
     @Test
     public void download_expectNoExceptions() {
-        MySqlCreateSimpleTeamsExample.executeTest(siardArchivesHandler, db);
+        MySqlCreateSimpleTeamsExample.executeTest(siardArchivesHandler, db.getJdbcUrl());
     }
 }
