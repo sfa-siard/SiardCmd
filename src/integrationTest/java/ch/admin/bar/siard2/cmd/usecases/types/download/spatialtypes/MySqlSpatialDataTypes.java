@@ -1,4 +1,4 @@
-package ch.admin.bar.siard2.cmd.usecases.types.download;
+package ch.admin.bar.siard2.cmd.usecases.types.download.spatialtypes;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
