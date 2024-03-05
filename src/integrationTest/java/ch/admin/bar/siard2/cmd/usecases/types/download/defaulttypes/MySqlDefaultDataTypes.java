@@ -12,7 +12,7 @@ import org.junit.Assert;
 
 public class MySqlDefaultDataTypes {
 
-    public final static String INIT_SCRIPT = "usecases/types/use-all-default-data-types_mysql8.sql";
+    public final static String INIT_SCRIPT = "usecases/types/default/use-all-default-data-types_mysql8.sql";
 
     private static final QualifiedTableId TABLE = QualifiedTableId.builder()
             .schemaId(Id.of("Schema1"))

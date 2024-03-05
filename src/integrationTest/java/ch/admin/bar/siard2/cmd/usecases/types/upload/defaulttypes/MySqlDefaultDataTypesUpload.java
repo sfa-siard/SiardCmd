@@ -1,4 +1,4 @@
-package ch.admin.bar.siard2.cmd.usecases.types.upload;
+package ch.admin.bar.siard2.cmd.usecases.types.upload.defaulttypes;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
 import ch.admin.bar.siard2.cmd.SiardToDb;

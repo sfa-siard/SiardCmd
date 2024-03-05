@@ -27,7 +27,7 @@ public class MySqlSpatialDataTypes {
      * | geometrycollection_column GEOMETRYCOLLECTION|
      * +---------------------------------------------+
      */
-    public final static String INIT_SCRIPT = "usecases/types/use-all-spatial-data-types_mysql.sql";
+    public final static String INIT_SCRIPT = "usecases/types/spatial/use-all-spatial-data-types_mysql.sql";
 
     private static final QualifiedTableId TABLE = QualifiedTableId.builder()
             .schemaId(Id.of("Schema1"))
