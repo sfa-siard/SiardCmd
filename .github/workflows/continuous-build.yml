@@ -21,3 +21,5 @@ jobs:
           distribution: 'adopt'
       - name: Run unit tests
         run: ./gradlew test
+      - name: Run integration tests
+        run: ./gradlew integrationTest
