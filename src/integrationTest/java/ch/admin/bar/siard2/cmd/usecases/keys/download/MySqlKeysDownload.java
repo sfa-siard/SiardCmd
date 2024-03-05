@@ -14,14 +14,10 @@ import lombok.SneakyThrows;
 import lombok.val;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
-import org.testcontainers.containers.JdbcDatabaseContainer;
-import org.testcontainers.containers.MySQLContainer;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Optional;
 
-public class MySqlCreateSimpleTeamsExample {
+public class MySqlKeysDownload {
 
     /**
      * +-------------------+          +-------------------+          +---------------------+

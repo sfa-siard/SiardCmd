@@ -6,20 +6,20 @@ import org.junit.Test;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-public class MySql5DownloadSiardProjectIT {
+public class MySql8KeysDownloadIT {
 
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public MySQLContainer<?> db = new MySQLContainer<>(DockerImageName.parse("mysql:5.6.51"))
+    public MySQLContainer<?> db = new MySQLContainer<>(DockerImageName.parse("mysql:8.0.30"))
             .withUsername("root")
             .withPassword("test")
             .withCommand("--max-allowed-packet=1G --innodb_log_file_size=256M")
-            .withInitScript(MySqlCreateSimpleTeamsExample.INIT_SCRIPT);
+            .withInitScript(MySqlKeysDownload.INIT_SCRIPT);
 
     @Test
     public void download_expectNoExceptions() {
-        MySqlCreateSimpleTeamsExample.executeTest(siardArchivesHandler, db.getJdbcUrl());
+        MySqlKeysDownload.executeTest(siardArchivesHandler, db.getJdbcUrl());
     }
 }
