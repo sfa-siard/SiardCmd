@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SiardArchiveAssertions {
 
-    private static final StringWrapper IGNORED_PLACEHOLDER = StringWrapper.of("IGNORED");
+    public static final StringWrapper IGNORED_PLACEHOLDER = StringWrapper.of("IGNORED");
 
     public static final AssertionModifier IGNORE_METADATA = () -> "Ignore metadata of SIARD archives";
 

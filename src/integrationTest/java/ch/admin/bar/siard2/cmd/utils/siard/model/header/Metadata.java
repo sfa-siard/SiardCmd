@@ -15,7 +15,9 @@ import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 import lombok.val;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -81,7 +83,7 @@ public class Metadata implements Updatable<Metadata> {
         Id<Table> name;
 
         @Builder.Default
-        Set<Column> columns = new HashSet<>();
+        List<Column> columns = new ArrayList<>();
 
         @NonNull
         @Builder.Default
@@ -104,7 +106,7 @@ public class Metadata implements Updatable<Metadata> {
                     updatedThis.name.applyUpdates(updater),
                     updatedThis.columns.stream()
                             .map(column -> column.applyUpdates(updater))
-                            .collect(Collectors.toSet()),
+                            .collect(Collectors.toList()),
                     updatedThis.primaryKey.map(primaryKey -> primaryKey.applyUpdates(updater)),
                     updatedThis.foreignKeys.stream()
                             .map(foreignKey -> foreignKey.applyUpdates(updater))

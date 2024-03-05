@@ -115,5 +115,10 @@ public class MySqlDefaultDataTypes {
        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_BLOB)).isPresent();
        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_MEDIUMBLOB)).isPresent();
        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_LONGBLOB)).isPresent();
+
+        val contentExplorer = actualArchive.exploreContent();
+
+        Assertions.assertThat(contentExplorer.findCellValue(COLUMN_DATE, 0)).isEqualTo("2022-01-01");
+        // TODO test the rest of the rows
     }
 }
