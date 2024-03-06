@@ -8,18 +8,42 @@ Created    : 08.05.2017, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.cmd;
 
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import ch.enterag.utils.*;
-import ch.enterag.utils.io.*;
-import ch.enterag.utils.jdbc.*;
-import ch.admin.bar.siard2.jdbc.*;
+import ch.admin.bar.siard2.jdbc.AccessDriver;
+import ch.admin.bar.siard2.jdbc.Db2Driver;
+import ch.admin.bar.siard2.jdbc.MsSqlDriver;
+import ch.admin.bar.siard2.jdbc.MySqlDriver;
+import ch.admin.bar.siard2.jdbc.OracleDriver;
+import ch.admin.bar.siard2.jdbc.PostgresDriver;
+import ch.enterag.utils.EU;
+import ch.enterag.utils.io.SpecialFolder;
+import ch.enterag.utils.jdbc.BaseDriver;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 
 /*====================================================================*/
 /** Loads the appropriate JDBC driver associated with a JDBC URL.
  @author Hartwig Thomas
  */
+@Slf4j
 @SuppressWarnings("serial")
 public class SiardConnection extends Properties
 {
@@ -140,6 +164,75 @@ public class SiardConnection extends Properties
       _sc = new SiardConnection();
     return _sc;
   } /* getSiardConnection */
+
+  static String extractSubSchema(final String jdbcUrl) {
+    val split = jdbcUrl.split(":");
+
+    if (split.length < 3 || !split[0].equals("jdbc")) {
+      throw new IllegalArgumentException(jdbcUrl + " is not a valid JDBC-Url.");
+    }
+
+    return split[1];
+  }
+
+  @SneakyThrows
+  public Driver loadValidDriver(String jdbcUrl) {
+    val subSchema = extractSubSchema(jdbcUrl);
+
+    val driverClassName = getProperty(subSchema);
+    if (driverClassName == null) {
+      throw new IllegalArgumentException("No driver specified for url " + jdbcUrl);
+    }
+    val driverClass = Class.forName(driverClassName);
+    val driver = (Driver) driverClass.newInstance();
+
+    if (!driver.acceptsURL(jdbcUrl)) {
+      throw new IllegalStateException(String.format(
+              "Driver %s does not accept url %s.",
+              driver.getClass().getCanonicalName(),
+              jdbcUrl));
+    }
+
+    log.info("'{}' as driver loaded for url '{}'", driver.getClass().getCanonicalName(), jdbcUrl);
+
+    return driver;
+  }
+
+  public Connection createValidConnection(
+          String jdbcUrl,
+          String user,
+          String password
+  ) throws SQLException {
+    logDrivers(jdbcUrl);
+
+    java.util.Properties info = new java.util.Properties();
+
+    if (user != null) {
+      info.put("user", user);
+    }
+    if (password != null) {
+      info.put("password", password);
+    }
+
+    val driver = loadValidDriver(jdbcUrl);
+    val connection = driver.connect(jdbcUrl, info);
+
+    log.info("Created connection of type '{}'for url '{}'", connection.getClass().getCanonicalName(), jdbcUrl);
+
+    return connection;
+  }
+
+  @SneakyThrows
+  private static void logDrivers(final String jdbcUrl) {
+    System.out.println("Registered JDBC drivers:");
+
+    val enumeration = DriverManager.getDrivers();
+    while(enumeration.hasMoreElements()) {
+      val driver = enumeration.nextElement();
+
+      System.out.println(" - " + driver.getClass().getCanonicalName() + ": " + driver.acceptsURL(jdbcUrl));
+    }
+  }
   
   /*--------------------------------------------------------------------*/
   /** load JDBC driver for given JDBC URL.

@@ -27,6 +27,7 @@ import ch.enterag.utils.EU;
 import ch.enterag.utils.ProgramInfo;
 import ch.enterag.utils.cli.Arguments;
 import ch.enterag.utils.logging.IndentLogger;
+import lombok.val;
 
 
 /**
@@ -272,10 +273,12 @@ public class SiardFromDb {
             }
             if (((_fileSiard == null) || !_fileSiard.exists()) && ((_fileExportXml == null) || !_fileExportXml.exists())) {
                 /* open connection */
-                String sError = SiardConnection.getSiardConnection().loadDriver(_sJdbcUrl);
+                String sError = null;
+
+                val siardConnection = SiardConnection.getSiardConnection();
                 if ((sError == null) || (sError.length() == 0)) {
                     DriverManager.setLoginTimeout(_iLoginTimeoutSeconds);
-                    _conn = DriverManager.getConnection(_sJdbcUrl, _sDatabaseUser, _sDatabasePassword);
+                    _conn = siardConnection.createValidConnection(_sJdbcUrl, _sDatabaseUser, _sDatabasePassword);
                     if ((_conn != null) && (!_conn.isClosed())) {
                         System.out.println("Connected to " + _conn.getMetaData().getURL().toString());
                         _conn.setAutoCommit(false);
