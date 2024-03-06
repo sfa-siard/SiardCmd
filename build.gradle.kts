@@ -40,7 +40,7 @@ sourceSets {
 }
 
 dependencies {
-//    implementation("com.mysql:mysql-connector-j:8.3.0")
+    implementation("com.mysql:mysql-connector-j:8.3.0") // transitive dependency from lib/jdbcmysql.jar
     implementation(fileTree("lib") { include("*.jar") })
 
     testImplementation("junit:junit:4.13.2")

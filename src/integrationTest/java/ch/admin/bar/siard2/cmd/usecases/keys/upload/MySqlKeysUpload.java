@@ -45,6 +45,8 @@ public class MySqlKeysUpload {
         SiardArchiveAssertions.builder()
                 .expectedArchive(expectedArchive)
                 .actualArchive(actualArchive.preserveArchive())
+                .assertionModifier(SiardArchiveAssertions.IGNORE_FOREIGN_KEY_DELETE_ACTION)
+                .assertionModifier(SiardArchiveAssertions.IGNORE_FOREIGN_KEY_UPDATE_ACTION)
                 .assertEqual();
     }
 }

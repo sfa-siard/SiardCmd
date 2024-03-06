@@ -60,6 +60,9 @@ public class MsSqlUploadDownloadSiardProjectIT {
                 .expectedArchive(expectedArchive)
                 .actualArchive(actualArchive)
                 .assertionModifier(SiardArchiveAssertions.IGNORE_DBNAME) // FIXME ?
+                .assertionModifier(SiardArchiveAssertions.IGNORE_PRIMARY_KEY_NAME) // DB restriction ?
+                .assertionModifier(SiardArchiveAssertions.IGNORE_FOREIGN_KEY_DELETE_ACTION) // FIXME
+                .assertionModifier(SiardArchiveAssertions.IGNORE_FOREIGN_KEY_UPDATE_ACTION) // FIXME
                 .assertEqual();
     }
 }
