@@ -26,3 +26,11 @@ jobs:
         run: ./gradlew test
       - name: Run integration tests
         run: ./gradlew integrationTest
+      - name: Store reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: reports
+          path: |
+            **/build/reports/
+            **/build/test-results/
