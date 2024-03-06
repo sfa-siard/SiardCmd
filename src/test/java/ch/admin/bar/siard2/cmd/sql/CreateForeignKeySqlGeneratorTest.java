@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CreateForeignKeySqlGeneratorTest {
@@ -57,7 +56,7 @@ public class CreateForeignKeySqlGeneratorTest {
         });
 
         // when
-        val result = createForeignKeySqlGenerator.create(Arrays.asList(siardMetaDataFactory.create()));
+        val result = createForeignKeySqlGenerator.create(siardMetaDataFactory.create());
 
         Assertions.assertThat(result)
                 .isEqualTo(String.format(
@@ -83,8 +82,8 @@ public class CreateForeignKeySqlGeneratorTest {
     public void createConstraintStatement_withMultiColumnsPrimaryKey_expectValidSqlStatement() {
         // given
         val siardMetaDataFactory = new SiardForeignKeyDataFactory()
-                .addReference()
-                .addReference();
+                .addReference(new SiardForeignKeyDataFactory.Reference(1))
+                .addReference(new SiardForeignKeyDataFactory.Reference(2));
 
         Mockito.when(tableIdMapperMock.map(Mockito.any())).then(invocationOnMock -> {
             final QualifiedTableId orig = invocationOnMock.getArgument(0);
@@ -105,7 +104,7 @@ public class CreateForeignKeySqlGeneratorTest {
         });
 
         // when
-        val result = createForeignKeySqlGenerator.create(Arrays.asList(siardMetaDataFactory.create()));
+        val result = createForeignKeySqlGenerator.create(siardMetaDataFactory.create());
 
         Assertions.assertThat(result)
                 .isEqualTo(String.format(
@@ -131,95 +130,24 @@ public class CreateForeignKeySqlGeneratorTest {
                 ));
     }
 
-    @Test
-    public void createConstraintStatement_withMultipleForeignKeysWithSingleColumnPrimaryKey_expectValidSqlStatement() {
-        // given
-        val siardMetaDataFactory1 = new SiardForeignKeyDataFactory();
-        val siardMetaDataFactory2 = new SiardForeignKeyDataFactory();
-
-        Mockito.when(tableIdMapperMock.map(Mockito.any())).then(invocationOnMock -> {
-            final QualifiedTableId orig = invocationOnMock.getArgument(0);
-
-            return orig.toBuilder()
-                    .schema(orig.getSchema() + "_mapped")
-                    .table(orig.getTable() + "_mapped")
-                    .build();
-        });
-        Mockito.when(columnIdMapper.map(Mockito.any())).then(invocationOnMock -> {
-            final QualifiedColumnId orig = invocationOnMock.getArgument(0);
-
-            return orig.toBuilder()
-                    .schema(orig.getSchema() + "_mapped")
-                    .table(orig.getTable() + "_mapped")
-                    .column(orig.getColumn() + "_mapped")
-                    .build();
-        });
-
-        // when
-        val result = createForeignKeySqlGenerator.create(Arrays.asList(
-                siardMetaDataFactory1.create(),
-                siardMetaDataFactory2.create()
-                ));
-
-        Assertions.assertThat(result)
-                .isEqualTo(String.format(
-                        "ALTER TABLE \"%s_mapped\".\"%s_mapped\" " +
-
-                                "ADD CONSTRAINT %s " +
-                                "FOREIGN KEY (\"%s_mapped\") " +
-                                "REFERENCES \"%s_mapped\".\"%s_mapped\" (\"%s_mapped\") " +
-                                "ON DELETE %s " +
-                                "ON UPDATE %s, " +
-
-                                "ADD CONSTRAINT %s " +
-                                "FOREIGN KEY (\"%s_mapped\") " +
-                                "REFERENCES \"%s_mapped\".\"%s_mapped\" (\"%s_mapped\") " +
-                                "ON DELETE %s " +
-                                "ON UPDATE %s",
-                        QUALIFIED_TABLE_ID.getSchema(),
-                        QUALIFIED_TABLE_ID.getTable(),
-
-                        siardMetaDataFactory1.getName(),
-                        siardMetaDataFactory1.getReferences().get(0).getColumn(),
-                        siardMetaDataFactory1.getReferencedSchema(),
-                        siardMetaDataFactory1.getReferencedTable(),
-                        siardMetaDataFactory1.getReferences().get(0).getReferenced(),
-                        siardMetaDataFactory1.getDeleteAction(),
-                        siardMetaDataFactory1.getUpdateAction(),
-
-                        siardMetaDataFactory2.getName(),
-                        siardMetaDataFactory2.getReferences().get(0).getColumn(),
-                        siardMetaDataFactory2.getReferencedSchema(),
-                        siardMetaDataFactory2.getReferencedTable(),
-                        siardMetaDataFactory2.getReferences().get(0).getReferenced(),
-                        siardMetaDataFactory2.getDeleteAction(),
-                        siardMetaDataFactory2.getUpdateAction()
-                ));
-    }
-
-
-
     @Data
     private static class SiardForeignKeyDataFactory {
 
-        private static int instancesCounter = 0;
+        String name = "foreign_key_name";
+        String referencedSchema = "foreign_key_referenced_schema";
+        String referencedTable = "foreign_key_referenced_table";
 
-        String name = instancesCounter + "_foreign_key_name";
-        String referencedSchema = instancesCounter + "_foreign_key_referenced_schema";
-        String referencedTable = instancesCounter + "_foreign_key_referenced_table";
-
-        String deleteAction = instancesCounter + "_foreign_key_delete_action";
-        String updateAction = instancesCounter + "_foreign_key_update_action";
+        String deleteAction = "foreign_key_delete_action";
+        String updateAction = "foreign_key_update_action";
 
         List<Reference> references = new ArrayList<>();
 
         public SiardForeignKeyDataFactory() {
-            instancesCounter++;
-            addReference();
+            references.add(new Reference(0));
         }
 
-        public SiardForeignKeyDataFactory addReference() {
-            references.add(new Reference());
+        public SiardForeignKeyDataFactory addReference(final Reference reference) {
+            references.add(reference);
             return this;
         }
 
@@ -248,15 +176,17 @@ public class CreateForeignKeySqlGeneratorTest {
 
         @Data
         public static class Reference {
-            private static int instancesCounter = 0;
-
             String column;
             String referenced;
 
-            public Reference() {
-                instancesCounter++;
-                this.column = "foreign_key_reference_column_" + instancesCounter;
-                this.referenced = "foreign_key_reference_referenced_" + instancesCounter;
+            public Reference(String column, String referenced) {
+                this.column = column;
+                this.referenced = referenced;
+            }
+
+            public Reference(final int index) {
+                this.column = "foreign_key_reference_column_" + index;
+                this.referenced = "foreign_key_reference_referenced_" + index;
             }
         }
     }

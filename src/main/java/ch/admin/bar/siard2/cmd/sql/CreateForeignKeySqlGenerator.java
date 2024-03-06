@@ -23,40 +23,13 @@ import java.util.stream.Collectors;
 @Builder
 public class CreateForeignKeySqlGenerator {
 
-    @NonNull
-    private final QualifiedTableId tableId;
+    @NonNull private final QualifiedTableId tableId;
 
-    @NonNull
-    private final TableIdMapper tableIdMapper;
-    @NonNull
-    private final ColumnIdMapper columnIdMapper;
-    @NonNull
-    private final IdEncoder idEncoder;
+    @NonNull private final TableIdMapper tableIdMapper;
+    @NonNull private final ColumnIdMapper columnIdMapper;
+    @NonNull private final IdEncoder idEncoder;
 
-    public String create(final List<MetaForeignKey> foreignKeyMetaData) {
-        if (foreignKeyMetaData.isEmpty()) {
-            return "";
-        }
-
-        val mappedTableId = tableIdMapper.map(tableId);
-
-        val sb = new StringBuilder()
-                .append("ALTER TABLE ")
-                .append(idEncoder.encodeKeySensitive(mappedTableId));
-
-        val addConstraintStatements = foreignKeyMetaData.stream()
-                .map(this::addConstraintStatement)
-                .collect(Collectors.joining(", "));
-
-        sb.append(" ")
-                .append(addConstraintStatements);
-
-        log.info("SQL statement for creating foreign-keys: {}", sb);
-
-        return sb.toString();
-    }
-
-    private String addConstraintStatement(final MetaForeignKey foreignKeyMetaData) {
+    public String create(final MetaForeignKey foreignKeyMetaData) {
         if (foreignKeyMetaData.getReferences() == 0) {
             log.error("SIARD metadata for foreign-key {} has no references and will be ignored.", foreignKeyMetaData.getName());
             return "";
@@ -69,8 +42,12 @@ public class CreateForeignKeySqlGenerator {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No references found"));
 
+        val mappedTableId = tableIdMapper.map(tableId);
+
         val sb = new StringBuilder()
-                .append("ADD CONSTRAINT ")
+                .append("ALTER TABLE ")
+                .append(idEncoder.encodeKeySensitive(mappedTableId))
+                .append(" ADD CONSTRAINT ")
                 .append(foreignKeyMetaData.getName())
                 .append(" FOREIGN KEY (")
                 .append(references.stream()
