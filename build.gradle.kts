@@ -40,6 +40,7 @@ sourceSets {
 }
 
 dependencies {
+    implementation("com.mysql:mysql-connector-j:8.3.0")
     implementation(fileTree("lib") { include("*.jar") })
 
     testImplementation("junit:junit:4.13.2")
