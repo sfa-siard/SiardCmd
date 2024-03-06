@@ -1,7 +1,8 @@
 package ch.admin.bar.siard2.cmd.sql;
 
 import ch.admin.bar.siard2.api.MetaForeignKey;
-import ch.admin.bar.siard2.cmd.mapping.IdMapper;
+import ch.admin.bar.siard2.cmd.mapping.ColumnIdMapper;
+import ch.admin.bar.siard2.cmd.mapping.TableIdMapper;
 import ch.admin.bar.siard2.cmd.model.QualifiedColumnId;
 import ch.admin.bar.siard2.cmd.model.QualifiedTableId;
 import ch.admin.bar.siard2.cmd.utils.ListAssembler;
@@ -16,64 +17,28 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * The {@code CreateForeignKeySqlGenerator} class is responsible for generating SQL statements to add foreign key constraints to a table.
- * <p>
- * It takes into account the SIARD metadata for foreign keys, such as names, referenced columns, and actions (e.g., ON DELETE, ON UPDATE).
- * The generated SQL statements can be used to alter a table by adding the specified foreign key constraints.
- * </p>
- * <p>
- * The class supports mapping identifiers and encoding keys as needed, making it adaptable to various requirements.
- * </p>
- * <p>
- * Note: Match-Type is currently not supported and marked with TODO FIXME.
- * </p>
- */
+// TODO FIXME Match-Type currently not supported
 @Slf4j
 @RequiredArgsConstructor
 @Builder
 public class CreateForeignKeySqlGenerator {
 
-    /**
-     * The qualified identifier of the table for which foreign key constraints are being generated.
-     */
     @NonNull
     private final QualifiedTableId tableId;
 
-    /**
-     * The identifier mapper for mapping table and column identifiers.
-     */
     @NonNull
-    private final IdMapper idMapper;
-
-    /**
-     * The identifier encoder for encoding keys.
-     */
+    private final TableIdMapper tableIdMapper;
+    @NonNull
+    private final ColumnIdMapper columnIdMapper;
     @NonNull
     private final IdEncoder idEncoder;
 
-    /**
-     * Generates SQL statements to create foreign key constraints based on the provided SIARD metadata.
-     *
-     * <p>Example:
-     * <pre>
-     * ALTER TABLE your_table_name
-     *   ADD CONSTRAINT your_foreign_key_name
-     *   FOREIGN KEY ("column1", "column2")
-     *   REFERENCES referenced_table_name ("referenced_column1", "referenced_column2")
-     *   ON DELETE CASCADE ON UPDATE CASCADE
-     * </pre>
-     * </p>
-     *
-     * @param foreignKeyMetaData List of SIARD metadata for foreign keys.
-     * @return The generated SQL statement for creating foreign key constraints.
-     */
     public String create(final List<MetaForeignKey> foreignKeyMetaData) {
         if (foreignKeyMetaData.isEmpty()) {
             return "";
         }
 
-        val mappedTableId = idMapper.map(tableId);
+        val mappedTableId = tableIdMapper.map(tableId);
 
         val sb = new StringBuilder()
                 .append("ALTER TABLE ")
@@ -158,8 +123,8 @@ public class CreateForeignKeySqlGenerator {
 
     private ForeignKeyReference resolveMappings(ForeignKeyReference origForeignKeyReference) {
         return origForeignKeyReference.toBuilder()
-                .column(idMapper.map(origForeignKeyReference.getColumn()))
-                .referenced(idMapper.map(origForeignKeyReference.getReferenced()))
+                .column(columnIdMapper.map(origForeignKeyReference.getColumn()))
+                .referenced(columnIdMapper.map(origForeignKeyReference.getReferenced()))
                 .build();
     }
 
