@@ -24,6 +24,7 @@ import ch.enterag.utils.background.Progress;
 import ch.enterag.utils.database.SqlTypes;
 import ch.enterag.utils.logging.IndentLogger;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.tika.Tika;
 
 import javax.xml.datatype.Duration;
@@ -332,6 +333,11 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         if (!stmt.isClosed())
             stmt.close();
         rr.close();
+
+        LOG.debug("All data of table '{}.{}' successfully downloaded",
+                qiTable.getSchema(),
+                qiTable.getName());
+
         _il.exit();
     } /* getTable */
 
@@ -346,11 +352,15 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      */
     private void getSchema(Schema schema)
             throws IOException, SQLException {
-        _il.enter(schema.getMetaSchema().getName());
+        val schemaName = schema.getMetaSchema().getName();
+
+        _il.enter(schemaName);
         for (int iTable = 0; (iTable < schema.getTables()) && (!cancelRequested()); iTable++) {
             Table table = schema.getTable(iTable);
             getTable(table);
         }
+
+        LOG.debug("All data of schema '{}' successfully downloaded", schemaName);
         _il.exit();
     } /* getSchema */
 

@@ -485,7 +485,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
   public void upload(Progress progress)
     throws IOException, SQLException
   {
-    LOG.info("Primary data upload of archive {}",
+    LOG.info("Start primary data upload of archive {}",
             this._archive.getFile().getAbsoluteFile());
 
     _il.enter();

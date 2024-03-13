@@ -940,6 +940,11 @@ public class MetaDataFromDb extends MetaDataBase {
                 }
             }
         } else throw new IOException("Size of table " + mt.getName() + " could not be determined!");
+
+        LOG.debug("Size of table '{}.{}' successfully determined",
+                qiTable.getSchema(),
+                qiTable.getName());
+
         rsSizes.close();
         stmtSizes.close();
     }
@@ -980,6 +985,11 @@ public class MetaDataFromDb extends MetaDataBase {
                 String sColumnName = rs.getString("COLUMN_NAME");
                 mapUniqueColumns.put(Integer.valueOf(iOrdinalPosition), sColumnName);
             }
+
+            LOG.debug("Metadata for unique key '{}' (table '{}.{}') loaded",
+                    sUniqueKeyName,
+                    sTableSchema,
+                    sTableName);
         }
         rs.close();
         addColumns(mt, sUniqueKeyName, mapUniqueColumns);
@@ -1027,6 +1037,11 @@ public class MetaDataFromDb extends MetaDataBase {
             mfk.setReferencedTable(sPkTableName);
             mfk.setDeleteAction(getReferentialAction(iDeleteRule));
             mfk.setUpdateAction(getReferentialAction(iUpdateRule));
+
+            LOG.debug("Metadata for foreign key '{}' (table '{}.{}') loaded",
+                    sForeignKeyName,
+                    sPkTableSchema,
+                    sPkTableName);
         }
         rs.close();
         /* add references to last foreign key */
@@ -1054,7 +1069,21 @@ public class MetaDataFromDb extends MetaDataBase {
             int iKeySeq = rs.getInt("KEY_SEQ");
             mapPkColumns.put(Integer.valueOf(iKeySeq), sColumnName);
             String s = rs.getString("PK_NAME");
-            if (s != null) sPkName = s;
+            if (s != null) {
+                sPkName = s;
+            } else {
+                LOG.info("No name for primary key of column '{}.{}.{}' available. Used '{}' instead.",
+                        sTableSchema,
+                        sTableName,
+                        sColumnName,
+                        sPkName);
+            }
+
+            LOG.debug("Metadata for primary key '{}' (column '{}.{}.{}') loaded",
+                    sPkName,
+                    sTableSchema,
+                    sTableName,
+                    sColumnName);
         }
         rs.close();
         if (mapPkColumns.size() > 0) {
@@ -1087,6 +1116,8 @@ public class MetaDataFromDb extends MetaDataBase {
             String sColumnName = rs.getString("COLUMN_NAME");
             MetaColumn mc = mt.createMetaColumn(sColumnName);
             getColumnData(rs, mc);
+
+            LOG.debug("Metadata for column '{}.{}.{}' loaded", sTableSchema, sTableName, sColumnName);
         }
         if (mt.getMetaColumns() == 0) throw new SQLException("Table " + mt.getName() + " has no columns!");
         rs.close();
@@ -1154,6 +1185,9 @@ public class MetaDataFromDb extends MetaDataBase {
             QualifiedId qiTable = new QualifiedId(null, sTableSchema, sTableName);
             System.out.println("  Table: " + qiTable.format());
             if ((sRemarks != null) && (sRemarks.length() > 0)) mt.setDescription(sRemarks);
+
+            LOG.debug("Load metadata for table '{}.{}'", sTableSchema, sTableName);
+
             getColumns(mt);
             getPrimaryKey(mt);
             getForeignKeys(mt);
