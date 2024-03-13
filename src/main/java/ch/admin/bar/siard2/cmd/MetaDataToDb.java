@@ -22,6 +22,7 @@ import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.*;
 import ch.admin.bar.siard2.api.generated.*;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /*====================================================================*/
 /** Transfers meta data from databases to SIARD files and back.
@@ -138,11 +139,16 @@ public class MetaDataToDb
             sbSql.append(" NOT");
           sbSql.append(" INSTANTIABLE");
         }
+        val sqlStatement = sbSql.toString();
+        LOG.trace("SQL statement: '{}'", sqlStatement);
+
         /* now execute it */
         Statement stmt = _dmd.getConnection().createStatement();
         stmt.setQueryTimeout(_iQueryTimeoutSeconds);
         stmt.executeUpdate(sbSql.toString());
         stmt.close();
+
+        LOG.debug("Type '{}.{}' successfully created", qiType.getSchema(), qiType.getName());
       }
     }
     _il.exit();
@@ -229,6 +235,8 @@ public class MetaDataToDb
               QualifiedId qiType = new QualifiedId(null,
                 sm.getMappedSchemaName(),tm.getMappedTypeName());
               String sSql = "DROP TYPE "+qiType.format()+" RESTRICT";
+              LOG.trace("SQL statement: '{}'", sSql);
+
               _il.event(sSql);
               Statement stmt = _dmd.getConnection().createStatement();
               stmt.setQueryTimeout(_iQueryTimeoutSeconds);
@@ -236,6 +244,8 @@ public class MetaDataToDb
               {
                 stmt.executeUpdate(sSql);
                 iterType.remove();
+
+                LOG.info("Type '{}.{}' successfully dropped", qiType.getSchema(), qiType.getName());
               }
               catch(SQLException se) {}
               finally { stmt.close(); }
@@ -371,15 +381,18 @@ public class MetaDataToDb
     /* unique and foreign keys are added in the end of upload */
     sbSql.append(")");
     /* now execute it */
-    _il.event(sbSql.toString());
+
+    val sqlStatement = sbSql.toString();
+    LOG.trace("SQL statement: '{}'", sqlStatement);
+    _il.event(sqlStatement);
 
     try {
       Statement stmt = _dmd.getConnection().createStatement();
       stmt.setQueryTimeout(_iQueryTimeoutSeconds);
-      stmt.executeUpdate(sbSql.toString());
+      stmt.executeUpdate(sqlStatement);
       stmt.close();
     } catch (Exception ex) {
-      System.out.println("Failed SQL statement:\n" + sbSql);
+      System.out.println("Failed SQL statement:\n" + sqlStatement);
       throw ex;
     }
 
@@ -414,6 +427,8 @@ public class MetaDataToDb
         tm.putMappedExtendedColumnName(sExtendedColumnName,sMappedColumnName);
     }
     rsColumns.close();
+
+    LOG.debug("Table '{}.{}' successfully created", sm.getMappedSchemaName(), tm.getMappedTableName());
     _il.exit();
   } /* createTable */
   
@@ -487,6 +502,8 @@ public class MetaDataToDb
           _il.event(sSql);
           stmt.executeUpdate(sSql);
           System.out.println("  Dropped: "+qiTable.format());
+
+          LOG.info("Table '{}.{}' successfully dropped", qiTable.getSchema(), qiTable.getName());
         }
       }
       catch(SQLException se) { System.out.println("  Could not drop "+tm.getMappedTableName()+" "+EU.getExceptionMessage(se)); } // could not drop this time but maybe next
@@ -524,6 +541,8 @@ public class MetaDataToDb
     if (!existsSchema(sm.getMappedSchemaName()))
     {
       String sSql = "CREATE SCHEMA \""+sm.getMappedSchemaName()+"\"";
+      LOG.trace("SQL statement: '{}'", sSql);
+
       _il.event(sSql);
       Statement stmt = _dmd.getConnection().createStatement();
       stmt.setQueryTimeout(_iQueryTimeoutSeconds);
@@ -531,6 +550,8 @@ public class MetaDataToDb
       { 
         stmt.executeUpdate(sSql);
         stmt.getConnection().commit();
+
+        LOG.debug("Schema '{}' successfully created", sm.getMappedSchemaName());
       }
       catch(SQLException se) 
       { 

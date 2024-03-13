@@ -36,6 +36,7 @@ import ch.enterag.sqlparser.*;
 import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.generated.*;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /*====================================================================*/
 /** Transfers primary data from SIARD files to databases.
@@ -139,10 +140,19 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
           sbSql.append(SqlLiterals.formatId(sMappedColumnName));
         }
         sbSql.append(")");
+
+        val sqlStatement = sbSql.toString();
+        LOG.trace("SQL statement: '{}'", sqlStatement);
+
         Statement stmt = conn.createStatement();
         stmt.setQueryTimeout(_iQueryTimeoutSeconds);
         stmt.execute(sbSql.toString());
         stmt.close();
+
+        LOG.debug("Candidate key '{}' (table '{}.{}') successfully created",
+                mck.getName(),
+                sm.getMappedSchemaName(),
+                tm.getMappedTableName());
       }
     }
   } /* addCandidateKeys */
@@ -181,10 +191,19 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
         sbSql.append(")");
         sbReferences.append(")");
         sbSql.append(sbReferences.toString());
+
+        val sqlStatement = sbSql.toString();
+        LOG.trace("SQL statement: '{}'", sqlStatement);
+
         Statement stmt = conn.createStatement();
         stmt.setQueryTimeout(_iQueryTimeoutSeconds);
-        stmt.execute(sbSql.toString());
+        stmt.execute(sqlStatement);
         stmt.close();
+
+        LOG.debug("Foreign key '{}' (table '{}.{}') successfully created",
+                mfk.getName(),
+                sm.getMappedSchemaName(),
+                tm.getMappedTableName());
       }
     }
     _il.exit();
@@ -454,6 +473,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     rd.close();
     _conn.commit();
     _il.exit();
+    LOG.debug("Records of table '{}.{}' successfully uploaded", qiTable.getSchema(), qiTable.getName());
   } /* putTable */
   
   /*------------------------------------------------------------------*/
@@ -475,6 +495,8 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     }
     _conn.commit();
     _il.exit();
+
+    LOG.debug("Records of schema '{}' successfully uploaded", ms.getName());
   } /* putSchema */
 
   /*------------------------------------------------------------------*/
