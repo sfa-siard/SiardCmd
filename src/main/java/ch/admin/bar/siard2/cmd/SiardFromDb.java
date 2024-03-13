@@ -22,11 +22,13 @@ import ch.admin.bar.siard2.api.MetaColumn;
 import ch.admin.bar.siard2.api.MetaSchema;
 import ch.admin.bar.siard2.api.MetaTable;
 import ch.admin.bar.siard2.api.primary.ArchiveImpl;
+import ch.admin.bar.siard2.cmd.utils.RuntimeHelper;
 import ch.admin.bar.siard2.cmd.utils.VersionsExplorer;
 import ch.enterag.utils.EU;
 import ch.enterag.utils.ProgramInfo;
 import ch.enterag.utils.cli.Arguments;
-import ch.enterag.utils.logging.IndentLogger;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 
 /**
@@ -34,13 +36,13 @@ import ch.enterag.utils.logging.IndentLogger;
  *
  * @author Hartwig Thomas
  */
+@Slf4j
 public class SiardFromDb {
     public static final int iRETURN_OK = 0;
     public static final int iRETURN_WARNING = 4;
     public static final int iRETURN_ERROR = 8;
     public static final int iRETURN_FATAL = 12;
 
-    private static IndentLogger _il = IndentLogger.getIndentLogger(SiardFromDb.class.getName());
     private static ProgramInfo _pi = ProgramInfo.getProgramInfo("SIARD Suite",
                                                                 VersionsExplorer.INSTANCE.getSiardVersion(),
                                                                 "SiardFromDb",
@@ -73,14 +75,6 @@ public class SiardFromDb {
 
     public int getReturn() {
         return _iReturn;
-    }
-
-    /**
-     * prints and logs the string
-     */
-    private static void logPrint(String s) {
-        _il.info(s);
-        System.out.println(s);
     }
 
     /**
@@ -128,7 +122,6 @@ public class SiardFromDb {
      * reads the parameters from the command line or from the config file.
      */
     private void getParameters(String[] asArgs) {
-        _il.enter();
         _iReturn = iRETURN_OK;
         Arguments args = Arguments.newInstance(asArgs);
         if (args.getOption("h") != null) _iReturn = iRETURN_WARNING;
@@ -231,25 +224,35 @@ public class SiardFromDb {
         }
         /* print and log the parameters */
         if (_iReturn == iRETURN_OK) {
-            logPrint("");
-            logPrint("Parameters");
-            logPrint("  JDBC URL               : " + _sJdbcUrl);
-            logPrint("  Database user          : " + _sDatabaseUser);
-            logPrint("  Database password      : ***");
-            if (_fileSiard != null) logPrint("  SIARD file             : " + _fileSiard.getAbsolutePath());
-            if (_fileExportXml != null) logPrint("  Export meta data XML   : " + _fileExportXml.getAbsolutePath());
+            val sb = new StringBuilder()
+                    .append("\n")
+                    .append("Parameters\n")
+                    .append("  SIARD file             : ").append(_fileSiard.getAbsolutePath()).append("\n")
+                    .append("  JDBC URL               : ").append(_sJdbcUrl).append("\n")
+                    .append("  Database user          : ").append(_sDatabaseUser).append("\n")
+                    .append("  Database password      : ***\n");
+            if (_fileSiard != null)
+                sb.append("  SIARD file             : ").append( _fileSiard.getAbsolutePath()).append("\n");
+            if (_fileExportXml != null)
+                sb.append("  Export meta data XML   : ").append(_fileExportXml.getAbsolutePath()).append("\n");
             if (sLoginTimeoutSeconds != null)
-                logPrint("  Login timeout          : " + String.valueOf(_iLoginTimeoutSeconds) + " seconds");
+                sb.append("  Login timeout          : ").append(_iLoginTimeoutSeconds).append(" seconds\n");
             if (sQueryTimeoutSeconds != null)
-                logPrint("  Query timeout          : " + String.valueOf(_iQueryTimeoutSeconds) + " seconds");
-            if (_fileImportXml != null) logPrint("  Import meta data XML   : " + _fileImportXml.getAbsolutePath());
+                sb.append("  Query timeout          : ").append(_iQueryTimeoutSeconds).append(" seconds\n");
+            if (_fileImportXml != null)
+                sb.append("  Import meta data XML   : ").append(_fileImportXml.getAbsolutePath()).append("\n");
             if (_uriExternalLobFolder != null)
-                logPrint("  External LOB folder    : " + _uriExternalLobFolder.toString());
-            if (_sMimeType != null) logPrint("  External LOB MIME type : " + _sMimeType);
-            if (_bViewsAsTables) logPrint("  Archive views as tables: " + String.valueOf(_bViewsAsTables));
-            logPrint("");
+                sb.append("  External LOB folder    : ").append(_uriExternalLobFolder).append("\n");
+            if (_sMimeType != null)
+                sb.append("  External LOB MIME type : ").append(_sMimeType).append("\n");
+            if (_bViewsAsTables)
+                sb.append("  Archive views as tables: ").append(_bViewsAsTables).append("\n");
+            sb.append("\n");
+
+            val message = sb.toString();
+            LOG.info(message);
+            System.out.println(message);
         } else printUsage();
-        _il.exit();
     } /* getParameters */
 
 
@@ -258,7 +261,6 @@ public class SiardFromDb {
      */
     public SiardFromDb(String asArgs[]) throws SQLException, IOException, ClassNotFoundException {
         super();
-        _il.enter();
         /* parameters */
         getParameters(asArgs);
         if (_iReturn == iRETURN_OK) {
@@ -350,7 +352,6 @@ public class SiardFromDb {
                 _iReturn = iRETURN_WARNING;
             }
         }
-        _il.exit();
     } /* constructor SiardFromDb */
 
 
@@ -364,17 +365,17 @@ public class SiardFromDb {
         try {
             _pi.printStart();
             _pi.logStart();
-            _il.systemProperties();
+            LOG.info(RuntimeHelper.getRuntimeInformation());
             SiardFromDb sfdb = new SiardFromDb(asArgs);
             _pi.logTermination();
             _pi.printTermination();
             iReturn = sfdb.getReturn();
         } catch (Exception e) {
-            _il.exception(e);
+            LOG.error("Exception while downloading SIARD archive", e);
             System.out.println(EU.getExceptionMessage(e));
             iReturn = iRETURN_ERROR;
         } catch (Error e) {
-            _il.error(e);
+            LOG.error("Error while downloading SIARD archive", e);
             System.out.println(EU.getErrorMessage(e));
             iReturn = iRETURN_FATAL;
         }
