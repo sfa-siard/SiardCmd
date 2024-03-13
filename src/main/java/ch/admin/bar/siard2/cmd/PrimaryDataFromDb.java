@@ -22,7 +22,6 @@ import ch.enterag.sqlparser.identifier.QualifiedId;
 import ch.enterag.utils.StopWatch;
 import ch.enterag.utils.background.Progress;
 import ch.enterag.utils.database.SqlTypes;
-import ch.enterag.utils.logging.IndentLogger;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.tika.Tika;
@@ -43,10 +42,6 @@ import java.sql.*;
  */
 @Slf4j
 public class PrimaryDataFromDb extends PrimaryDataTransfer {
-    /**
-     * logger
-     */
-    private static final IndentLogger _il = IndentLogger.getIndentLogger(PrimaryDataFromDb.class.getName());
     private static final long _lREPORT_RECORDS = 1000;
     private Progress _progress = null;
     private long _lRecordsDownloaded = -1;
@@ -287,7 +282,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      */
     private void getTable(Table table)
             throws IOException, SQLException {
-        _il.enter(table.getMetaTable().getName());
         _swGetCell = StopWatch.getInstance();
         _swGetValue = StopWatch.getInstance();
         _swSetValue = StopWatch.getInstance();
@@ -337,8 +331,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         LOG.debug("All data of table '{}.{}' successfully downloaded",
                 qiTable.getSchema(),
                 qiTable.getName());
-
-        _il.exit();
     } /* getTable */
 
     /*------------------------------------------------------------------*/
@@ -354,14 +346,12 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             throws IOException, SQLException {
         val schemaName = schema.getMetaSchema().getName();
 
-        _il.enter(schemaName);
         for (int iTable = 0; (iTable < schema.getTables()) && (!cancelRequested()); iTable++) {
             Table table = schema.getTable(iTable);
             getTable(table);
         }
 
         LOG.debug("All data of schema '{}' successfully downloaded", schemaName);
-        _il.exit();
     } /* getSchema */
 
     /*------------------------------------------------------------------*/
@@ -380,7 +370,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         LOG.info("Start primary data download to archive {}",
                 this._archive.getFile().getAbsoluteFile());
 
-        _il.enter();
         System.out.println("\r\nPrimary Data");
         _progress = progress;
         /* determine total number of records in the database */
@@ -403,7 +392,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             throw new IOException("\r\nDownload of primary data cancelled!");
         System.out.println("\r\nDownload terminated successfully.");
         _conn.rollback();
-        _il.exit();
 
         LOG.info("Primary data download finished");
     } /* download */

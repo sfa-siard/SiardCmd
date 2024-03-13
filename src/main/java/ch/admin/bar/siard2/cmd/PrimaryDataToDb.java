@@ -31,7 +31,6 @@ import ch.admin.bar.siard2.api.Table;
 import ch.admin.bar.siard2.api.Value;
 import ch.enterag.utils.*;
 import ch.enterag.utils.background.*;
-import ch.enterag.utils.logging.*;
 import ch.enterag.sqlparser.*;
 import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.generated.*;
@@ -45,8 +44,6 @@ import lombok.val;
 @Slf4j
 public class PrimaryDataToDb extends PrimaryDataTransfer
 {
-  /** logger */  
-  private static IndentLogger _il = IndentLogger.getIndentLogger(PrimaryDataToDb.class.getName());
   private static final int iBUFFER_SIZE = 8192;
   private static final long lCOMMIT_RECORDS = 1000;
   private Progress _progress = null;
@@ -121,7 +118,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
   public void addCandidateKeys(Connection conn, MetaTable mt)
     throws SQLException
   {
-    _il.enter(mt.getName());
     if (mt.getMetaCandidateKeys() > 0)
     {
       SchemaMapping sm = _am.getSchemaMapping(mt.getParentMetaSchema().getName());
@@ -160,7 +156,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
   public void addForeignKeys(Connection conn, MetaTable mt)
     throws SQLException
   {
-    _il.enter(mt.getName());
     if (mt.getMetaForeignKeys() > 0)
     {
       SchemaMapping sm = _am.getSchemaMapping(mt.getParentMetaSchema().getName());
@@ -206,12 +201,10 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
                 tm.getMappedTableName());
       }
     }
-    _il.exit();
   } /* addForeignKeys */
   
   private void enableConstraints(MetaSchema ms)
   {
-    _il.enter(ms.getName());
     for (int iTable = 0; (iTable < ms.getMetaTables()) && (!cancelRequested()); iTable++)
     {
       MetaTable mt = ms.getMetaTable(iTable);
@@ -220,7 +213,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       try { addForeignKeys(_conn, mt); }
       catch(SQLException se) { System.err.println(EU.getExceptionMessage(se)); }
     }
-    _il.exit();
   }  /* enableConstraints */
   
   /*------------------------------------------------------------------*/
@@ -230,14 +222,12 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
    */
   private void enableConstraints()
   {
-    _il.enter();
     MetaData md = _archive.getMetaData();
     for(int iSchema = 0; iSchema < md.getMetaSchemas(); iSchema++)
     {
       MetaSchema ms = md.getMetaSchema(iSchema);
       enableConstraints(ms);
     }
-    _il.exit();
   } /* enableConstraints */
   
   /*------------------------------------------------------------------*/
@@ -431,7 +421,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
   private void putTable(Table table,SchemaMapping sm)
     throws IOException, SQLException
   {
-    _il.enter(table);
     MetaTable mt = table.getMetaTable();
     QualifiedId qiTable = new QualifiedId(null,
       mt.getParentMetaSchema().getName(),
@@ -472,7 +461,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       stmt.close();
     rd.close();
     _conn.commit();
-    _il.exit();
     LOG.debug("Records of table '{}.{}' successfully uploaded", qiTable.getSchema(), qiTable.getName());
   } /* putTable */
   
@@ -486,7 +474,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     throws IOException, SQLException
   {
     MetaSchema ms = schema.getMetaSchema(); 
-    _il.enter(ms.getName());
     SchemaMapping sm = _am.getSchemaMapping(ms.getName());
     for (int iTable = 0; (iTable < schema.getTables()) && (!cancelRequested()); iTable++)
     {
@@ -494,7 +481,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       putTable(table,sm);
     }
     _conn.commit();
-    _il.exit();
 
     LOG.debug("Records of schema '{}' successfully uploaded", ms.getName());
   } /* putSchema */
@@ -510,7 +496,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     LOG.info("Start primary data upload of archive {}",
             this._archive.getFile().getAbsoluteFile());
 
-    _il.enter();
     System.out.println("\r\nPrimary Data");
     _progress = progress;
     /* determine total number of records in the database */
@@ -538,7 +523,6 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       throw new IOException("\r\nUpload of primary data cancelled!");
     System.out.println("\r\nUpload terminated successfully.");
     _conn.commit();
-    _il.exit();
 
     LOG.info("Primary data upload finished");
   } /* upload */

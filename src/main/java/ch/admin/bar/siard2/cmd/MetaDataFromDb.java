@@ -18,7 +18,6 @@ import java.util.regex.*;
 import ch.enterag.utils.*;
 import ch.enterag.utils.background.*;
 import ch.enterag.utils.jdbc.*;
-import ch.enterag.utils.logging.*;
 import ch.enterag.sqlparser.*;
 import ch.enterag.sqlparser.datatype.*;
 import ch.enterag.sqlparser.identifier.*;
@@ -32,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class MetaDataFromDb extends MetaDataBase {
-    private static IndentLogger _il = IndentLogger.getIndentLogger(MetaDataFromDb.class.getName());
     static final Pattern _patARRAY_CONSTRUCTOR = Pattern.compile("^\\s*(.*?)\\s+ARRAY\\s*\\[\\s*(\\d+)\\s*\\]$");
     private boolean _bMaxLobNeeded = false;
     private MetaColumn _mcMaxLob = null;
@@ -1215,7 +1213,7 @@ public class MetaDataFromDb extends MetaDataBase {
             InetAddress ia = InetAddress.getLocalHost();
             _md.setClientMachine(ia.getCanonicalHostName());
         } catch (UnknownHostException uhe) {
-            _il.exception(uhe);
+            LOG.error("Can not determine host", uhe);
         }
         /* database product (incl. version) */
         _md.setDatabaseProduct(_dmd.getDatabaseProductName() + " " + _dmd.getDatabaseProductVersion());
@@ -1244,7 +1242,6 @@ public class MetaDataFromDb extends MetaDataBase {
                 bViewsAsTables,
                 bMaxLobNeeded);
 
-        _il.enter();
         System.out.println("Meta Data");
         _progress = progress;
         _bViewsAsTables = bViewsAsTables;
@@ -1258,7 +1255,6 @@ public class MetaDataFromDb extends MetaDataBase {
         /* get global meta data (Users, Roles, Privileges) */
         if (!cancelRequested()) getGlobalMetaData();
         if (cancelRequested()) throw new IOException("Meta data download cancelled!");
-        _il.exit();
 
         LOG.info("Meta data download finished");
     }
