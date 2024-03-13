@@ -25,10 +25,12 @@ import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.*;
 import ch.admin.bar.siard2.api.meta.*;
 import ch.admin.bar.siard2.api.generated.*;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Transfers meta data from databases to SIARD files.
  */
+@Slf4j
 public class MetaDataFromDb extends MetaDataBase {
     private static IndentLogger _il = IndentLogger.getIndentLogger(MetaDataFromDb.class.getName());
     static final Pattern _patARRAY_CONSTRUCTOR = Pattern.compile("^\\s*(.*?)\\s+ARRAY\\s*\\[\\s*(\\d+)\\s*\\]$");
@@ -221,9 +223,11 @@ public class MetaDataFromDb extends MetaDataBase {
      * @return true, if cancel was requested.
      */
     private boolean cancelRequested() {
-        boolean bCancelRequested = false;
-        if (_progress != null) bCancelRequested = _progress.cancelRequested();
-        return bCancelRequested;
+        if (_progress != null && _progress.cancelRequested()) {
+            LOG.info("Cancel downloading of meta data because of request");
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -1196,8 +1200,16 @@ public class MetaDataFromDb extends MetaDataBase {
      * @throws IOException  if an I/O error occurred.
      * @throws SQLException if a database error occurred.
      */
-    public void download(boolean bViewsAsTables, boolean bMaxLobNeeded,
-                         Progress progress) throws IOException, SQLException {
+    public void download(
+            boolean bViewsAsTables,
+            boolean bMaxLobNeeded,
+            Progress progress
+    ) throws IOException, SQLException {
+        LOG.info("Start meta data download to archive {} (view-as-tables: {}, max-lob-needed: {})",
+                this._md.getArchive().getFile().getAbsoluteFile(),
+                bViewsAsTables,
+                bMaxLobNeeded);
+
         _il.enter();
         System.out.println("Meta Data");
         _progress = progress;
@@ -1213,5 +1225,7 @@ public class MetaDataFromDb extends MetaDataBase {
         if (!cancelRequested()) getGlobalMetaData();
         if (cancelRequested()) throw new IOException("Meta data download cancelled!");
         _il.exit();
+
+        LOG.info("Meta data download finished");
     }
 }

@@ -23,6 +23,7 @@ import ch.enterag.utils.StopWatch;
 import ch.enterag.utils.background.Progress;
 import ch.enterag.utils.database.SqlTypes;
 import ch.enterag.utils.logging.IndentLogger;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 
 import javax.xml.datatype.Duration;
@@ -39,6 +40,7 @@ import java.sql.*;
  *
  * @author Hartwig Thomas
  */
+@Slf4j
 public class PrimaryDataFromDb extends PrimaryDataTransfer {
     /**
      * logger
@@ -68,19 +70,18 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         }
     } /* incDownloaded */
 
-    /*------------------------------------------------------------------*/
-
     /**
      * check if cancel was requested.
      *
      * @return true, if cancel was requested.
      */
     private boolean cancelRequested() {
-        boolean bCancelRequested = false;
-        if (_progress != null)
-            bCancelRequested = _progress.cancelRequested();
-        return bCancelRequested;
-    } /* cancelRequested */
+        if (_progress != null && _progress.cancelRequested()) {
+            LOG.info("Cancel downloading of primary data because of request");
+            return true;
+        }
+        return false;
+    }
 
     private void setValue(Value value, Object oValue)
             throws IOException, SQLException {
@@ -365,6 +366,10 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      */
     public void download(Progress progress)
             throws IOException, SQLException {
+
+        LOG.info("Start primary data download to archive {}",
+                this._archive.getFile().getAbsoluteFile());
+
         _il.enter();
         System.out.println("\r\nPrimary Data");
         _progress = progress;
@@ -389,6 +394,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         System.out.println("\r\nDownload terminated successfully.");
         _conn.rollback();
         _il.exit();
+
+        LOG.info("Primary data download finished");
     } /* download */
 
     /*------------------------------------------------------------------*/

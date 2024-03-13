@@ -40,6 +40,8 @@ sourceSets {
 }
 
 dependencies {
+    implementation("org.apache.tika:tika-core:2.9.1") // used for getting mime-type from binary data
+    implementation("ch.qos.logback:logback-classic:1.3.14") // latest version which supports java 8
     implementation(fileTree("lib") { include("*.jar") })
 
     testImplementation("junit:junit:4.13.2")

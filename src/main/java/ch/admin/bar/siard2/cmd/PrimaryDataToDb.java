@@ -35,11 +35,13 @@ import ch.enterag.utils.logging.*;
 import ch.enterag.sqlparser.*;
 import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.generated.*;
+import lombok.extern.slf4j.Slf4j;
 
 /*====================================================================*/
 /** Transfers primary data from SIARD files to databases.
  @author Hartwig Thomas
  */
+@Slf4j
 public class PrimaryDataToDb extends PrimaryDataTransfer
 {
   /** logger */  
@@ -65,17 +67,16 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     }
   } /* incUploaded */
 
-  /*------------------------------------------------------------------*/
   /** check if cancel was requested.
    * @return true, if cancel was requested.
    */
-  private boolean cancelRequested()
-  {
-    boolean bCancelRequested = false;
-    if (_progress != null)
-      bCancelRequested = _progress.cancelRequested();
-    return bCancelRequested;
-  } /* cancelRequested */
+  private boolean cancelRequested() {
+    if (_progress != null && _progress.cancelRequested()) {
+      LOG.info("Cancel uploading of primary data because of request");
+      return true;
+    }
+    return false;
+  }
   
   private void copyFromReaderToWriter(Reader rdr, Writer wr)
     throws IOException
@@ -484,6 +485,9 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
   public void upload(Progress progress)
     throws IOException, SQLException
   {
+    LOG.info("Primary data upload of archive {}",
+            this._archive.getFile().getAbsoluteFile());
+
     _il.enter();
     System.out.println("\r\nPrimary Data");
     _progress = progress;
@@ -513,6 +517,8 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
     System.out.println("\r\nUpload terminated successfully.");
     _conn.commit();
     _il.exit();
+
+    LOG.info("Primary data upload finished");
   } /* upload */
   
   /*------------------------------------------------------------------*/

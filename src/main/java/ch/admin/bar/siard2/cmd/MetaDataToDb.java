@@ -21,11 +21,13 @@ import ch.enterag.sqlparser.*;
 import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.*;
 import ch.admin.bar.siard2.api.generated.*;
+import lombok.extern.slf4j.Slf4j;
 
 /*====================================================================*/
 /** Transfers meta data from databases to SIARD files and back.
  @author Hartwig Thomas
  */
+@Slf4j
 public class MetaDataToDb
   extends MetaDataBase
 {
@@ -54,17 +56,16 @@ public class MetaDataToDb
     }
   } /* incTablesCreated */
   
-  /*------------------------------------------------------------------*/
   /** check if cancel was requested.
    * @return true, if cancel was requested.
    */
-  private boolean cancelRequested()
-  {
-    boolean bCancelRequested = false;
-    if (_progress != null)
-      bCancelRequested = _progress.cancelRequested();
-    return bCancelRequested;
-  } /* cancelRequested */
+  private boolean cancelRequested() {
+    if (_progress != null && _progress.cancelRequested()) {
+      LOG.info("Cancel uploading of meta data because of request");
+      return true;
+    }
+    return false;
+  }
 
   /*------------------------------------------------------------------*/
   /** create an attribute definition for a CREATE TYPE statement from
@@ -550,6 +551,9 @@ public class MetaDataToDb
   public void upload(Progress progress)
     throws IOException, SQLException
   {
+    LOG.info("Start meta data upload of archive {}",
+            this._md.getArchive().getFile().getAbsoluteFile());
+
     _il.enter();
     System.out.println("Meta Data");
     _progress = progress;
@@ -613,6 +617,8 @@ public class MetaDataToDb
       throw new IOException("Upload of meta data cancelled!");
     _dmd.getConnection().commit();
     _il.exit();
+
+    LOG.info("Meta data upload finished");
   } /* upload */
   
   /*------------------------------------------------------------------*/
