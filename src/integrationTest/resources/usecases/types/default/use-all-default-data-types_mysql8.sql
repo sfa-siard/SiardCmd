@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS ExampleDataTable
     longtext_column   LONGTEXT,
     enum_column       ENUM ('value1', 'value2', 'value3'),
     set_column        SET ('option1', 'option2', 'option3'),
-    binary_column     BINARY(128),
+    binary_column     BINARY(6),
     varbinary_column  VARBINARY(255),
 
     -- Numerische Datentypen
