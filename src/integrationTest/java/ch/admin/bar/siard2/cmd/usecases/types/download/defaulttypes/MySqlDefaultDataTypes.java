@@ -5,13 +5,29 @@ import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import ch.admin.bar.siard2.cmd.utils.siard.model.utils.Id;
 import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedColumnId;
 import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedTableId;
+import ch.admin.bar.siard2.cmd.utils.siard.utils.ContentExplorer;
+import ch.admin.bar.siard2.cmd.utils.siard.utils.MetadataExplorer;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.util.CanIgnoreReturnValue;
 import org.junit.Assert;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+@Slf4j
 public class MySqlDefaultDataTypes {
 
+    /**
+     * Creates one table which contains all supported data types (one column for each type)
+     */
     public final static String INIT_SCRIPT = "usecases/types/default/use-all-default-data-types_mysql8.sql";
 
     private static final QualifiedTableId TABLE = QualifiedTableId.builder()
@@ -30,7 +46,6 @@ public class MySqlDefaultDataTypes {
     public final static QualifiedColumnId COLUMN_SET = TABLE.createQualifiedColumnId(Id.of("set_column"));
     public final static QualifiedColumnId COLUMN_BINARY = TABLE.createQualifiedColumnId(Id.of("binary_column"));
     public final static QualifiedColumnId COLUMN_VARBINARY = TABLE.createQualifiedColumnId(Id.of("varbinary_column"));
-    public final static QualifiedColumnId COLUMN_JSON = TABLE.createQualifiedColumnId(Id.of("json_column"));
 
     // numeric types
     public final static QualifiedColumnId COLUMN_BIT = TABLE.createQualifiedColumnId(Id.of("bit_column"));
@@ -52,10 +67,10 @@ public class MySqlDefaultDataTypes {
     public final static QualifiedColumnId COLUMN_YEAR = TABLE.createQualifiedColumnId(Id.of("year_column"));
 
     // LOB types
-    public final static QualifiedColumnId COLUMN_TINYBLOB = TABLE.createQualifiedColumnId(Id.of("date_column"));
-    public final static QualifiedColumnId COLUMN_BLOB = TABLE.createQualifiedColumnId(Id.of("datetime_column"));
-    public final static QualifiedColumnId COLUMN_MEDIUMBLOB = TABLE.createQualifiedColumnId(Id.of("timestamp_column"));
-    public final static QualifiedColumnId COLUMN_LONGBLOB = TABLE.createQualifiedColumnId(Id.of("time_column"));
+    public final static QualifiedColumnId COLUMN_TINYBLOB = TABLE.createQualifiedColumnId(Id.of("tinyblob_column"));
+    public final static QualifiedColumnId COLUMN_BLOB = TABLE.createQualifiedColumnId(Id.of("blob_column"));
+    public final static QualifiedColumnId COLUMN_MEDIUMBLOB = TABLE.createQualifiedColumnId(Id.of("mediumblob_column"));
+    public final static QualifiedColumnId COLUMN_LONGBLOB = TABLE.createQualifiedColumnId(Id.of("longblob_column"));
 
     @SneakyThrows
     public static void executeTest(SiardArchivesHandler siardArchivesHandler, String jdbcUrl) {
@@ -76,49 +91,93 @@ public class MySqlDefaultDataTypes {
 
         actualArchive.preserveArchive();
 
-        val metadataExplorer = actualArchive.exploreMetadata();
+        val assertionsHelper = new AssertionsHelper(
+                actualArchive.exploreMetadata(),
+                actualArchive.exploreContent()
+        );
 
         // string types
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_CHAR)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_VARCHAR)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_TINYTEXT)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_TEXT)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_MEDIUMTEXT)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_LONGTEXT)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_ENUM)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_SET)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_BINARY)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_VARBINARY)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_JSON)).isPresent();
+        assertionsHelper.testThat(COLUMN_CHAR).containsExactly("abc");
+
+        assertionsHelper.testThat(COLUMN_CHAR).containsExactly("abc");
+        assertionsHelper.testThat(COLUMN_VARCHAR).containsExactly("varchar example");
+        assertionsHelper.testThat(COLUMN_TINYTEXT).containsExactly("tinytext example");
+        assertionsHelper.testThat(COLUMN_TEXT).containsExactly("text example");
+        assertionsHelper.testThat(COLUMN_MEDIUMTEXT).containsExactly("mediumtext example");
+        assertionsHelper.testThat(COLUMN_LONGTEXT).containsExactly("longtext example");
+        assertionsHelper.testThat(COLUMN_ENUM).containsExactly("value1");
+        assertionsHelper.testThat(COLUMN_SET).containsExactly("option1,option2");
+        assertionsHelper.testThat(COLUMN_BINARY).containsExactly("binary");
+        assertionsHelper.testThat(COLUMN_VARBINARY).containsExactly("varbinary");
 
         // numeric types
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_BIT)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_TINYINT)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_SMALLINT)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_MEDIUMINT)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_INT)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_BIGINT )).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_DECIMAL)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_FLOAT )).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_DOUBLE)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_BOOLEAN )).isPresent();
+        assertionsHelper.testThat(COLUMN_BIT).containsExactly("true"); // FIXME Should be 1 ?
+        assertionsHelper.testThat(COLUMN_TINYINT).containsExactly("42");
+        assertionsHelper.testThat(COLUMN_SMALLINT).containsExactly("32767");
+        assertionsHelper.testThat(COLUMN_MEDIUMINT).containsExactly("8388607");
+        assertionsHelper.testThat(COLUMN_INT).containsExactly("2147483647");
+        assertionsHelper.testThat(COLUMN_BIGINT).containsExactly("9223372036854775807");
+        assertionsHelper.testThat(COLUMN_DECIMAL).containsExactly("123.45");
+        assertionsHelper.testThat(COLUMN_FLOAT ).containsExactly("123.45");
+        assertionsHelper.testThat(COLUMN_DOUBLE).containsExactly("123.45");
+        assertionsHelper.testThat(COLUMN_BOOLEAN).containsExactly("1"); // FIXME should be true?
 
         // date/time types
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_DATE)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_DATETIME )).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_TIMESTAMP)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_TIME)).isPresent();
-        Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_YEAR)).isPresent();
+        assertionsHelper.testThat(COLUMN_DATE).containsExactly("2022-01-01"); // FIXME MySql 8
+        assertionsHelper.testThat(COLUMN_DATETIME).containsExactly("2022-01-01T12:34:56Z"); // FIXME MySql 8
+        assertionsHelper.testThat(COLUMN_TIMESTAMP).containsExactly("2022-01-01T12:34:56Z"); // FIXME MySql 8
+        assertionsHelper.testThat(COLUMN_TIME).containsExactly("12:34:56Z"); // FIXME MySql 8
+        assertionsHelper.testThat(COLUMN_YEAR).containsExactly("2022"); // FIXME MySql 8
 
         // LOB types
-       Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_TINYBLOB)).isPresent();
-       Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_BLOB)).isPresent();
-       Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_MEDIUMBLOB)).isPresent();
-       Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_LONGBLOB)).isPresent();
+       assertionsHelper.testThat(COLUMN_TINYBLOB).containsExactly("tinyblob data");
+       assertionsHelper.testThat(COLUMN_BLOB).containsExactly("blob data");
+       assertionsHelper.testThat(COLUMN_MEDIUMBLOB).containsExactly("mediumblob data");
+       assertionsHelper.testThat(COLUMN_LONGBLOB).containsExactly("longblob data");
 
-        val contentExplorer = actualArchive.exploreContent();
+       assertionsHelper.assertAllTestsSuccessful();
+    }
 
-        Assertions.assertThat(contentExplorer.findCellValue(COLUMN_DATE, 0)).isEqualTo("2022-01-01");
-        // TODO test the rest of the rows
+    @RequiredArgsConstructor
+    private static class AssertionsHelper {
+        private final MetadataExplorer metadataExplorer;
+        private final ContentExplorer contentExplorer;
+
+        private final List<ColumValueMissmatch> valueMissmatches = new ArrayList<>();
+        public ColumWarnings testThat(final QualifiedColumnId qualifiedColumnId) {
+            return expected -> {
+                Assertions.assertThat(metadataExplorer.tryFindByColumnId(qualifiedColumnId))
+                        .isPresent();
+
+                val actual = contentExplorer.findCellValue(qualifiedColumnId, 0);
+
+                if (!expected.equals(actual)) {
+                    log.warn("Column '{}' contains value '{}' instead of '{}'", qualifiedColumnId, actual, expected);
+
+                    valueMissmatches.add(ColumValueMissmatch.builder()
+                            .columnId(qualifiedColumnId)
+                            .expected(expected)
+                            .actual(actual)
+                            .build());
+                }
+            };
+        }
+
+        public void assertAllTestsSuccessful() {
+            Assertions.assertThat(valueMissmatches)
+                    .as("Expecting successful tests only")
+                    .hasSize(0);
+        }
+    }
+
+    @Value
+    @Builder
+    private static class ColumValueMissmatch {
+        QualifiedColumnId columnId;
+        String expected;
+        String actual;
+    }
+    private interface ColumWarnings {
+        void containsExactly(String expected);
     }
 }

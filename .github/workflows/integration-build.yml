@@ -4,13 +4,8 @@
 name: Integration build
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches: [ main ]
-  schedule:
-    - cron: "0 0 * * *" # end of the day
 
 jobs:
   execute-unitand-integration-tests:

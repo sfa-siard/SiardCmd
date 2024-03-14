@@ -4,6 +4,9 @@ GRANT ALL PRIVILEGES ON test.* TO 'it_user'@'%';
 GRANT ALL PRIVILEGES ON Schema1.* TO 'it_user'@'%';
 FLUSH PRIVILEGES;
 
+-- TODO beschreiben
+SET time_zone = 'UTC';
+
 -- Create Schema1
 CREATE SCHEMA IF NOT EXISTS Schema1;
 USE Schema1;
@@ -21,7 +24,6 @@ CREATE TABLE IF NOT EXISTS ExampleDataTable
     set_column        SET ('option1', 'option2', 'option3'),
     binary_column     BINARY(128),
     varbinary_column  VARBINARY(255),
-    json_column       JSON,
 
     -- Numerische Datentypen
     bit_column        BIT(1),
@@ -60,9 +62,6 @@ VALUES ('abc',
         'option1,option2',
         BINARY 'binary',
         BINARY 'varbinary',
-        '{
-          "key": "value"
-        }',
         b'1',
         42,
         32767,

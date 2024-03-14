@@ -14,7 +14,7 @@ public class MySqlSpatialDataTypes {
 
     /**
      * +---------------------------------------------+
-     * | SpatialDataTable                          |
+     * | SpatialDataTable                            |
      * +-------------------------------------------- +
      * | id INT (PK)                                 |
      * | point_column POINT                          |
