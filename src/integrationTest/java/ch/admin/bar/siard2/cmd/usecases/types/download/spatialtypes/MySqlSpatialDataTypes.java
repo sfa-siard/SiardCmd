@@ -74,5 +74,7 @@ public class MySqlSpatialDataTypes {
         Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_MULTIPOLYGON)).isPresent();
         Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_GEOMETRY)).isPresent();
         Assertions.assertThat(metadataExplorer.tryFindByColumnId(COLUMN_GEOMETRYCOLLECTION)).isPresent();
+
+        // TODO: Test content
     }
 }
