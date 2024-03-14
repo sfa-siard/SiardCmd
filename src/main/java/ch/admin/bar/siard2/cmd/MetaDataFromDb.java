@@ -18,19 +18,19 @@ import java.util.regex.*;
 import ch.enterag.utils.*;
 import ch.enterag.utils.background.*;
 import ch.enterag.utils.jdbc.*;
-import ch.enterag.utils.logging.*;
 import ch.enterag.sqlparser.*;
 import ch.enterag.sqlparser.datatype.*;
 import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.*;
 import ch.admin.bar.siard2.api.meta.*;
 import ch.admin.bar.siard2.api.generated.*;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Transfers meta data from databases to SIARD files.
  */
+@Slf4j
 public class MetaDataFromDb extends MetaDataBase {
-    private static IndentLogger _il = IndentLogger.getIndentLogger(MetaDataFromDb.class.getName());
     static final Pattern _patARRAY_CONSTRUCTOR = Pattern.compile("^\\s*(.*?)\\s+ARRAY\\s*\\[\\s*(\\d+)\\s*\\]$");
     private boolean _bMaxLobNeeded = false;
     private MetaColumn _mcMaxLob = null;
@@ -221,9 +221,11 @@ public class MetaDataFromDb extends MetaDataBase {
      * @return true, if cancel was requested.
      */
     private boolean cancelRequested() {
-        boolean bCancelRequested = false;
-        if (_progress != null) bCancelRequested = _progress.cancelRequested();
-        return bCancelRequested;
+        if (_progress != null && _progress.cancelRequested()) {
+            LOG.info("Cancel downloading of meta data because of request");
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -936,6 +938,11 @@ public class MetaDataFromDb extends MetaDataBase {
                 }
             }
         } else throw new IOException("Size of table " + mt.getName() + " could not be determined!");
+
+        LOG.debug("Size of table '{}.{}' successfully determined",
+                qiTable.getSchema(),
+                qiTable.getName());
+
         rsSizes.close();
         stmtSizes.close();
     }
@@ -976,6 +983,11 @@ public class MetaDataFromDb extends MetaDataBase {
                 String sColumnName = rs.getString("COLUMN_NAME");
                 mapUniqueColumns.put(Integer.valueOf(iOrdinalPosition), sColumnName);
             }
+
+            LOG.debug("Metadata for unique key '{}' (table '{}.{}') loaded",
+                    sUniqueKeyName,
+                    sTableSchema,
+                    sTableName);
         }
         rs.close();
         addColumns(mt, sUniqueKeyName, mapUniqueColumns);
@@ -1023,6 +1035,11 @@ public class MetaDataFromDb extends MetaDataBase {
             mfk.setReferencedTable(sPkTableName);
             mfk.setDeleteAction(getReferentialAction(iDeleteRule));
             mfk.setUpdateAction(getReferentialAction(iUpdateRule));
+
+            LOG.debug("Metadata for foreign key '{}' (table '{}.{}') loaded",
+                    sForeignKeyName,
+                    sPkTableSchema,
+                    sPkTableName);
         }
         rs.close();
         /* add references to last foreign key */
@@ -1050,7 +1067,21 @@ public class MetaDataFromDb extends MetaDataBase {
             int iKeySeq = rs.getInt("KEY_SEQ");
             mapPkColumns.put(Integer.valueOf(iKeySeq), sColumnName);
             String s = rs.getString("PK_NAME");
-            if (s != null) sPkName = s;
+            if (s != null) {
+                sPkName = s;
+            } else {
+                LOG.info("No name for primary key of column '{}.{}.{}' available. Used '{}' instead.",
+                        sTableSchema,
+                        sTableName,
+                        sColumnName,
+                        sPkName);
+            }
+
+            LOG.debug("Metadata for primary key '{}' (column '{}.{}.{}') loaded",
+                    sPkName,
+                    sTableSchema,
+                    sTableName,
+                    sColumnName);
         }
         rs.close();
         if (mapPkColumns.size() > 0) {
@@ -1083,6 +1114,8 @@ public class MetaDataFromDb extends MetaDataBase {
             String sColumnName = rs.getString("COLUMN_NAME");
             MetaColumn mc = mt.createMetaColumn(sColumnName);
             getColumnData(rs, mc);
+
+            LOG.debug("Metadata for column '{}.{}.{}' loaded", sTableSchema, sTableName, sColumnName);
         }
         if (mt.getMetaColumns() == 0) throw new SQLException("Table " + mt.getName() + " has no columns!");
         rs.close();
@@ -1150,6 +1183,9 @@ public class MetaDataFromDb extends MetaDataBase {
             QualifiedId qiTable = new QualifiedId(null, sTableSchema, sTableName);
             System.out.println("  Table: " + qiTable.format());
             if ((sRemarks != null) && (sRemarks.length() > 0)) mt.setDescription(sRemarks);
+
+            LOG.debug("Load metadata for table '{}.{}'", sTableSchema, sTableName);
+
             getColumns(mt);
             getPrimaryKey(mt);
             getForeignKeys(mt);
@@ -1177,7 +1213,7 @@ public class MetaDataFromDb extends MetaDataBase {
             InetAddress ia = InetAddress.getLocalHost();
             _md.setClientMachine(ia.getCanonicalHostName());
         } catch (UnknownHostException uhe) {
-            _il.exception(uhe);
+            LOG.error("Can not determine host", uhe);
         }
         /* database product (incl. version) */
         _md.setDatabaseProduct(_dmd.getDatabaseProductName() + " " + _dmd.getDatabaseProductVersion());
@@ -1196,9 +1232,16 @@ public class MetaDataFromDb extends MetaDataBase {
      * @throws IOException  if an I/O error occurred.
      * @throws SQLException if a database error occurred.
      */
-    public void download(boolean bViewsAsTables, boolean bMaxLobNeeded,
-                         Progress progress) throws IOException, SQLException {
-        _il.enter();
+    public void download(
+            boolean bViewsAsTables,
+            boolean bMaxLobNeeded,
+            Progress progress
+    ) throws IOException, SQLException {
+        LOG.info("Start meta data download to archive {} (view-as-tables: {}, max-lob-needed: {})",
+                this._md.getArchive().getFile().getAbsoluteFile(),
+                bViewsAsTables,
+                bMaxLobNeeded);
+
         System.out.println("Meta Data");
         _progress = progress;
         _bViewsAsTables = bViewsAsTables;
@@ -1212,6 +1255,7 @@ public class MetaDataFromDb extends MetaDataBase {
         /* get global meta data (Users, Roles, Privileges) */
         if (!cancelRequested()) getGlobalMetaData();
         if (cancelRequested()) throw new IOException("Meta data download cancelled!");
-        _il.exit();
+
+        LOG.info("Meta data download finished");
     }
 }

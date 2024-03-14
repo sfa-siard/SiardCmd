@@ -22,7 +22,8 @@ import ch.enterag.sqlparser.identifier.QualifiedId;
 import ch.enterag.utils.StopWatch;
 import ch.enterag.utils.background.Progress;
 import ch.enterag.utils.database.SqlTypes;
-import ch.enterag.utils.logging.IndentLogger;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.tika.Tika;
 
 import javax.xml.datatype.Duration;
@@ -39,11 +40,8 @@ import java.sql.*;
  *
  * @author Hartwig Thomas
  */
+@Slf4j
 public class PrimaryDataFromDb extends PrimaryDataTransfer {
-    /**
-     * logger
-     */
-    private static final IndentLogger _il = IndentLogger.getIndentLogger(PrimaryDataFromDb.class.getName());
     private static final long _lREPORT_RECORDS = 1000;
     private Progress _progress = null;
     private long _lRecordsDownloaded = -1;
@@ -68,19 +66,18 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         }
     } /* incDownloaded */
 
-    /*------------------------------------------------------------------*/
-
     /**
      * check if cancel was requested.
      *
      * @return true, if cancel was requested.
      */
     private boolean cancelRequested() {
-        boolean bCancelRequested = false;
-        if (_progress != null)
-            bCancelRequested = _progress.cancelRequested();
-        return bCancelRequested;
-    } /* cancelRequested */
+        if (_progress != null && _progress.cancelRequested()) {
+            LOG.info("Cancel downloading of primary data because of request");
+            return true;
+        }
+        return false;
+    }
 
     private void setValue(Value value, Object oValue)
             throws IOException, SQLException {
@@ -285,7 +282,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      */
     private void getTable(Table table)
             throws IOException, SQLException {
-        _il.enter(table.getMetaTable().getName());
         _swGetCell = StopWatch.getInstance();
         _swGetValue = StopWatch.getInstance();
         _swSetValue = StopWatch.getInstance();
@@ -331,7 +327,10 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         if (!stmt.isClosed())
             stmt.close();
         rr.close();
-        _il.exit();
+
+        LOG.debug("All data of table '{}.{}' successfully downloaded",
+                qiTable.getSchema(),
+                qiTable.getName());
     } /* getTable */
 
     /*------------------------------------------------------------------*/
@@ -345,12 +344,14 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      */
     private void getSchema(Schema schema)
             throws IOException, SQLException {
-        _il.enter(schema.getMetaSchema().getName());
+        val schemaName = schema.getMetaSchema().getName();
+
         for (int iTable = 0; (iTable < schema.getTables()) && (!cancelRequested()); iTable++) {
             Table table = schema.getTable(iTable);
             getTable(table);
         }
-        _il.exit();
+
+        LOG.debug("All data of schema '{}' successfully downloaded", schemaName);
     } /* getSchema */
 
     /*------------------------------------------------------------------*/
@@ -365,7 +366,10 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      */
     public void download(Progress progress)
             throws IOException, SQLException {
-        _il.enter();
+
+        LOG.info("Start primary data download to archive {}",
+                this._archive.getFile().getAbsoluteFile());
+
         System.out.println("\r\nPrimary Data");
         _progress = progress;
         /* determine total number of records in the database */
@@ -388,7 +392,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             throw new IOException("\r\nDownload of primary data cancelled!");
         System.out.println("\r\nDownload terminated successfully.");
         _conn.rollback();
-        _il.exit();
+
+        LOG.info("Primary data download finished");
     } /* download */
 
     /*------------------------------------------------------------------*/

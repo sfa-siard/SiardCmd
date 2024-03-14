@@ -24,17 +24,19 @@ import ch.admin.bar.siard2.api.Archive;
 import ch.admin.bar.siard2.api.MetaData;
 import ch.admin.bar.siard2.api.MetaSchema;
 import ch.admin.bar.siard2.api.primary.ArchiveImpl;
+import ch.admin.bar.siard2.cmd.utils.RuntimeHelper;
 import ch.admin.bar.siard2.cmd.utils.VersionsExplorer;
 import ch.enterag.utils.EU;
 import ch.enterag.utils.ProgramInfo;
 import ch.enterag.utils.cli.Arguments;
-import ch.enterag.utils.logging.IndentLogger;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 /*====================================================================*/
 /** Loads the data from a siard file to a database instance.
  @author Hartwig Thomas
  */
+@Slf4j
 public class SiardToDb
 {
   /*====================================================================
@@ -48,8 +50,6 @@ public class SiardToDb
   /*====================================================================
   (private) data members
   ====================================================================*/
-  /** logger */  
-  private static IndentLogger _il = IndentLogger.getIndentLogger(SiardFromDb.class.getName());
   /** info */
   private static ProgramInfo _pi = ProgramInfo.getProgramInfo(
   		"SIARD Suite", VersionsExplorer.INSTANCE.getSiardVersion(),
@@ -88,15 +88,6 @@ public class SiardToDb
   /*====================================================================
   methods
   ====================================================================*/
-	/*------------------------------------------------------------------*/
-	/** prints and logs the string */
-	private static void logPrint(String s)
-	{
-		_il.info(s);
-		System.out.println(s);
-	} /* logPrint */
-	
-	/*------------------------------------------------------------------*/
   /** prints usage information */
   private void printUsage()
   {
@@ -134,7 +125,6 @@ public class SiardToDb
 	*/
 	private void getParameters(String[] asArgs)
   {
-	  _il.enter();
     _iReturn = iRETURN_OK;
     Arguments args = Arguments.newInstance(asArgs);
     if (args.getOption("h") != null)
@@ -215,32 +205,36 @@ public class SiardToDb
   	/* print and log the parameters */
     if (_iReturn == iRETURN_OK)
     {
-      logPrint("");
-      logPrint("Parameters");
-      logPrint("  SIARD file             : "+_fileSiard.getAbsolutePath());
-      logPrint("  JDBC URL               : "+_sJdbcUrl);
-      logPrint("  Database user          : "+_sDatabaseUser);
-      logPrint("  Database password      : ***");
+      val sb = new StringBuilder()
+              .append("\n")
+      .append("Parameters\n")
+      .append("  SIARD file             : ").append(_fileSiard.getAbsolutePath()).append("\n")
+      .append("  JDBC URL               : ").append(_sJdbcUrl).append("\n")
+      .append("  Database user          : ").append(_sDatabaseUser).append("\n")
+      .append("  Database password      : ***\n");
       if (sLoginTimeoutSeconds != null)
-        logPrint("  Login timeout          : "+String.valueOf(_iLoginTimeoutSeconds)+" seconds");
+        sb.append("  Login timeout          : ").append(_iLoginTimeoutSeconds).append(" seconds\n");
       if (sQueryTimeoutSeconds != null)
-        logPrint("  Query timeout          : "+String.valueOf(_iQueryTimeoutSeconds)+" seconds");
+        sb.append("  Query timeout          : ").append(_iQueryTimeoutSeconds).append(" seconds\n");
       if (_bOverwrite)
-        logPrint("  Overwrite              : Database objects may be overwritten on upload");
+        sb.append("  Overwrite              : Database objects may be overwritten on upload\n");
       if (_mapSchemas.size() > 0)
       {
         for (Iterator<String> iterSchema = _mapSchemas.keySet().iterator(); iterSchema.hasNext(); )
         {
           String sSchema = iterSchema.next();
           String sMappedSchema = _mapSchemas.get(sSchema);
-          logPrint("  Mapped Schema          : \""+sSchema+"\" => \""+sMappedSchema+"\"");
+          sb.append("  Mapped Schema          : \"").append(sSchema).append("\" => \"").append(sMappedSchema).append("\"");
         }
       }
-      logPrint("");
+      sb.append("\n");
+
+      val message = sb.toString();
+      LOG.info(message);
+      System.out.println(message);
     }
     else
       printUsage();
-	  _il.exit();
   } /* getParameters */
 
   /*====================================================================
@@ -252,7 +246,6 @@ public class SiardToDb
 	  throws IOException, SQLException
   {
 	  super();
-	  _il.enter();
 	  /* parameters */
     getParameters(asArgs);
     if (_iReturn == iRETURN_OK)
@@ -286,8 +279,12 @@ public class SiardToDb
                 MetaSchema ms = md.getMetaSchema(iSchema);
                 iTypesInSiard = iTypesInSiard + ms.getMetaTypes();
               }
-              if (iTypesInSiard > 0)
-                logPrint("Target database does not support UDTs. UDTs will be \"flattened\".\r\n");
+              if (iTypesInSiard > 0) {
+                val message = "Target database does not support UDTs. UDTs will be \"flattened\".";
+
+                LOG.info(message);
+                System.out.println(message);
+              }
             }
             mdtd.upload(null);
             /* upload primary data from DB */
@@ -312,7 +309,6 @@ public class SiardToDb
         System.err.println("Connection to "+_sJdbcUrl+" not supported ("+sError+")!");
       _archive.close();
     }
-	  _il.exit();
   } /* constructor SiardToDb */
 
   /*====================================================================
@@ -329,7 +325,7 @@ public class SiardToDb
 		{
 			_pi.printStart();
 	    _pi.logStart();
-	    _il.systemProperties();
+        LOG.info(RuntimeHelper.getRuntimeInformation());
 	    /* run application */
 	    SiardToDb stdb = new SiardToDb(asArgs);
 	    /* log termination info */
@@ -340,13 +336,13 @@ public class SiardToDb
 		}
     catch (Exception e)
     {
-      _il.exception(e);
+      LOG.error("Exception while uploading SIARD archive", e);
       System.err.println(EU.getExceptionMessage(e));
       iReturn = iRETURN_ERROR;
     }
     catch (Error e)
     {
-      _il.error(e);
+      LOG.error("Error while uploading SIARD archive", e);
       System.err.println(EU.getErrorMessage(e));
       iReturn = iRETURN_FATAL;
     }
