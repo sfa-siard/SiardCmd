@@ -193,7 +193,7 @@ public class SiardConnection extends Properties
               jdbcUrl));
     }
 
-    log.info("'{}' as driver loaded for url '{}'", driver.getClass().getCanonicalName(), jdbcUrl);
+    LOG.info("'{}' as driver loaded for url '{}'", driver.getClass().getCanonicalName(), jdbcUrl);
 
     return driver;
   }
@@ -217,7 +217,7 @@ public class SiardConnection extends Properties
     val driver = loadValidDriver(jdbcUrl);
     val connection = driver.connect(jdbcUrl, info);
 
-    log.info("Created connection of type '{}'for url '{}'", connection.getClass().getCanonicalName(), jdbcUrl);
+    LOG.info("Created connection of type '{}'for url '{}'", connection.getClass().getCanonicalName(), jdbcUrl);
 
     return connection;
   }
@@ -238,7 +238,7 @@ public class SiardConnection extends Properties
                     .append(driver.acceptsURL(jdbcUrl));
         }
 
-        log.info(sb.toString());
+        LOG.info(sb.toString());
     }
 
   /*--------------------------------------------------------------------*/
