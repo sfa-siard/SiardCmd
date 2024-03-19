@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.rules.ExternalResource;
@@ -114,6 +115,7 @@ public class SiardArchivesHandler extends ExternalResource {
      * Please use the {@link SiardArchivesHandler#prepareResource(String)} or the
      * {@link SiardArchivesHandler#prepareEmpty()} method to create a new {@link SiardArchiveExplorer} instance.
      */
+    @Slf4j
     @Builder
     @RequiredArgsConstructor
     public static class SiardArchiveExplorer {
@@ -186,6 +188,8 @@ public class SiardArchivesHandler extends ExternalResource {
             Files.copy(
                     pathToArchiveFile.toPath(),
                     outputFile.toPath());
+
+            log.info("Archive {} preserved at {}", filename, outputFile.getAbsolutePath());
 
             return this;
         }

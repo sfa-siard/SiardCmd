@@ -10,4 +10,12 @@ import lombok.Value;
 public class QualifiedTableId {
     @NonNull Id<Metadata.Schema> schemaId;
     @NonNull Id<Metadata.Table> tableId;
+
+    public QualifiedColumnId createQualifiedColumnId(final Id<Metadata.Column> columnId) {
+        return QualifiedColumnId.builder()
+                .schemaId(schemaId)
+                .tableId(tableId)
+                .columnId(columnId)
+                .build();
+    }
 }

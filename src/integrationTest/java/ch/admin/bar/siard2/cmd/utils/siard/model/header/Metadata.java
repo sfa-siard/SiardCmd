@@ -6,6 +6,8 @@ import ch.admin.bar.siard2.cmd.utils.siard.model.utils.StringWrapper;
 import ch.admin.bar.siard2.cmd.utils.siard.update.Updatable;
 import ch.admin.bar.siard2.cmd.utils.siard.update.Updater;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Builder;
 import lombok.NonNull;
@@ -13,7 +15,9 @@ import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 import lombok.val;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -79,7 +83,7 @@ public class Metadata implements Updatable<Metadata> {
         Id<Table> name;
 
         @Builder.Default
-        Set<Column> columns = new HashSet<>();
+        List<Column> columns = new ArrayList<>();
 
         @NonNull
         @Builder.Default
@@ -102,7 +106,7 @@ public class Metadata implements Updatable<Metadata> {
                     updatedThis.name.applyUpdates(updater),
                     updatedThis.columns.stream()
                             .map(column -> column.applyUpdates(updater))
-                            .collect(Collectors.toSet()),
+                            .collect(Collectors.toList()),
                     updatedThis.primaryKey.map(primaryKey -> primaryKey.applyUpdates(updater)),
                     updatedThis.foreignKeys.stream()
                             .map(foreignKey -> foreignKey.applyUpdates(updater))
@@ -148,8 +152,13 @@ public class Metadata implements Updatable<Metadata> {
     @Builder(toBuilder = true)
     @Jacksonized
     public static class PrimaryKey implements Updatable<PrimaryKey> {
-        StringWrapper name;
-        Id<Column> column;
+        Id<PrimaryKey> name;
+
+        @NonNull
+        @Builder.Default
+        @JacksonXmlProperty(localName = "column")
+        @JacksonXmlElementWrapper(useWrapping = false)
+        Set<Id<Column>> columns = new HashSet<>();
 
         @Override
         public PrimaryKey applyUpdates(Updater updater) {
@@ -157,7 +166,9 @@ public class Metadata implements Updatable<Metadata> {
 
             return new PrimaryKey(
                     updatedThis.name.applyUpdates(updater),
-                    updatedThis.column.applyUpdates(updater));
+                    updatedThis.columns.stream()
+                            .map(columnId -> columnId.applyUpdates(updater))
+                            .collect(Collectors.toSet()));
         }
     }
 
@@ -168,7 +179,14 @@ public class Metadata implements Updatable<Metadata> {
         Id<ForeignKey> name;
         Id<Schema> referencedSchema;
         Id<Table> referencedTable;
-        Reference reference; // TODO Probably a embedded set?
+
+        @NonNull
+        @Builder.Default
+        @JacksonXmlProperty(localName = "reference")
+        @JacksonXmlElementWrapper(useWrapping = false)
+        Set<Reference> references = new HashSet<>();
+
+
         @Builder.Default
         Optional<StringWrapper> deleteAction = Optional.empty();
         @Builder.Default
@@ -182,7 +200,9 @@ public class Metadata implements Updatable<Metadata> {
                     updatedThis.name.applyUpdates(updater),
                     updatedThis.referencedSchema.applyUpdates(updater),
                     updatedThis.referencedTable.applyUpdates(updater),
-                    updatedThis.reference.applyUpdates(updater),
+                    updatedThis.references.stream()
+                            .map(reference -> reference.applyUpdates(updater))
+                            .collect(Collectors.toSet()),
                     updatedThis.deleteAction.map(s -> s.applyUpdates(updater)),
                     updatedThis.updateAction.map(s -> s.applyUpdates(updater)));
         }

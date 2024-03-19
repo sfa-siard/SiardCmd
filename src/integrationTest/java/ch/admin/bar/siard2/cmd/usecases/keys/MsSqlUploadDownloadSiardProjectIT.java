@@ -1,5 +1,7 @@
-package ch.admin.bar.siard2.cmd;
+package ch.admin.bar.siard2.cmd.usecases.keys;
 
+import ch.admin.bar.siard2.cmd.SiardFromDb;
+import ch.admin.bar.siard2.cmd.SiardToDb;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import ch.admin.bar.siard2.cmd.utils.siard.assertions.SiardArchiveAssertions;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
@@ -7,42 +9,46 @@ import lombok.val;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.MSSQLServerContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class MySql5UploadDownloadSiardProjectIT {
+public class MsSqlUploadDownloadSiardProjectIT {
+
+    /**
+     * Output of {@link MsSqlDownloadSiardProjectIT}
+     */
+    public final static String SIMPLE_TEAMS_EXAMPLE = "usecases/keys/simple-teams-example_mssql.siard";
+
 
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public MySQLContainer<?> db = new MySQLContainer<>(DockerImageName.parse("mysql:5.6.51"))
-            .withUsername("root")
-            .withPassword("test")
-            .withCommand("--max-allowed-packet=1G --innodb_log_file_size=256M");
+    public MSSQLServerContainer<?> db = new MSSQLServerContainer<>(DockerImageName.parse("mcr.microsoft.com/mssql/server:2017-CU12"))
+            .acceptLicense();
 
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
         // given
-        val expectedArchive = siardArchivesHandler.prepareResource(SiardProjectExamples.SIMPLE_TEAMS_EXAMPLE_MYSQL5_2_2);
+        val expectedArchive = siardArchivesHandler.prepareResource(SIMPLE_TEAMS_EXAMPLE);
         val actualArchive = siardArchivesHandler.prepareEmpty();
 
         // when
         SiardToDb siardToDb = new SiardToDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
-                "-u:" + "root",
-                "-p:" + "test",
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
                 "-s:" + expectedArchive.getPathToArchiveFile()
         });
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
-                "-u:" + "root",
-                "-p:" + "test",
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
                 "-s:" + actualArchive.getPathToArchiveFile()
         });
 
@@ -52,7 +58,11 @@ public class MySql5UploadDownloadSiardProjectIT {
 
         SiardArchiveAssertions.builder()
                 .expectedArchive(expectedArchive)
-                .actualArchive(actualArchive);
-        //.assertEqual(); FIXME fails trough unzip archive ("Unexpected end of input stream" while inflating)
+                .actualArchive(actualArchive)
+                .assertionModifier(SiardArchiveAssertions.IGNORE_DBNAME) // FIXME ?
+                .assertionModifier(SiardArchiveAssertions.IGNORE_PRIMARY_KEY_NAME) // DB restriction ?
+                .assertionModifier(SiardArchiveAssertions.IGNORE_FOREIGN_KEY_DELETE_ACTION) // FIXME
+                .assertionModifier(SiardArchiveAssertions.IGNORE_FOREIGN_KEY_UPDATE_ACTION) // FIXME
+                .assertEqual();
     }
 }
