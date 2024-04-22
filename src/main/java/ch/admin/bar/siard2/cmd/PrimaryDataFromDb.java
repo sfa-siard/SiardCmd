@@ -32,6 +32,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
 import java.sql.*;
+import java.sql.Date;
+import java.util.*;
 
 /*====================================================================*/
 
@@ -79,15 +81,21 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         return false;
     }
 
-    private void setValue(Value value, Object oValue)
+    private void setValue(Value value, Object oValue, Map<String, Set<String>> mimeTypes)
             throws IOException, SQLException {
         if (oValue != null) {
             if (oValue instanceof String)
                 value.setString((String) oValue);
             else if (oValue instanceof byte[]) {
                 byte[] bytes = (byte[]) oValue;
+                String name = ((Cell) value).getMetaColumn().getName();
                 String mimeType = tika.detect(bytes);
-                value.getMetaValue().setMimeType(mimeType);
+                if(!mimeTypes.containsKey(name)) {
+                    mimeTypes.put(name, new HashSet<>(Arrays.asList(mimeType)));
+                } else {
+                    mimeTypes.get(name).add(mimeType);
+                }
+                setMimeType(mimeTypes, (Cell) value);
                 value.setBytes(bytes);
             } else if (oValue instanceof Boolean)
                 value.setBoolean((Boolean) oValue);
@@ -115,8 +123,14 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 value.setDuration((Duration) oValue);
             else if (oValue instanceof Clob) {
                 Clob clob = (Clob) oValue;
+                String name = ((Cell) value).getMetaColumn().getName();
                 String mimeType = tika.detect(clob.getAsciiStream());
-                value.getMetaValue().setMimeType(mimeType);
+                if(!mimeTypes.containsKey(name)) {
+                    mimeTypes.put(name, new HashSet<>(Arrays.asList(mimeType)));
+                } else {
+                    mimeTypes.get(name).add(mimeType);
+                }
+                setMimeType(mimeTypes, (Cell) value);
                 value.setReader(clob.getCharacterStream());
                 clob.free();
             } else if (oValue instanceof SQLXML) {
@@ -125,8 +139,14 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 sqlxml.free();
             } else if (oValue instanceof Blob) {
                 Blob blob = (Blob) oValue;
+                String name = ((Cell) value).getMetaColumn().getName();
                 String mimeType = tika.detect(blob.getBinaryStream());
-                value.getMetaValue().setMimeType(mimeType);
+                if(!mimeTypes.containsKey(name)) {
+                    mimeTypes.put(name, new HashSet<>(Arrays.asList(mimeType)));
+                } else {
+                    mimeTypes.get(name).add(mimeType);
+                }
+                setMimeType(mimeTypes, (Cell) value);
                 value.setInputStream(blob.getBinaryStream());
                 blob.free();
             } else if (oValue instanceof URL) {
@@ -137,7 +157,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 Object[] ao = (Object[]) array.getArray();
                 for (int iElement = 0; iElement < ao.length; iElement++) {
                     Value valueElement = value.getElement(iElement);
-                    setValue(valueElement, ao[iElement]);
+                    setValue(valueElement, ao[iElement], mimeTypes);
                 }
                 array.free();
             } else if (oValue instanceof Struct) {
@@ -145,7 +165,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 Object[] ao = struct.getAttributes();
                 for (int iAttribute = 0; iAttribute < ao.length; iAttribute++) {
                     Value valueAttribute = value.getAttribute(iAttribute);
-                    setValue(valueAttribute, ao[iAttribute]);
+                    setValue(valueAttribute, ao[iAttribute], mimeTypes);
                 }
             } else
                 throw new SQLException("Invalid value type " + oValue.getClass().getName() + " encountered!");
@@ -162,27 +182,23 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      * @throws IOException  if an I/O error occurred.
      * @throws SQLException if a database error occurred.
      */
-    private void getRecord(ResultSet rs, Record record)
-            throws IOException, SQLException {
+    private void getRecord(ResultSet rs, Record record, Map<String, Set<String>> mimeTypes) throws IOException, SQLException {
         ResultSetMetaData restultSetMetaData = rs.getMetaData();
-        if (restultSetMetaData.getColumnCount() != record.getCells())
-            throw new IOException("Invalid number of result columns found!");
+        if (restultSetMetaData.getColumnCount() != record.getCells()) throw new IOException("Invalid number of result columns found!");
         for (int iCell = 0; iCell < record.getCells(); iCell++) {
+
             _swGetCell.start();
             int iPosition = iCell + 1;
             Cell cell = record.getCell(iCell);
             MetaColumn mc = cell.getMetaColumn();
             // String sColumnName = mc.getName();
             int iDataType = mc.getPreType();
-            if (mc.getCardinality() >= 0)
-                iDataType = Types.ARRAY;
+            if (mc.getCardinality() >= 0) iDataType = Types.ARRAY;
             MetaType mt = mc.getMetaType();
             if (mt != null) {
                 CategoryType cat = mt.getCategoryType();
-                if (cat == CategoryType.DISTINCT)
-                    iDataType = mt.getBasePreType();
-                else
-                    iDataType = Types.STRUCT;
+                if (cat == CategoryType.DISTINCT) iDataType = mt.getBasePreType();
+                else iDataType = Types.STRUCT;
             }
             _swGetCell.stop();
             _swGetValue.start();
@@ -226,8 +242,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                     break;
                 case Types.BIGINT:
                     BigDecimal bdInt = rs.getBigDecimal(iPosition);
-                    if (bdInt != null)
-                        oValue = bdInt.toBigIntegerExact();
+                    if (bdInt != null) oValue = bdInt.toBigIntegerExact();
                     break;
                 case Types.DECIMAL:
                 case Types.NUMERIC:
@@ -257,18 +272,25 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                     oValue = rs.getArray(iPosition);
                     break;
                 default:
-                    throw new SQLException("Invalid data type " +
-                                                   iDataType + " (" +
-                                                   SqlTypes.getTypeName(iDataType) + ") encountered!");
+                    throw new SQLException("Invalid data type " + iDataType + " (" + SqlTypes.getTypeName(iDataType) + ") encountered!");
             } /* switch */
-            if (rs.wasNull())
-                oValue = null;
+            if (rs.wasNull()) oValue = null;
             _swGetValue.stop();
             _swSetValue.start();
-            setValue(cell, oValue);
+            setValue(cell, oValue, mimeTypes);
+
             _swSetValue.stop();
         } /* loop over values */
     } /* getRecord */
+
+    private void setMimeType(Map<String, Set<String>> mimeTypes, Cell cell) throws IOException {
+        Set<String> types = mimeTypes.get(cell.getMetaColumn().getName());
+        if (types.size() == 1) {
+            cell.getMetaColumn().setMimeType((String) types.toArray()[0]);
+        } else {
+            cell.getMetaColumn().setMimeType("");
+        }
+    }
 
     /*------------------------------------------------------------------*/
 
@@ -299,13 +321,15 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         StopWatch sw = StopWatch.getInstance();
         sw.start();
         long lBytesStart = rr.getByteCount();
+
+        Map<String, Set<String>> mimeTypes = new HashMap<>();
         while (rs.next() && (!cancelRequested())) {
             swCreate.start();
             Record record = rr.create();
             swCreate.stop();
             swGet.start();
 
-            getRecord(rs, record);
+            getRecord(rs, record, mimeTypes);
             swGet.stop();
             swPut.start();
             rr.put(record);
