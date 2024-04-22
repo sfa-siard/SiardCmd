@@ -135,6 +135,10 @@ public class Metadata implements Updatable<Metadata> {
         @Builder.Default
         Optional<Id<Type>> typeName = Optional.empty();
 
+        @NonNull
+        @Builder.Default
+        Optional<Id<MimeType>> mimeType = Optional.empty();
+
         @Override
         public Column applyUpdates(Updater updater) {
             val updatedThis = updater.applyUpdate(this);
@@ -143,7 +147,8 @@ public class Metadata implements Updatable<Metadata> {
                     updatedThis.name.applyUpdates(updater),
                     updatedThis.nullable,
                     updatedThis.typeSchema.map(typeId -> typeId.applyUpdates(updater)),
-                    updatedThis.typeName.map(typeId -> typeId.applyUpdates(updater))
+                    updatedThis.typeName.map(typeId -> typeId.applyUpdates(updater)),
+                    updatedThis.mimeType.map(mimeType -> mimeType.applyUpdates(updater))
             );
         }
     }
@@ -251,6 +256,23 @@ public class Metadata implements Updatable<Metadata> {
                     updatedThis.category,
                     updatedThis.instantiable,
                     updatedThis.finalFlag);
+        }
+    }
+
+
+    @Value
+    @Builder
+    @Jacksonized
+    public static class MimeType implements Updatable<MimeType> {
+        String mimeType;
+
+        @Override
+        public MimeType applyUpdates(Updater updater) {
+            val updatedThis = updater.applyUpdate(this);
+
+            return new MimeType(
+                    updatedThis.mimeType
+            );
         }
     }
 }
