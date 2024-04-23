@@ -88,16 +88,14 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         for (int iSchema = 0; iSchema < _archive.getSchemas(); iSchema++) {
             Schema schema = _archive.getSchema(iSchema);
             for (int iTable = 0; iTable < schema.getTables(); iTable++) {
-                Table table = schema.getTable(iTable);
-                recordsTotal = recordsTotal + table.getMetaTable().getRows();
+                recordsTotal = recordsTotal + schema.getTable(iTable).getMetaTable().getRows();
             }
         }
         recordsPercent = (recordsTotal + 99) / 100;
         recordsDownloaded = 0;
         /* now download */
         for (int iSchema = 0; (iSchema < _archive.getSchemas()) && (!cancelRequested()); iSchema++) {
-            Schema schema = _archive.getSchema(iSchema);
-            getSchema(schema);
+            getSchema(_archive.getSchema(iSchema));
         }
         if (cancelRequested())
             throw new IOException("\r\nDownload of primary data cancelled!");
@@ -194,8 +192,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 Struct struct = (Struct) oValue;
                 Object[] ao = struct.getAttributes();
                 for (int iAttribute = 0; iAttribute < ao.length; iAttribute++) {
-                    Value valueAttribute = value.getAttribute(iAttribute);
-                    setValue(valueAttribute, ao[iAttribute], mimeTypeHandler);
+                    setValue(value.getAttribute(iAttribute), ao[iAttribute], mimeTypeHandler);
                 }
             } else
                 throw new SQLException("Invalid value type " + oValue.getClass().getName() + " encountered!");
@@ -210,8 +207,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      * @throws SQLException if a database error occurred.
      */
     private void getRecord(ResultSet rs, Record record, MimeTypeHandler mimeTypeHandler) throws IOException, SQLException {
-        ResultSetMetaData restultSetMetaData = rs.getMetaData();
-        if (restultSetMetaData.getColumnCount() != record.getCells())
+        if (rs.getMetaData().getColumnCount() != record.getCells())
             throw new IOException("Invalid number of result columns found!");
         for (int iCell = 0; iCell < record.getCells(); iCell++) {
 
@@ -301,7 +297,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                     break;
                 default:
                     throw new SQLException("Invalid data type " + iDataType + " (" + SqlTypes.getTypeName(iDataType) + ") encountered!");
-            } /* switch */
+            }
             if (rs.wasNull()) oValue = null;
             getValueStopWatch.stop();
             setValueStopWatch.start();
@@ -384,13 +380,12 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      */
     private void getSchema(Schema schema)
             throws IOException, SQLException {
-        val schemaName = schema.getMetaSchema().getName();
 
         for (int iTable = 0; (iTable < schema.getTables()) && (!cancelRequested()); iTable++) {
             Table table = schema.getTable(iTable);
             getTable(table);
         }
 
-        LOG.debug("All data of schema '{}' successfully downloaded", schemaName);
+        LOG.debug("All data of schema '{}' successfully downloaded", schema.getMetaSchema().getName());
     }
 }
