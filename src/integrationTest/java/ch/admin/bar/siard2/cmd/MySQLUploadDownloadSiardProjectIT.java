@@ -3,9 +3,6 @@ package ch.admin.bar.siard2.cmd;
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import ch.admin.bar.siard2.cmd.utils.siard.assertions.SiardArchiveAssertions;
-import ch.admin.bar.siard2.cmd.utils.siard.model.header.Metadata;
-import ch.admin.bar.siard2.cmd.utils.siard.model.utils.Id;
-import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedColumnId;
 import lombok.val;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -15,8 +12,6 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
-import static org.junit.Assert.assertNotNull;
 
 public class MySQLUploadDownloadSiardProjectIT {
 
