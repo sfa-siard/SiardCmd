@@ -210,102 +210,108 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         if (rs.getMetaData().getColumnCount() != record.getCells())
             throw new IOException("Invalid number of result columns found!");
         for (int iCell = 0; iCell < record.getCells(); iCell++) {
-
             getCellStopWatch.start();
             int iPosition = iCell + 1;
             Cell cell = record.getCell(iCell);
-            MetaColumn mc = cell.getMetaColumn();
-            // String sColumnName = mc.getName();
-            int iDataType = mc.getPreType();
-            if (mc.getCardinality() >= 0) iDataType = Types.ARRAY;
-            MetaType mt = mc.getMetaType();
-            if (mt != null) {
-                CategoryType cat = mt.getCategoryType();
-                if (cat == CategoryType.DISTINCT) iDataType = mt.getBasePreType();
-                else iDataType = Types.STRUCT;
-            }
             getCellStopWatch.stop();
             getValueStopWatch.start();
-            Object oValue = null;
-            switch (iDataType) {
-                case Types.CHAR:
-                case Types.VARCHAR:
-                    oValue = rs.getString(iPosition);
-                    break;
-                case Types.CLOB:
-                    oValue = rs.getClob(iPosition);
-                    break;
-                case Types.SQLXML:
-                    oValue = rs.getSQLXML(iPosition);
-                    break;
-                case Types.NCHAR:
-                case Types.NVARCHAR:
-                    oValue = rs.getNString(iPosition);
-                    break;
-                case Types.NCLOB:
-                    oValue = rs.getNClob(iPosition);
-                    break;
-                case Types.BINARY:
-                case Types.VARBINARY:
-                    oValue = rs.getBytes(iPosition);
-                    break;
-                case Types.BLOB:
-                    oValue = rs.getBlob(iPosition);
-                    break;
-                case Types.DATALINK:
-                    oValue = rs.getURL(iPosition);
-                    break;
-                case Types.BOOLEAN:
-                    oValue = rs.getBoolean(iPosition);
-                    break;
-                case Types.SMALLINT:
-                    oValue = rs.getInt(iPosition);
-                    break;
-                case Types.INTEGER:
-                    oValue = rs.getLong(iPosition);
-                    break;
-                case Types.BIGINT:
-                    BigDecimal bdInt = rs.getBigDecimal(iPosition);
-                    if (bdInt != null) oValue = bdInt.toBigIntegerExact();
-                    break;
-                case Types.DECIMAL:
-                case Types.NUMERIC:
-                    oValue = rs.getBigDecimal(iPosition);
-                    break;
-                case Types.REAL:
-                    oValue = rs.getFloat(iPosition);
-                    break;
-                case Types.FLOAT:
-                case Types.DOUBLE:
-                    oValue = rs.getDouble(iPosition);
-                    break;
-                case Types.DATE:
-                    oValue = rs.getDate(iPosition);
-                    break;
-                case Types.TIME:
-                    oValue = rs.getTime(iPosition);
-                    break;
-                case Types.TIMESTAMP:
-                    oValue = rs.getTimestamp(iPosition);
-                    break;
-                case Types.OTHER:
-                case Types.STRUCT:
-                    oValue = rs.getObject(iPosition);
-                    break;
-                case Types.ARRAY:
-                    oValue = rs.getArray(iPosition);
-                    break;
-                default:
-                    throw new SQLException("Invalid data type " + iDataType + " (" + SqlTypes.getTypeName(iDataType) + ") encountered!");
-            }
+            Object oValue = getObjectValue(rs, getDataType(cell.getMetaColumn()), iPosition);
             if (rs.wasNull()) oValue = null;
             getValueStopWatch.stop();
             setValueStopWatch.start();
             setValue(cell, oValue, mimeTypeHandler);
             mimeTypeHandler.applyMimeType(cell);
-
             setValueStopWatch.stop();
         }
+    }
+
+    private static int getDataType(MetaColumn mc) throws IOException {
+        int iDataType = mc.getPreType();
+        if (mc.getCardinality() >= 0) iDataType = Types.ARRAY;
+        MetaType mt = mc.getMetaType();
+        if (mt != null) {
+            CategoryType cat = mt.getCategoryType();
+            if (cat == CategoryType.DISTINCT) iDataType = mt.getBasePreType();
+            else iDataType = Types.STRUCT;
+        }
+        return iDataType;
+    }
+
+    private Object getObjectValue(ResultSet resultSet, int dataType, int iPosition) throws SQLException {
+
+        Object oValue = null;
+        switch (dataType) {
+            case Types.CHAR:
+            case Types.VARCHAR:
+                oValue = resultSet.getString(iPosition);
+                break;
+            case Types.CLOB:
+                oValue = resultSet.getClob(iPosition);
+                break;
+            case Types.SQLXML:
+                oValue = resultSet.getSQLXML(iPosition);
+                break;
+            case Types.NCHAR:
+            case Types.NVARCHAR:
+                oValue = resultSet.getNString(iPosition);
+                break;
+            case Types.NCLOB:
+                oValue = resultSet.getNClob(iPosition);
+                break;
+            case Types.BINARY:
+            case Types.VARBINARY:
+                oValue = resultSet.getBytes(iPosition);
+                break;
+            case Types.BLOB:
+                oValue = resultSet.getBlob(iPosition);
+                break;
+            case Types.DATALINK:
+                oValue = resultSet.getURL(iPosition);
+                break;
+            case Types.BOOLEAN:
+                oValue = resultSet.getBoolean(iPosition);
+                break;
+            case Types.SMALLINT:
+                oValue = resultSet.getInt(iPosition);
+                break;
+            case Types.INTEGER:
+                oValue = resultSet.getLong(iPosition);
+                break;
+            case Types.BIGINT:
+                BigDecimal bdInt = resultSet.getBigDecimal(iPosition);
+                if (bdInt != null) oValue = bdInt.toBigIntegerExact();
+                break;
+            case Types.DECIMAL:
+            case Types.NUMERIC:
+                oValue = resultSet.getBigDecimal(iPosition);
+                break;
+            case Types.REAL:
+                oValue = resultSet.getFloat(iPosition);
+                break;
+            case Types.FLOAT:
+            case Types.DOUBLE:
+                oValue = resultSet.getDouble(iPosition);
+                break;
+            case Types.DATE:
+                oValue = resultSet.getDate(iPosition);
+                break;
+            case Types.TIME:
+                oValue = resultSet.getTime(iPosition);
+                break;
+            case Types.TIMESTAMP:
+                oValue = resultSet.getTimestamp(iPosition);
+                break;
+            case Types.OTHER:
+            case Types.STRUCT:
+                oValue = resultSet.getObject(iPosition);
+                break;
+            case Types.ARRAY:
+                oValue = resultSet.getArray(iPosition);
+                break;
+            default:
+                throw new SQLException("Invalid data type " + dataType + " (" + SqlTypes.getTypeName(dataType) + ") encountered!");
+        }
+        return oValue;
     }
 
     /**
