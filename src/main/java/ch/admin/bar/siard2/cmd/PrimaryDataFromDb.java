@@ -41,6 +41,7 @@ import java.sql.Date;
  */
 @Slf4j
 public class PrimaryDataFromDb extends PrimaryDataTransfer {
+
     private static final long _lREPORT_RECORDS = 1000;
     private Progress _progress = null;
     private long _lRecordsDownloaded = -1;
@@ -51,6 +52,61 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
     private StopWatch _swSetValue = null;
     private final Tika tika = new Tika();
 
+
+    private PrimaryDataFromDb(Connection conn, Archive archive) {
+        super(conn, archive, null, true, true, true);
+    }
+
+    /**
+     * Factory method to create an instance of {@link PrimaryDataFromDb}
+     *
+     * @param conn    database connection.
+     * @param archive SIARD archive.
+     * @return new instance of PrimaryDataFromDb.
+     */
+    public static PrimaryDataFromDb newInstance(Connection conn, Archive archive) {
+        return new PrimaryDataFromDb(conn, archive);
+    }
+
+    /**
+     * download primary data.
+     *
+     * @param progress receives progress notifications and sends cancel
+     *                 requests.
+     * @throws IOException  if an I/O error occurred.
+     * @throws SQLException if a database error occurred.
+     */
+    public void download(Progress progress)
+            throws IOException, SQLException {
+
+        LOG.info("Start primary data download to archive {}",
+                this._archive.getFile().getAbsoluteFile());
+
+        System.out.println("\r\nPrimary Data");
+        _progress = progress;
+        /* determine total number of records in the database */
+        _lRecordsTotal = 0;
+        for (int iSchema = 0; iSchema < _archive.getSchemas(); iSchema++) {
+            Schema schema = _archive.getSchema(iSchema);
+            for (int iTable = 0; iTable < schema.getTables(); iTable++) {
+                Table table = schema.getTable(iTable);
+                _lRecordsTotal = _lRecordsTotal + table.getMetaTable().getRows();
+            }
+        }
+        _lRecordsPercent = (_lRecordsTotal + 99) / 100;
+        _lRecordsDownloaded = 0;
+        /* now download */
+        for (int iSchema = 0; (iSchema < _archive.getSchemas()) && (!cancelRequested()); iSchema++) {
+            Schema schema = _archive.getSchema(iSchema);
+            getSchema(schema);
+        }
+        if (cancelRequested())
+            throw new IOException("\r\nDownload of primary data cancelled!");
+        System.out.println("\r\nDownload terminated successfully.");
+        _conn.rollback();
+
+        LOG.info("Primary data download finished");
+    }
 
     /**
      * increment the number of records downloaded, issuing a notification,
@@ -338,66 +394,4 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
 
         LOG.debug("All data of schema '{}' successfully downloaded", schemaName);
     }
-
-    /**
-     * download primary data.
-     *
-     * @param progress receives progress notifications and sends cancel
-     *                 requests.
-     * @throws IOException  if an I/O error occurred.
-     * @throws SQLException if a database error occurred.
-     */
-    public void download(Progress progress)
-            throws IOException, SQLException {
-
-        LOG.info("Start primary data download to archive {}",
-                this._archive.getFile().getAbsoluteFile());
-
-        System.out.println("\r\nPrimary Data");
-        _progress = progress;
-        /* determine total number of records in the database */
-        _lRecordsTotal = 0;
-        for (int iSchema = 0; iSchema < _archive.getSchemas(); iSchema++) {
-            Schema schema = _archive.getSchema(iSchema);
-            for (int iTable = 0; iTable < schema.getTables(); iTable++) {
-                Table table = schema.getTable(iTable);
-                _lRecordsTotal = _lRecordsTotal + table.getMetaTable().getRows();
-            }
-        }
-        _lRecordsPercent = (_lRecordsTotal + 99) / 100;
-        _lRecordsDownloaded = 0;
-        /* now download */
-        for (int iSchema = 0; (iSchema < _archive.getSchemas()) && (!cancelRequested()); iSchema++) {
-            Schema schema = _archive.getSchema(iSchema);
-            getSchema(schema);
-        }
-        if (cancelRequested())
-            throw new IOException("\r\nDownload of primary data cancelled!");
-        System.out.println("\r\nDownload terminated successfully.");
-        _conn.rollback();
-
-        LOG.info("Primary data download finished");
-    }
-
-    /**
-     * constructor
-     *
-     * @param conn    database connection.
-     * @param archive SIARD archive.
-     */
-    private PrimaryDataFromDb(Connection conn, Archive archive) {
-        super(conn, archive, null, true, true, true);
-    }
-
-    /**
-     * factory
-     *
-     * @param conn    database connection.
-     * @param archive SIARD archive.
-     * @return new instance of PrimaryDataFromDb.
-     */
-    public static PrimaryDataFromDb newInstance(Connection conn, Archive archive) {
-        return new PrimaryDataFromDb(conn, archive);
-    }
-
 }
