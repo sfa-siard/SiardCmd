@@ -34,8 +34,6 @@ import java.net.URL;
 import java.sql.*;
 import java.sql.Date;
 
-/*====================================================================*/
-
 /**
  * Transfers primary data from databases to SIARD files.
  *
@@ -54,8 +52,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
     private final Tika tika = new Tika();
 
 
-    /*------------------------------------------------------------------*/
-
     /**
      * increment the number of records downloaded, issuing a notification,
      * when a percent is reached.
@@ -66,7 +62,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             int iPercent = (int) ((100 * _lRecordsDownloaded) / _lRecordsTotal);
             _progress.notifyProgress(iPercent);
         }
-    } /* incDownloaded */
+    }
 
     /**
      * check if cancel was requested.
@@ -149,10 +145,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             } else
                 throw new SQLException("Invalid value type " + oValue.getClass().getName() + " encountered!");
         }
-    } /* setValue */
-
-    /*------------------------------------------------------------------*/
-
+    }
     /**
      * extract primary data of a record from the result set.
      *
@@ -261,10 +254,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             mimeTypeHandler.applyMimeType(cell);
 
             _swSetValue.stop();
-        } /* loop over values */
-    } /* getRecord */
-
-    /*------------------------------------------------------------------*/
+        }
+    }
 
     /**
      * download primary data of a table using a SELECT query for all
@@ -327,9 +318,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         LOG.debug("All data of table '{}.{}' successfully downloaded",
                 qiTable.getSchema(),
                 qiTable.getName());
-    } /* getTable */
-
-    /*------------------------------------------------------------------*/
+    }
 
     /**
      * download primary data of a schema.
@@ -348,9 +337,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         }
 
         LOG.debug("All data of schema '{}' successfully downloaded", schemaName);
-    } /* getSchema */
-
-    /*------------------------------------------------------------------*/
+    }
 
     /**
      * download primary data.
@@ -390,9 +377,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         _conn.rollback();
 
         LOG.info("Primary data download finished");
-    } /* download */
-
-    /*------------------------------------------------------------------*/
+    }
 
     /**
      * constructor
@@ -402,9 +387,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      */
     private PrimaryDataFromDb(Connection conn, Archive archive) {
         super(conn, archive, null, true, true, true);
-    } /* constructor PrimaryDataTransfer */
-
-    /*------------------------------------------------------------------*/
+    }
 
     /**
      * factory
@@ -415,6 +398,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      */
     public static PrimaryDataFromDb newInstance(Connection conn, Archive archive) {
         return new PrimaryDataFromDb(conn, archive);
-    } /* newInstance */
+    }
 
-} /* class PrimaryDataFromDb */
+}
