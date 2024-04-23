@@ -81,21 +81,14 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         return false;
     }
 
-    private void setValue(Value value, Object oValue, Map<String, Set<String>> mimeTypes)
+    private void setValue(Value value, Object oValue, MimeTypeHandler mimeTypeHandler)
             throws IOException, SQLException {
         if (oValue != null) {
             if (oValue instanceof String)
                 value.setString((String) oValue);
             else if (oValue instanceof byte[]) {
                 byte[] bytes = (byte[]) oValue;
-                String name = ((Cell) value).getMetaColumn().getName();
-                String mimeType = tika.detect(bytes);
-                if(!mimeTypes.containsKey(name)) {
-                    mimeTypes.put(name, new HashSet<>(Arrays.asList(mimeType)));
-                } else {
-                    mimeTypes.get(name).add(mimeType);
-                }
-                setMimeType(mimeTypes, (Cell) value);
+                mimeTypeHandler.handle((Cell) value, bytes);
                 value.setBytes(bytes);
             } else if (oValue instanceof Boolean)
                 value.setBoolean((Boolean) oValue);
@@ -123,14 +116,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 value.setDuration((Duration) oValue);
             else if (oValue instanceof Clob) {
                 Clob clob = (Clob) oValue;
-                String name = ((Cell) value).getMetaColumn().getName();
-                String mimeType = tika.detect(clob.getAsciiStream());
-                if(!mimeTypes.containsKey(name)) {
-                    mimeTypes.put(name, new HashSet<>(Arrays.asList(mimeType)));
-                } else {
-                    mimeTypes.get(name).add(mimeType);
-                }
-                setMimeType(mimeTypes, (Cell) value);
+                mimeTypeHandler.handle((Cell) value, clob);
                 value.setReader(clob.getCharacterStream());
                 clob.free();
             } else if (oValue instanceof SQLXML) {
@@ -139,14 +125,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 sqlxml.free();
             } else if (oValue instanceof Blob) {
                 Blob blob = (Blob) oValue;
-                String name = ((Cell) value).getMetaColumn().getName();
-                String mimeType = tika.detect(blob.getBinaryStream());
-                if(!mimeTypes.containsKey(name)) {
-                    mimeTypes.put(name, new HashSet<>(Arrays.asList(mimeType)));
-                } else {
-                    mimeTypes.get(name).add(mimeType);
-                }
-                setMimeType(mimeTypes, (Cell) value);
+                mimeTypeHandler.handle((Cell) value, blob);
                 value.setInputStream(blob.getBinaryStream());
                 blob.free();
             } else if (oValue instanceof URL) {
@@ -157,7 +136,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 Object[] ao = (Object[]) array.getArray();
                 for (int iElement = 0; iElement < ao.length; iElement++) {
                     Value valueElement = value.getElement(iElement);
-                    setValue(valueElement, ao[iElement], mimeTypes);
+                    setValue(valueElement, ao[iElement], mimeTypeHandler);
                 }
                 array.free();
             } else if (oValue instanceof Struct) {
@@ -165,7 +144,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 Object[] ao = struct.getAttributes();
                 for (int iAttribute = 0; iAttribute < ao.length; iAttribute++) {
                     Value valueAttribute = value.getAttribute(iAttribute);
-                    setValue(valueAttribute, ao[iAttribute], mimeTypes);
+                    setValue(valueAttribute, ao[iAttribute], mimeTypeHandler);
                 }
             } else
                 throw new SQLException("Invalid value type " + oValue.getClass().getName() + " encountered!");
@@ -182,7 +161,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      * @throws IOException  if an I/O error occurred.
      * @throws SQLException if a database error occurred.
      */
-    private void getRecord(ResultSet rs, Record record, Map<String, Set<String>> mimeTypes) throws IOException, SQLException {
+    private void getRecord(ResultSet rs, Record record, MimeTypeHandler mimeTypeHandler) throws IOException, SQLException {
         ResultSetMetaData restultSetMetaData = rs.getMetaData();
         if (restultSetMetaData.getColumnCount() != record.getCells()) throw new IOException("Invalid number of result columns found!");
         for (int iCell = 0; iCell < record.getCells(); iCell++) {
@@ -277,7 +256,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             if (rs.wasNull()) oValue = null;
             _swGetValue.stop();
             _swSetValue.start();
-            setValue(cell, oValue, mimeTypes);
+            setValue(cell, oValue, mimeTypeHandler);
+            mimeTypeHandler.applyMimeType(cell);
 
             _swSetValue.stop();
         } /* loop over values */
@@ -322,14 +302,14 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         sw.start();
         long lBytesStart = rr.getByteCount();
 
-        Map<String, Set<String>> mimeTypes = new HashMap<>();
+        MimeTypeHandler mimeTypeHandler = new MimeTypeHandler();
         while (rs.next() && (!cancelRequested())) {
             swCreate.start();
             Record record = rr.create();
             swCreate.stop();
             swGet.start();
 
-            getRecord(rs, record, mimeTypes);
+            getRecord(rs, record, mimeTypeHandler);
             swGet.stop();
             swPut.start();
             rr.put(record);
@@ -445,4 +425,36 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         return new PrimaryDataFromDb(conn, archive);
     } /* newInstance */
 
+    private class MimeTypeHandler {
+
+        Map<String, Set<String>> mimeTypes = new HashMap<>();
+
+        public void handle(Cell cell, byte[] bytes) throws IOException {
+            addMimeType(cell, tika.detect(bytes));
+        }
+
+        public void handle(Cell cell, Clob clob) throws SQLException, IOException {
+            addMimeType(cell, tika.detect(clob.getAsciiStream()));
+        }
+
+        public void handle(Cell cell, Blob blob) throws SQLException, IOException {
+            addMimeType(cell, tika.detect(blob.getBinaryStream()));
+        }
+
+        public void applyMimeType(Cell cell) throws IOException {
+            Set<String> types = mimeTypes.get(cell.getMetaColumn().getName());
+            if (types == null) return;
+            if (types.size() == 1) cell.getMetaColumn().setMimeType((String) types.toArray()[0]);
+            if (types.size() != 1) cell.getMetaColumn().setMimeType("");
+        }
+
+        private void addMimeType(Cell cell, String mimeType) {
+            String name = cell.getMetaColumn().getName();
+            if(!this.mimeTypes.containsKey(name)) {
+                mimeTypes.put(name, new HashSet<>(Arrays.asList(mimeType)));
+            } else {
+                mimeTypes.get(name).add(mimeType);
+            }
+        }
+    }
 } /* class PrimaryDataFromDb */
