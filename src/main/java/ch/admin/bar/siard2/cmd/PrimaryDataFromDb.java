@@ -42,30 +42,30 @@ import java.sql.Date;
 @Slf4j
 public class PrimaryDataFromDb extends PrimaryDataTransfer {
 
-    private static final long _lREPORT_RECORDS = 1000;
-    private Progress _progress = null;
-    private long _lRecordsDownloaded = -1;
-    private long _lRecordsTotal = -1;
-    private long _lRecordsPercent = -1;
-    private StopWatch _swGetCell = null;
-    private StopWatch _swGetValue = null;
-    private StopWatch _swSetValue = null;
+    private static final long REPORT_RECORDS = 1000;
+    private Progress progress = null;
+    private long recordsDownloaded = -1;
+    private long recordsTotal = -1;
+    private long recordsPercent = -1;
+    private StopWatch getCellStopWatch = null;
+    private StopWatch getValueStopWatch = null;
+    private StopWatch setValueStopWatch = null;
     private final Tika tika = new Tika();
 
 
-    private PrimaryDataFromDb(Connection conn, Archive archive) {
-        super(conn, archive, null, true, true, true);
+    private PrimaryDataFromDb(Connection connection, Archive archive) {
+        super(connection, archive, null, true, true, true);
     }
 
     /**
      * Factory method to create an instance of {@link PrimaryDataFromDb}
      *
-     * @param conn    database connection.
+     * @param connection    database connection.
      * @param archive SIARD archive.
      * @return new instance of PrimaryDataFromDb.
      */
-    public static PrimaryDataFromDb newInstance(Connection conn, Archive archive) {
-        return new PrimaryDataFromDb(conn, archive);
+    public static PrimaryDataFromDb newInstance(Connection connection, Archive archive) {
+        return new PrimaryDataFromDb(connection, archive);
     }
 
     /**
@@ -76,25 +76,24 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      * @throws IOException  if an I/O error occurred.
      * @throws SQLException if a database error occurred.
      */
-    public void download(Progress progress)
-            throws IOException, SQLException {
+    public void download(Progress progress) throws IOException, SQLException {
 
         LOG.info("Start primary data download to archive {}",
                 this._archive.getFile().getAbsoluteFile());
 
         System.out.println("\r\nPrimary Data");
-        _progress = progress;
+        this.progress = progress;
         /* determine total number of records in the database */
-        _lRecordsTotal = 0;
+        recordsTotal = 0;
         for (int iSchema = 0; iSchema < _archive.getSchemas(); iSchema++) {
             Schema schema = _archive.getSchema(iSchema);
             for (int iTable = 0; iTable < schema.getTables(); iTable++) {
                 Table table = schema.getTable(iTable);
-                _lRecordsTotal = _lRecordsTotal + table.getMetaTable().getRows();
+                recordsTotal = recordsTotal + table.getMetaTable().getRows();
             }
         }
-        _lRecordsPercent = (_lRecordsTotal + 99) / 100;
-        _lRecordsDownloaded = 0;
+        recordsPercent = (recordsTotal + 99) / 100;
+        recordsDownloaded = 0;
         /* now download */
         for (int iSchema = 0; (iSchema < _archive.getSchemas()) && (!cancelRequested()); iSchema++) {
             Schema schema = _archive.getSchema(iSchema);
@@ -113,10 +112,10 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      * when a percent is reached.
      */
     private void incDownloaded() {
-        _lRecordsDownloaded++;
-        if ((_progress != null) && (_lRecordsTotal > 0) && ((_lRecordsDownloaded % _lRecordsPercent) == 0)) {
-            int iPercent = (int) ((100 * _lRecordsDownloaded) / _lRecordsTotal);
-            _progress.notifyProgress(iPercent);
+        recordsDownloaded++;
+        if ((progress != null) && (recordsTotal > 0) && ((recordsDownloaded % recordsPercent) == 0)) {
+            int iPercent = (int) ((100 * recordsDownloaded) / recordsTotal);
+            progress.notifyProgress(iPercent);
         }
     }
 
@@ -126,7 +125,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      * @return true, if cancel was requested.
      */
     private boolean cancelRequested() {
-        if (_progress != null && _progress.cancelRequested()) {
+        if (progress != null && progress.cancelRequested()) {
             LOG.info("Cancel downloading of primary data because of request");
             return true;
         }
@@ -216,7 +215,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             throw new IOException("Invalid number of result columns found!");
         for (int iCell = 0; iCell < record.getCells(); iCell++) {
 
-            _swGetCell.start();
+            getCellStopWatch.start();
             int iPosition = iCell + 1;
             Cell cell = record.getCell(iCell);
             MetaColumn mc = cell.getMetaColumn();
@@ -229,8 +228,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 if (cat == CategoryType.DISTINCT) iDataType = mt.getBasePreType();
                 else iDataType = Types.STRUCT;
             }
-            _swGetCell.stop();
-            _swGetValue.start();
+            getCellStopWatch.stop();
+            getValueStopWatch.start();
             Object oValue = null;
             switch (iDataType) {
                 case Types.CHAR:
@@ -304,12 +303,12 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                     throw new SQLException("Invalid data type " + iDataType + " (" + SqlTypes.getTypeName(iDataType) + ") encountered!");
             } /* switch */
             if (rs.wasNull()) oValue = null;
-            _swGetValue.stop();
-            _swSetValue.start();
+            getValueStopWatch.stop();
+            setValueStopWatch.start();
             setValue(cell, oValue, mimeTypeHandler);
             mimeTypeHandler.applyMimeType(cell);
 
-            _swSetValue.stop();
+            setValueStopWatch.stop();
         }
     }
 
@@ -323,9 +322,9 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      */
     private void getTable(Table table)
             throws IOException, SQLException {
-        _swGetCell = StopWatch.getInstance();
-        _swGetValue = StopWatch.getInstance();
-        _swSetValue = StopWatch.getInstance();
+        getCellStopWatch = StopWatch.getInstance();
+        getValueStopWatch = StopWatch.getInstance();
+        setValueStopWatch = StopWatch.getInstance();
         QualifiedId qiTable = new QualifiedId(null,
                 table.getParentSchema().getMetaSchema().getName(),
                 table.getMetaTable().getName());
@@ -354,7 +353,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             rr.put(record);
             swPut.stop();
             lRecord++;
-            if ((lRecord % _lREPORT_RECORDS) == 0) {
+            if ((lRecord % REPORT_RECORDS) == 0) {
                 System.out.println("    Record " + lRecord + " (" + sw.formatRate(rr.getByteCount() - lBytesStart,
                         sw.stop()) + " kB/s)");
                 lBytesStart = rr.getByteCount();
