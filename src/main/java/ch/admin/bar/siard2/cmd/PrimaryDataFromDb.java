@@ -270,23 +270,10 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
 
         MimeTypeHandler mimeTypeHandler = new MimeTypeHandler(tika);
         while (rs.next() && (!cancelRequested())) {
-            swCreate.start();
-            Record record = rr.create();
-            swCreate.stop();
-            swGet.start();
-
-            getRecord(rs, record, mimeTypeHandler);
-            swGet.stop();
-            swPut.start();
-            rr.put(record);
-            swPut.stop();
-            lRecord++;
-            if ((lRecord % REPORT_RECORDS) == 0) {
-                System.out.println("    Record " + lRecord + " (" + sw.formatRate(rr.getByteCount() - lBytesStart,
-                        sw.stop()) + " kB/s)");
-                lBytesStart = rr.getByteCount();
-                sw.start();
-            }
+            Record record = createRecord(swCreate, rr);
+            readRecord(swGet, rs, record, mimeTypeHandler);
+            putRecord(swPut, rr, record);
+            lBytesStart = logRecordProgress(lRecord++, sw, rr, lBytesStart);
             incDownloaded();
         }
         System.out.println("    Record " + lRecord + " (" + sw.formatRate(rr.getByteCount() - lBytesStart,
@@ -301,6 +288,35 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         LOG.debug("All data of table '{}.{}' successfully downloaded",
                 qiTable.getSchema(),
                 qiTable.getName());
+    }
+
+    private static long logRecordProgress(long lRecord, StopWatch sw, RecordRetainer rr, long lBytesStart) {
+        if ((lRecord % REPORT_RECORDS) == 0) {
+            System.out.println("    Record " + lRecord + " (" + sw.formatRate(rr.getByteCount() - lBytesStart,
+                    sw.stop()) + " kB/s)");
+            lBytesStart = rr.getByteCount();
+            sw.start();
+        }
+        return lBytesStart;
+    }
+
+    private static void putRecord(StopWatch swPut, RecordRetainer rr, Record record) throws IOException {
+        swPut.start();
+        rr.put(record);
+        swPut.stop();
+    }
+
+    private void readRecord(StopWatch swGet, ResultSet rs, Record record, MimeTypeHandler mimeTypeHandler) throws IOException, SQLException {
+        swGet.start();
+        getRecord(rs, record, mimeTypeHandler);
+        swGet.stop();
+    }
+
+    private static Record createRecord(StopWatch swCreate, RecordRetainer rr) throws IOException {
+        swCreate.start();
+        Record record = rr.create();
+        swCreate.stop();
+        return record;
     }
 
     /**
