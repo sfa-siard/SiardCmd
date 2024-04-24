@@ -63,6 +63,13 @@ public class SiardProjectExamples {
      */
     public final static String DVD_RENTAL_2_1_SIARD = "siard-projects/2_1/dvd-rental_postgres11_2-1.siard";
 
+
+    /**
+     * Archive that contains a table with a blob column with more than one mime type (pdfs and jpeg)
+     * See https://github.com/sfa-siard/siard-suite/issues/90 for context
+     */
+    public final static String MIXED_MIME_TYPES = "siard-projects/2_2/mixed-mime-types.siard";
+
     private SiardProjectExamples() {
     }
 }
