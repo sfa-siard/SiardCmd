@@ -27,33 +27,18 @@ class MimeTypeHandler {
     }
 
     public void add(Value value, Blob blob) throws SQLException, IOException {
-        if (value instanceof Cell) {
-            this.add((Cell) value, blob);
-        }
-
-        if (value instanceof Field) {
-            this.add((Field) value, blob);
-        }
+        if (value instanceof Cell) this.add((Cell) value, blob);
+        if (value instanceof Field) this.add((Field) value, blob);
     }
 
     public void add(Value value, byte[] bytes) throws IOException {
-        if (value instanceof Cell) {
-            this.add((Cell) value, bytes);
-        }
-
-        if (value instanceof Field) {
-            this.add((Field) value, bytes);
-        }
+        if (value instanceof Cell) this.add((Cell) value, bytes);
+        if (value instanceof Field) this.add((Field) value, bytes);
     }
 
     public void add(Value value, Clob clob) throws SQLException, IOException {
-        if (value instanceof Cell) {
-            this.add((Cell) value, clob);
-        }
-
-        if (value instanceof Field) {
-            this.add((Field) value, clob);
-        }
+        if (value instanceof Cell) this.add((Cell) value, clob);
+        if (value instanceof Field) this.add((Field) value, clob);
     }
 
     /**
@@ -65,13 +50,8 @@ class MimeTypeHandler {
      * @param value - the value to apply the mime type to
      */
     public void applyMimeType(Value value) throws IOException {
-        if (value instanceof Cell) {
-            this.applyMimeType((Cell) value);
-        }
-
-        if (value instanceof Field) {
-            this.applyMimeType((Field) value);
-        }
+        if (value instanceof Cell) this.applyMimeType((Cell) value);
+        if (value instanceof Field) this.applyMimeType((Field) value);
     }
 
     private void add(Cell cell, byte[] bytes) {
@@ -98,6 +78,22 @@ class MimeTypeHandler {
         add(field, tika.detect(blob.getBinaryStream()));
     }
 
+    private void add(Cell cell, String mimeType) {
+        add(mimeType, cell.getMetaColumn().getName());
+    }
+
+    private void add(Field field, String mimeType) {
+        add(mimeType, field.getMetaField().getName());
+    }
+
+    private void add(String mimeType, String name) {
+        if (!mimeTypes.containsKey(name)) {
+            mimeTypes.put(name, new HashSet<>(Collections.singletonList(mimeType)));
+        } else {
+            mimeTypes.get(name).add(mimeType);
+        }
+    }
+
     private void applyMimeType(Cell cell) throws IOException {
         applyMimeType(cell.getMetaColumn());
     }
@@ -111,24 +107,5 @@ class MimeTypeHandler {
         if (types == null) return;
         if (types.size() == 1) metaValue.setMimeType((String) types.toArray()[0]);
         if (types.size() != 1) metaValue.setMimeType("");
-    }
-
-    private void add(Cell cell, String mimeType) {
-        String name = cell.getMetaColumn().getName();
-        add(mimeType, name);
-    }
-
-    private void add(String mimeType, String name) {
-        if (!mimeTypes.containsKey(name)) {
-            mimeTypes.put(name, new HashSet<>(Collections.singletonList(mimeType)));
-        } else {
-            mimeTypes.get(name).add(mimeType);
-        }
-    }
-
-    private void add(Field field, String mimeType) {
-        String name = field.getMetaField().getName();
-        add(mimeType, name);
-
     }
 }
