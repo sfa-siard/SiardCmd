@@ -70,6 +70,11 @@ public class SiardProjectExamples {
      */
     public final static String MIXED_MIME_TYPES = "siard-projects/2_2/mixed-mime-types.siard";
 
+    /**
+     * Archive that contains the archive exported from the nations.accdb file - exported with SIARD Suite 2.2.141
+     */
+    public final static String MS_ACCESSS_NATIONS = "siard-projects/2_2/nations.siard";
+
     private SiardProjectExamples() {
     }
 }
