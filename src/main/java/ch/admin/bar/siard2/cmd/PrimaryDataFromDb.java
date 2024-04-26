@@ -127,7 +127,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 value.setString((String) oValue);
             else if (oValue instanceof byte[]) {
                 byte[] bytes = (byte[]) oValue;
-                mimeTypeHandler.add((Cell) value, bytes);
+                mimeTypeHandler.add(value, bytes);
                 value.setBytes(bytes);
             } else if (oValue instanceof Boolean)
                 value.setBoolean((Boolean) oValue);
@@ -155,7 +155,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 value.setDuration((Duration) oValue);
             else if (oValue instanceof Clob) {
                 Clob clob = (Clob) oValue;
-                mimeTypeHandler.add((Cell) value, clob);
+                mimeTypeHandler.add(value, clob);
                 value.setReader(clob.getCharacterStream());
                 clob.free();
             } else if (oValue instanceof SQLXML) {
@@ -164,7 +164,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 sqlxml.free();
             } else if (oValue instanceof Blob) {
                 Blob blob = (Blob) oValue;
-                mimeTypeHandler.add((Cell) value, blob);
+                mimeTypeHandler.add(value, blob);
                 value.setInputStream(blob.getBinaryStream());
                 blob.free();
             } else if (oValue instanceof URL) {
@@ -176,6 +176,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 for (int iElement = 0; iElement < ao.length; iElement++) {
                     Value valueElement = value.getElement(iElement);
                     setValue(valueElement, ao[iElement], mimeTypeHandler);
+                    mimeTypeHandler.applyMimeType(valueElement);
                 }
                 array.free();
             } else if (oValue instanceof Struct) {
