@@ -15,7 +15,6 @@ import ch.enterag.utils.logging.*;
 import ch.enterag.sqlparser.*;
 import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.*;
-import lombok.val;
 
 /*====================================================================*/
 /** Opens a record set to a database for up- or download.
@@ -72,7 +71,11 @@ public class PrimaryDataTransfer
       String sExtendedColumnName = sbColumnName.toString();
       if (tm != null)
         sExtendedColumnName = tm.getMappedExtendedColumnName(sExtendedColumnName);
-      sbSql.append(SqlLiterals.formatId(sExtendedColumnName));
+      String formattedColumnName = SqlLiterals.formatId(sExtendedColumnName);
+      if (!formattedColumnName.startsWith("\"") && formattedColumnName.equals(formattedColumnName.toUpperCase())) {
+        formattedColumnName = "\"" + formattedColumnName.replace("\"", "\"\"") + "\"";
+      }
+      sbSql.append(formattedColumnName);
     }
     String sSchemaName = mt.getParentMetaSchema().getName();
     if (sm != null)
@@ -84,8 +87,6 @@ public class PrimaryDataTransfer
     sbSql.append("\r\n FROM "+qiTable.format());
     /* execute query */
     _il.event(sbSql.toString());
-
-    val sql = sbSql.toString();
     
     int iHoldability = ResultSet.HOLD_CURSORS_OVER_COMMIT;
     if (sm == null)
