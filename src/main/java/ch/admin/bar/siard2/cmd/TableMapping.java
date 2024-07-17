@@ -7,10 +7,10 @@ import ch.admin.bar.siard2.api.*;
 public class TableMapping extends Mapping
 {
   private String _sMappedTableName = null;
-  String getMappedTableName() { return _sMappedTableName; }
+  public String getMappedTableName() { return _sMappedTableName; }
   public void setMappedTableName(String sMappedTableName) { _sMappedTableName = sMappedTableName; }
   private Map<String,String> _mapColumns = new HashMap<String,String>();
-  String getMappedColumnName(String sColumnName) 
+  public String getMappedColumnName(String sColumnName)
   { return _mapColumns.get(sColumnName); }
   private Map<String,String> _mapExtendedColumns = new HashMap<String,String>();
   String getMappedExtendedColumnName(String sExtendedColumnName) 

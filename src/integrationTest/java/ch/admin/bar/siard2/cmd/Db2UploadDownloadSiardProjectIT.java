@@ -1,7 +1,7 @@
 package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.cmd.utils.SiardProjectExamples;
-import ch.admin.bar.siard2.cmd.utils.siard.SiardArchiveAssertions;
+import ch.admin.bar.siard2.cmd.utils.siard.assertions.SiardArchiveAssertions;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import lombok.val;
 import org.junit.Assert;
@@ -51,10 +51,10 @@ public class Db2UploadDownloadSiardProjectIT {
         SiardArchiveAssertions.builder()
                 .expectedArchive(expectedArchive)
                 .actualArchive(actualArchive)
-                .updateInstruction(SiardArchiveAssertions.IGNORE_DBNAME) // FIXME ?
-                .updateInstruction(SiardArchiveAssertions.IGNORE_PRIMARY_KEY_NAME) // Probably a DB-restriction (primary key names are generated)
-                .updateInstruction(SiardArchiveAssertions.IGNORE_FOREIGN_KEY_UPDATE_ACTION) // FIXME ?
-                .updateInstruction(SiardArchiveAssertions.IGNORE_FOREIGN_KEY_DELETE_ACTION) // FIXME ?
+                .assertionModifier(SiardArchiveAssertions.IGNORE_DBNAME) // FIXME ?
+                .assertionModifier(SiardArchiveAssertions.IGNORE_PRIMARY_KEY_NAME) // Probably a DB-restriction (primary key names are generated)
+                .assertionModifier(SiardArchiveAssertions.IGNORE_FOREIGN_KEY_UPDATE_ACTION) // FIXME ?
+                .assertionModifier(SiardArchiveAssertions.IGNORE_FOREIGN_KEY_DELETE_ACTION) // FIXME ?
                 .assertEqual();
     }
 }

@@ -11,19 +11,19 @@ package ch.admin.bar.siard2.cmd;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
-import ch.enterag.utils.logging.*;
 import ch.enterag.sqlparser.*;
 import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.*;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /*====================================================================*/
 /** Opens a record set to a database for up- or download.
  @author Hartwig Thomas
  */
+@Slf4j
 public class PrimaryDataTransfer
 {
-  /** logger */  
-  private static IndentLogger _il = IndentLogger.getIndentLogger(PrimaryDataTransfer.class.getName());
   protected Connection _conn = null;
   protected Archive _archive = null;
   protected ArchiveMapping _am = null;
@@ -47,7 +47,6 @@ public class PrimaryDataTransfer
     throws IOException, SQLException
   {
     MetaTable mt = table.getMetaTable();
-    _il.enter(mt.getName());
     /* schema mapping is null on download */
     TableMapping tm = null;
     if (sm != null)
@@ -86,8 +85,9 @@ public class PrimaryDataTransfer
     QualifiedId qiTable = new QualifiedId(null,sSchemaName,sTableName);
     sbSql.append("\r\n FROM "+qiTable.format());
     /* execute query */
-    _il.event(sbSql.toString());
-    
+    val sqlStatement = sbSql.toString();
+    LOG.trace("SQL statement: '{}'", sqlStatement);
+
     int iHoldability = ResultSet.HOLD_CURSORS_OVER_COMMIT;
     if (sm == null)
     	iHoldability = ResultSet.HOLD_CURSORS_OVER_COMMIT;
@@ -101,7 +101,9 @@ public class PrimaryDataTransfer
     Statement stmt = _conn.createStatement(iType,iConcurrency,iHoldability);
     stmt.setQueryTimeout(_iQueryTimeoutSeconds);
     ResultSet rs = stmt.executeQuery(sbSql.toString());
-    _il.exit(rs);
+
+    LOG.debug("Data from table '{}.{}' successfully loaded", qiTable.getSchema(), qiTable.getName());
+
     return rs;
   } /* openTable */
 

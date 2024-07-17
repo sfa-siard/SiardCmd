@@ -16,21 +16,21 @@ import java.util.regex.*;
 import ch.enterag.utils.jdbc.*;
 import ch.enterag.utils.EU;
 import ch.enterag.utils.background.*;
-import ch.enterag.utils.logging.*;
 import ch.enterag.sqlparser.*;
 import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.*;
 import ch.admin.bar.siard2.api.generated.*;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 /*====================================================================*/
 /** Transfers meta data from databases to SIARD files and back.
  @author Hartwig Thomas
  */
+@Slf4j
 public class MetaDataToDb
   extends MetaDataBase
 {
-  /** logger */  
-  private static IndentLogger _il = IndentLogger.getIndentLogger(MetaDataToDb.class.getName());
   private ArchiveMapping _am = null;
   public ArchiveMapping getArchiveMapping() { return _am; }
   private int _iMaxTableNameLength = -1;
@@ -54,17 +54,16 @@ public class MetaDataToDb
     }
   } /* incTablesCreated */
   
-  /*------------------------------------------------------------------*/
   /** check if cancel was requested.
    * @return true, if cancel was requested.
    */
-  private boolean cancelRequested()
-  {
-    boolean bCancelRequested = false;
-    if (_progress != null)
-      bCancelRequested = _progress.cancelRequested();
-    return bCancelRequested;
-  } /* cancelRequested */
+  private boolean cancelRequested() {
+    if (_progress != null && _progress.cancelRequested()) {
+      LOG.info("Cancel uploading of meta data because of request");
+      return true;
+    }
+    return false;
+  }
 
   /*------------------------------------------------------------------*/
   /** create an attribute definition for a CREATE TYPE statement from
@@ -104,7 +103,6 @@ public class MetaDataToDb
   private void createType(MetaType mt, SchemaMapping sm)
     throws SQLException
   {
-    _il.enter(mt.getName());
     TypeMapping tm = sm.getTypeMapping(mt.getName());
     QualifiedId qiType = new QualifiedId(null,
       sm.getMappedSchemaName(),tm.getMappedTypeName());
@@ -137,14 +135,18 @@ public class MetaDataToDb
             sbSql.append(" NOT");
           sbSql.append(" INSTANTIABLE");
         }
+        val sqlStatement = sbSql.toString();
+        LOG.trace("SQL statement: '{}'", sqlStatement);
+
         /* now execute it */
         Statement stmt = _dmd.getConnection().createStatement();
         stmt.setQueryTimeout(_iQueryTimeoutSeconds);
         stmt.executeUpdate(sbSql.toString());
         stmt.close();
+
+        LOG.debug("Type '{}.{}' successfully created", qiType.getSchema(), qiType.getName());
       }
     }
-    _il.exit();
   } /* createType */
 
   /*------------------------------------------------------------------*/
@@ -156,7 +158,6 @@ public class MetaDataToDb
   private void createTypes(MetaSchema ms, SchemaMapping sm)
     throws SQLException
   {
-    _il.enter(ms.getName());
     if (supportsUdts() || supportsDistincts())
     {
       for (int iType = 0; iType < ms.getMetaTypes(); iType++)
@@ -168,7 +169,6 @@ public class MetaDataToDb
           createType(mt, sm);
       }
     }
-    _il.exit();
   } /* createTypes */
   
   /*------------------------------------------------------------------*/
@@ -201,7 +201,6 @@ public class MetaDataToDb
   private void dropTypes(MetaSchema ms, SchemaMapping sm)
     throws IOException, SQLException
   {
-    _il.enter(ms.getName());
     if (supportsUdts())
     {
       Set<String> setTypes = new HashSet<String>();
@@ -228,13 +227,16 @@ public class MetaDataToDb
               QualifiedId qiType = new QualifiedId(null,
                 sm.getMappedSchemaName(),tm.getMappedTypeName());
               String sSql = "DROP TYPE "+qiType.format()+" RESTRICT";
-              _il.event(sSql);
+              LOG.trace("SQL statement: '{}'", sSql);
+
               Statement stmt = _dmd.getConnection().createStatement();
               stmt.setQueryTimeout(_iQueryTimeoutSeconds);
               try 
               {
                 stmt.executeUpdate(sSql);
                 iterType.remove();
+
+                LOG.info("Type '{}.{}' successfully dropped", qiType.getSchema(), qiType.getName());
               }
               catch(SQLException se) {}
               finally { stmt.close(); }
@@ -245,7 +247,6 @@ public class MetaDataToDb
         }
       }
     }
-    _il.exit();
   } /* dropTypes */
 
   /*------------------------------------------------------------------*/
@@ -321,7 +322,6 @@ public class MetaDataToDb
   private void createTable(MetaTable mt, SchemaMapping sm)
     throws IOException, SQLException
   {
-    _il.enter(mt.getName());
     Set<QualifiedId> setBefore = getTables();
     TableMapping tm = sm.getTableMapping(mt.getName());
     QualifiedId qiTable = new QualifiedId(null,sm.getMappedSchemaName(),tm.getMappedTableName());
@@ -370,15 +370,17 @@ public class MetaDataToDb
     /* unique and foreign keys are added in the end of upload */
     sbSql.append(")");
     /* now execute it */
-    _il.event(sbSql.toString());
+
+    val sqlStatement = sbSql.toString();
+    LOG.trace("SQL statement: '{}'", sqlStatement);
 
     try {
       Statement stmt = _dmd.getConnection().createStatement();
       stmt.setQueryTimeout(_iQueryTimeoutSeconds);
-      stmt.executeUpdate(sbSql.toString());
+      stmt.executeUpdate(sqlStatement);
       stmt.close();
     } catch (Exception ex) {
-      System.out.println("Failed SQL statement:\n" + sbSql);
+      System.out.println("Failed SQL statement:\n" + sqlStatement);
       throw ex;
     }
 
@@ -413,7 +415,8 @@ public class MetaDataToDb
         tm.putMappedExtendedColumnName(sExtendedColumnName,sMappedColumnName);
     }
     rsColumns.close();
-    _il.exit();
+
+    LOG.debug("Table '{}.{}' successfully created", sm.getMappedSchemaName(), tm.getMappedTableName());
   } /* createTable */
   
   /*------------------------------------------------------------------*/
@@ -426,7 +429,6 @@ public class MetaDataToDb
   private void createTables(MetaSchema ms, SchemaMapping sm)
     throws IOException, SQLException
   {
-    _il.enter(ms.getName());
     for (int iTable = 0; (iTable < ms.getMetaTables()) && (!cancelRequested()); iTable++)
     {
       MetaTable mt = ms.getMetaTable(iTable);
@@ -435,7 +437,6 @@ public class MetaDataToDb
       createTable(mt, sm);
       incTablesCreated();
     }
-    _il.exit();
   } /* createTables */
 
   /*------------------------------------------------------------------*/
@@ -468,7 +469,6 @@ public class MetaDataToDb
   private void dropTables(MetaSchema ms, SchemaMapping sm)
     throws SQLException
   {
-    _il.enter(ms, sm);
     for (int iTable = 0; iTable < ms.getMetaTables(); iTable++)
     {
       String sTableName = ms.getMetaTable(iTable).getName();
@@ -483,15 +483,16 @@ public class MetaDataToDb
           sm.getMappedSchemaName(),tm.getMappedTableName());
           /* CASCADE must always drop! */
           String sSql = "DROP TABLE "+qiTable.format() +" CASCADE";
-          _il.event(sSql);
+          LOG.trace("SQL statement: '{}'", sSql);
           stmt.executeUpdate(sSql);
           System.out.println("  Dropped: "+qiTable.format());
+
+          LOG.info("Table '{}.{}' successfully dropped", qiTable.getSchema(), qiTable.getName());
         }
       }
       catch(SQLException se) { System.out.println("  Could not drop "+tm.getMappedTableName()+" "+EU.getExceptionMessage(se)); } // could not drop this time but maybe next
       finally{ stmt.close(); }
     }
-    _il.exit();
   } /* dropTables */
 
   /*------------------------------------------------------------------*/
@@ -523,17 +524,25 @@ public class MetaDataToDb
     if (!existsSchema(sm.getMappedSchemaName()))
     {
       String sSql = "CREATE SCHEMA \""+sm.getMappedSchemaName()+"\"";
-      _il.event(sSql);
+      LOG.trace("SQL statement: '{}'", sSql);
+
       Statement stmt = _dmd.getConnection().createStatement();
       stmt.setQueryTimeout(_iQueryTimeoutSeconds);
       try 
       { 
         stmt.executeUpdate(sSql);
         stmt.getConnection().commit();
+
+        LOG.debug("Schema '{}' successfully created", sm.getMappedSchemaName());
       }
       catch(SQLException se) 
       { 
-        _il.exception(se);
+        LOG.error(
+                String.format(
+                        "Can not create schema '%s' with SQL statement '%s'",
+                        sm.getMappedSchemaName(),
+                        sSql),
+                se);
         stmt.getConnection().rollback();
         /* rethrow it (only caught for finally clause) */
         throw new SQLException(se.getMessage(),se.getCause());
@@ -550,7 +559,9 @@ public class MetaDataToDb
   public void upload(Progress progress)
     throws IOException, SQLException
   {
-    _il.enter();
+    LOG.info("Start meta data upload of archive {}",
+            this._md.getArchive().getFile().getAbsoluteFile());
+
     System.out.println("Meta Data");
     _progress = progress;
     /* compute number of tables to create */
@@ -612,7 +623,8 @@ public class MetaDataToDb
     if (cancelRequested())
       throw new IOException("Upload of meta data cancelled!");
     _dmd.getConnection().commit();
-    _il.exit();
+
+    LOG.info("Meta data upload finished");
   } /* upload */
   
   /*------------------------------------------------------------------*/
@@ -623,7 +635,6 @@ public class MetaDataToDb
   public int tablesDroppedByUpload()
     throws SQLException
   {
-    _il.enter();
     int iTablesDropped = 0;
     for (int iSchema = 0; iSchema < _md.getMetaSchemas(); iSchema++)
     {
@@ -636,7 +647,6 @@ public class MetaDataToDb
           iTablesDropped++;
       }
     }
-    _il.exit(String.valueOf(iTablesDropped));
     return iTablesDropped;
   } /* tablesDroppedByUpload */
 
@@ -810,7 +820,6 @@ public class MetaDataToDb
   public int typesDroppedByUpload()
     throws IOException, SQLException
   {
-    _il.enter();
     int iTypesDropped = 0;
     if (supportsUdts())
     {
@@ -826,7 +835,6 @@ public class MetaDataToDb
         }
       }
     }
-    _il.exit(String.valueOf(iTypesDropped));
     return iTypesDropped;
   } /* typesDroppedByUpload */
 

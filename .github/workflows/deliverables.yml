@@ -28,6 +28,14 @@ jobs:
         run: ./gradlew cV
       - name: Execute Gradle build
         run: ./gradlew packDeliverables
+      - name: Store reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: reports
+          path: |
+            **/build/reports/
+            **/build/test-results/
       - name: upload deliverables
         uses: actions/upload-artifact@v3
         with:

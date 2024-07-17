@@ -8,6 +8,8 @@ import java.util.*
  * For more details take a look at the 'Building Java & JVM projects' chapter in the Gradle
  * User Manual available at https://docs.gradle.org/7.3.2/userguide/building_java_projects.html
  */
+
+group = "ch.admin.bar"
 version = scmVersion.version
 val siardVersion = "2.2"
 val versionedProjectName = "${project.name}-${scmVersion.version}"
@@ -40,6 +42,9 @@ sourceSets {
 }
 
 dependencies {
+    implementation("org.apache.tika:tika-core:2.9.1") // used for getting mime-type from binary data
+    implementation("ch.qos.logback:logback-classic:1.3.14") // latest version which supports java 8
+    implementation("com.mysql:mysql-connector-j:8.3.0") // transitive dependency from lib/jdbcmysql.jar
     implementation(fileTree("lib") { include("*.jar") })
 
     testImplementation("junit:junit:4.13.2")
@@ -48,12 +53,15 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.2")
+    testImplementation("org.mockito:mockito-core:4.11.0") // latest version which supports java 8
 
     // testcontainers
     testImplementation("org.testcontainers:testcontainers:1.19.0")
     testImplementation("org.testcontainers:mssqlserver:1.19.0")
     testImplementation("org.testcontainers:postgresql:1.19.0")
     testImplementation("org.testcontainers:mysql:1.19.0")
+    testImplementation("org.testcontainers:mariadb:1.19.6")
+    testImplementation("org.mariadb.jdbc:mariadb-java-client:2.7.4") // Used by mariadb testcontainer
     testImplementation("org.testcontainers:oracle-xe:1.19.0")
     testImplementation("org.testcontainers:db2:1.19.0")
 }

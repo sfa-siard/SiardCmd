@@ -8,21 +8,12 @@ Created    : 01.09.2016, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.cmd;
 
-import ch.admin.bar.siard2.api.Archive;
-import ch.admin.bar.siard2.api.Cell;
-import ch.admin.bar.siard2.api.MetaColumn;
-import ch.admin.bar.siard2.api.MetaType;
-import ch.admin.bar.siard2.api.Record;
-import ch.admin.bar.siard2.api.RecordRetainer;
-import ch.admin.bar.siard2.api.Schema;
-import ch.admin.bar.siard2.api.Table;
-import ch.admin.bar.siard2.api.Value;
+import ch.admin.bar.siard2.api.*;
 import ch.admin.bar.siard2.api.generated.CategoryType;
 import ch.enterag.sqlparser.identifier.QualifiedId;
 import ch.enterag.utils.StopWatch;
 import ch.enterag.utils.background.Progress;
-import ch.enterag.utils.database.SqlTypes;
-import ch.enterag.utils.logging.IndentLogger;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 
 import javax.xml.datatype.Duration;
@@ -31,44 +22,90 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
 import java.sql.*;
-
-/*====================================================================*/
+import java.sql.Date;
 
 /**
  * Transfers primary data from databases to SIARD files.
  *
  * @author Hartwig Thomas
  */
+@Slf4j
 public class PrimaryDataFromDb extends PrimaryDataTransfer {
-    /**
-     * logger
-     */
-    private static final IndentLogger _il = IndentLogger.getIndentLogger(PrimaryDataFromDb.class.getName());
-    private static final long _lREPORT_RECORDS = 1000;
-    private Progress _progress = null;
-    private long _lRecordsDownloaded = -1;
-    private long _lRecordsTotal = -1;
-    private long _lRecordsPercent = -1;
-    private StopWatch _swGetCell = null;
-    private StopWatch _swGetValue = null;
-    private StopWatch _swSetValue = null;
+
+    private static final long REPORT_RECORDS = 1000;
+    private Progress progress = null;
+    private long recordsDownloaded = -1;
+    private long recordsTotal = -1;
+    private long recordsPercent = -1;
+    private StopWatch getCellStopWatch = null;
+    private StopWatch getValueStopWatch = null;
+    private StopWatch setValueStopWatch = null;
     private final Tika tika = new Tika();
 
-    /*------------------------------------------------------------------*/
+
+    private PrimaryDataFromDb(Connection connection, Archive archive) {
+        super(connection, archive, null, true, true, true);
+    }
+
+    /**
+     * Factory method to create an instance of {@link PrimaryDataFromDb}
+     *
+     * @param connection    database connection.
+     * @param archive SIARD archive.
+     * @return new instance of PrimaryDataFromDb.
+     */
+    public static PrimaryDataFromDb newInstance(Connection connection, Archive archive) {
+        return new PrimaryDataFromDb(connection, archive);
+    }
+
+    /**
+     * download primary data.
+     *
+     * @param progress receives progress notifications and sends cancel
+     *                 requests.
+     * @throws IOException  if an I/O error occurred.
+     * @throws SQLException if a database error occurred.
+     */
+    public void download(Progress progress) throws IOException, SQLException {
+
+        LOG.info("Start primary data download to archive {}",
+                this._archive.getFile().getAbsoluteFile());
+
+        System.out.println("\r\nPrimary Data");
+        this.progress = progress;
+        /* determine total number of records in the database */
+        recordsTotal = 0;
+        for (int iSchema = 0; iSchema < _archive.getSchemas(); iSchema++) {
+            Schema schema = _archive.getSchema(iSchema);
+            for (int iTable = 0; iTable < schema.getTables(); iTable++) {
+                recordsTotal = recordsTotal + schema.getTable(iTable).getMetaTable().getRows();
+            }
+        }
+        recordsPercent = (recordsTotal + 99) / 100;
+        recordsDownloaded = 0;
+        /* now download */
+        for (int iSchema = 0; (iSchema < _archive.getSchemas()) && (!cancelRequested()); iSchema++) {
+            getSchema(_archive.getSchema(iSchema));
+        }
+        if (cancelRequested())
+            throw new IOException("\r\nDownload of primary data cancelled!");
+        System.out.println("\r\nDownload terminated successfully.");
+        _conn.rollback();
+
+        LOG.info("Primary data download finished");
+    }
 
     /**
      * increment the number of records downloaded, issuing a notification,
      * when a percent is reached.
      */
     private void incDownloaded() {
-        _lRecordsDownloaded++;
-        if ((_progress != null) && (_lRecordsTotal > 0) && ((_lRecordsDownloaded % _lRecordsPercent) == 0)) {
-            int iPercent = (int) ((100 * _lRecordsDownloaded) / _lRecordsTotal);
-            _progress.notifyProgress(iPercent);
+        recordsDownloaded++;
+        if ((progress != null) && (recordsTotal > 0) && ((recordsDownloaded % recordsPercent) == 0)) {
+            int iPercent = (int) ((100 * recordsDownloaded) / recordsTotal);
+            progress.notifyProgress(iPercent);
         }
-    } /* incDownloaded */
-
-    /*------------------------------------------------------------------*/
+    }
 
     /**
      * check if cancel was requested.
@@ -76,21 +113,21 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      * @return true, if cancel was requested.
      */
     private boolean cancelRequested() {
-        boolean bCancelRequested = false;
-        if (_progress != null)
-            bCancelRequested = _progress.cancelRequested();
-        return bCancelRequested;
-    } /* cancelRequested */
+        if (progress != null && progress.cancelRequested()) {
+            LOG.info("Cancel downloading of primary data because of request");
+            return true;
+        }
+        return false;
+    }
 
-    private void setValue(Value value, Object oValue)
+    private void setValue(Value value, Object oValue, MimeTypeHandler mimeTypeHandler)
             throws IOException, SQLException {
         if (oValue != null) {
             if (oValue instanceof String)
                 value.setString((String) oValue);
             else if (oValue instanceof byte[]) {
                 byte[] bytes = (byte[]) oValue;
-                String mimeType = tika.detect(bytes);
-                value.getMetaValue().setMimeType(mimeType);
+                mimeTypeHandler.add(value, bytes);
                 value.setBytes(bytes);
             } else if (oValue instanceof Boolean)
                 value.setBoolean((Boolean) oValue);
@@ -118,8 +155,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 value.setDuration((Duration) oValue);
             else if (oValue instanceof Clob) {
                 Clob clob = (Clob) oValue;
-                String mimeType = tika.detect(clob.getAsciiStream());
-                value.getMetaValue().setMimeType(mimeType);
+                mimeTypeHandler.add(value, clob);
                 value.setReader(clob.getCharacterStream());
                 clob.free();
             } else if (oValue instanceof SQLXML) {
@@ -128,8 +164,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 sqlxml.free();
             } else if (oValue instanceof Blob) {
                 Blob blob = (Blob) oValue;
-                String mimeType = tika.detect(blob.getBinaryStream());
-                value.getMetaValue().setMimeType(mimeType);
+                mimeTypeHandler.add(value, blob);
                 value.setInputStream(blob.getBinaryStream());
                 blob.free();
             } else if (oValue instanceof URL) {
@@ -140,23 +175,20 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 Object[] ao = (Object[]) array.getArray();
                 for (int iElement = 0; iElement < ao.length; iElement++) {
                     Value valueElement = value.getElement(iElement);
-                    setValue(valueElement, ao[iElement]);
+                    setValue(valueElement, ao[iElement], mimeTypeHandler);
+                    mimeTypeHandler.applyMimeType(valueElement);
                 }
                 array.free();
             } else if (oValue instanceof Struct) {
                 Struct struct = (Struct) oValue;
                 Object[] ao = struct.getAttributes();
                 for (int iAttribute = 0; iAttribute < ao.length; iAttribute++) {
-                    Value valueAttribute = value.getAttribute(iAttribute);
-                    setValue(valueAttribute, ao[iAttribute]);
+                    setValue(value.getAttribute(iAttribute), ao[iAttribute], mimeTypeHandler);
                 }
             } else
                 throw new SQLException("Invalid value type " + oValue.getClass().getName() + " encountered!");
         }
-    } /* setValue */
-
-    /*------------------------------------------------------------------*/
-
+    }
     /**
      * extract primary data of a record from the result set.
      *
@@ -165,115 +197,49 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      * @throws IOException  if an I/O error occurred.
      * @throws SQLException if a database error occurred.
      */
-    private void getRecord(ResultSet rs, Record record)
-            throws IOException, SQLException {
-        ResultSetMetaData restultSetMetaData = rs.getMetaData();
-        if (restultSetMetaData.getColumnCount() != record.getCells())
+    private void getRecord(ResultSet rs, Record record, MimeTypeHandler mimeTypeHandler) throws IOException, SQLException {
+        if (rs.getMetaData().getColumnCount() != record.getCells())
             throw new IOException("Invalid number of result columns found!");
-        for (int iCell = 0; iCell < record.getCells(); iCell++) {
-            _swGetCell.start();
-            int iPosition = iCell + 1;
-            Cell cell = record.getCell(iCell);
-            MetaColumn mc = cell.getMetaColumn();
-            // String sColumnName = mc.getName();
-            int iDataType = mc.getPreType();
-            if (mc.getCardinality() >= 0)
-                iDataType = Types.ARRAY;
-            MetaType mt = mc.getMetaType();
-            if (mt != null) {
-                CategoryType cat = mt.getCategoryType();
-                if (cat == CategoryType.DISTINCT)
-                    iDataType = mt.getBasePreType();
-                else
-                    iDataType = Types.STRUCT;
-            }
-            _swGetCell.stop();
-            _swGetValue.start();
-            Object oValue = null;
-            switch (iDataType) {
-                case Types.CHAR:
-                case Types.VARCHAR:
-                    oValue = rs.getString(iPosition);
-                    break;
-                case Types.CLOB:
-                    oValue = rs.getClob(iPosition);
-                    break;
-                case Types.SQLXML:
-                    oValue = rs.getSQLXML(iPosition);
-                    break;
-                case Types.NCHAR:
-                case Types.NVARCHAR:
-                    oValue = rs.getNString(iPosition);
-                    break;
-                case Types.NCLOB:
-                    oValue = rs.getNClob(iPosition);
-                    break;
-                case Types.BINARY:
-                case Types.VARBINARY:
-                    oValue = rs.getBytes(iPosition);
-                    break;
-                case Types.BLOB:
-                    oValue = rs.getBlob(iPosition);
-                    break;
-                case Types.DATALINK:
-                    oValue = rs.getURL(iPosition);
-                    break;
-                case Types.BOOLEAN:
-                    oValue = rs.getBoolean(iPosition);
-                    break;
-                case Types.SMALLINT:
-                    oValue = rs.getInt(iPosition);
-                    break;
-                case Types.INTEGER:
-                    oValue = rs.getLong(iPosition);
-                    break;
-                case Types.BIGINT:
-                    BigDecimal bdInt = rs.getBigDecimal(iPosition);
-                    if (bdInt != null)
-                        oValue = bdInt.toBigIntegerExact();
-                    break;
-                case Types.DECIMAL:
-                case Types.NUMERIC:
-                    oValue = rs.getBigDecimal(iPosition);
-                    break;
-                case Types.REAL:
-                    oValue = rs.getFloat(iPosition);
-                    break;
-                case Types.FLOAT:
-                case Types.DOUBLE:
-                    oValue = rs.getDouble(iPosition);
-                    break;
-                case Types.DATE:
-                    oValue = rs.getDate(iPosition);
-                    break;
-                case Types.TIME:
-                    oValue = rs.getTime(iPosition);
-                    break;
-                case Types.TIMESTAMP:
-                    oValue = rs.getTimestamp(iPosition);
-                    break;
-                case Types.OTHER:
-                case Types.STRUCT:
-                    oValue = rs.getObject(iPosition);
-                    break;
-                case Types.ARRAY:
-                    oValue = rs.getArray(iPosition);
-                    break;
-                default:
-                    throw new SQLException("Invalid data type " +
-                                                   iDataType + " (" +
-                                                   SqlTypes.getTypeName(iDataType) + ") encountered!");
-            } /* switch */
-            if (rs.wasNull())
-                oValue = null;
-            _swGetValue.stop();
-            _swSetValue.start();
-            setValue(cell, oValue);
-            _swSetValue.stop();
-        } /* loop over values */
-    } /* getRecord */
+        for (int cellIndex = 0; cellIndex < record.getCells(); cellIndex++) {
+            Cell cell = getCell(record, cellIndex);
+            Object oValue = getValue(rs, cell, cellIndex);
+            setValue(mimeTypeHandler, cell, oValue);
+        }
+    }
 
-    /*------------------------------------------------------------------*/
+    private Cell getCell(Record record, int cellIndex) throws IOException {
+        getCellStopWatch.start();
+        Cell cell = record.getCell(cellIndex);
+        getCellStopWatch.stop();
+        return cell;
+    }
+
+    private Object getValue(ResultSet rs, Cell cell, int cellIndex) throws SQLException, IOException {
+        getValueStopWatch.start();
+        Object oValue = new ObjectValueReader(rs, getDataType(cell.getMetaColumn()), cellIndex + 1).read();
+        if (rs.wasNull()) oValue = null;
+        getValueStopWatch.stop();
+        return oValue;
+    }
+
+    private void setValue(MimeTypeHandler mimeTypeHandler, Cell cell, Object oValue) throws IOException, SQLException {
+        setValueStopWatch.start();
+        setValue(cell, oValue, mimeTypeHandler);
+        mimeTypeHandler.applyMimeType(cell);
+        setValueStopWatch.stop();
+    }
+
+    private int getDataType(MetaColumn mc) throws IOException {
+        int iDataType = mc.getPreType();
+        if (mc.getCardinality() >= 0) iDataType = Types.ARRAY;
+        MetaType mt = mc.getMetaType();
+        if (mt != null) {
+            CategoryType cat = mt.getCategoryType();
+            if (cat == CategoryType.DISTINCT) iDataType = mt.getBasePreType();
+            else iDataType = Types.STRUCT;
+        }
+        return iDataType;
+    }
 
     /**
      * download primary data of a table using a SELECT query for all
@@ -285,13 +251,12 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      */
     private void getTable(Table table)
             throws IOException, SQLException {
-        _il.enter(table.getMetaTable().getName());
-        _swGetCell = StopWatch.getInstance();
-        _swGetValue = StopWatch.getInstance();
-        _swSetValue = StopWatch.getInstance();
+        getCellStopWatch = StopWatch.getInstance();
+        getValueStopWatch = StopWatch.getInstance();
+        setValueStopWatch = StopWatch.getInstance();
         QualifiedId qiTable = new QualifiedId(null,
-                                              table.getParentSchema().getMetaSchema().getName(),
-                                              table.getMetaTable().getName());
+                table.getParentSchema().getMetaSchema().getName(),
+                table.getMetaTable().getName());
         System.out.println("  Table: " + qiTable.format());
         long lRecord = 0;
         RecordRetainer rr = table.createRecords();
@@ -303,38 +268,57 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         StopWatch sw = StopWatch.getInstance();
         sw.start();
         long lBytesStart = rr.getByteCount();
-        while (rs.next() && (!cancelRequested())) {
-            swCreate.start();
-            Record record = rr.create();
-            swCreate.stop();
-            swGet.start();
 
-            getRecord(rs, record);
-            swGet.stop();
-            swPut.start();
-            rr.put(record);
-            swPut.stop();
-            lRecord++;
-            if ((lRecord % _lREPORT_RECORDS) == 0) {
-                System.out.println("    Record " + lRecord + " (" + sw.formatRate(rr.getByteCount() - lBytesStart,
-                                                                                  sw.stop()) + " kB/s)");
-                lBytesStart = rr.getByteCount();
-                sw.start();
-            }
+        MimeTypeHandler mimeTypeHandler = new MimeTypeHandler(tika);
+        while (rs.next() && (!cancelRequested())) {
+            Record record = createRecord(swCreate, rr);
+            readRecord(swGet, rs, record, mimeTypeHandler);
+            putRecord(swPut, rr, record);
+            lBytesStart = logRecordProgress(lRecord++, sw, rr, lBytesStart);
             incDownloaded();
         }
         System.out.println("    Record " + lRecord + " (" + sw.formatRate(rr.getByteCount() - lBytesStart,
-                                                                          sw.stop()) + " kB/s)");
+                sw.stop()) + " kB/s)");
         System.out.println("    Total: " + StopWatch.formatLong(lRecord) + " records (" + StopWatch.formatLong(rr.getByteCount()) + " bytes in " + sw.formatMs() + " ms)");
         if (!rs.isClosed())
             rs.close();
         if (!stmt.isClosed())
             stmt.close();
         rr.close();
-        _il.exit();
-    } /* getTable */
 
-    /*------------------------------------------------------------------*/
+        LOG.debug("All data of table '{}.{}' successfully downloaded",
+                qiTable.getSchema(),
+                qiTable.getName());
+    }
+
+    private static long logRecordProgress(long lRecord, StopWatch sw, RecordRetainer rr, long lBytesStart) {
+        if ((lRecord % REPORT_RECORDS) == 0) {
+            System.out.println("    Record " + lRecord + " (" + sw.formatRate(rr.getByteCount() - lBytesStart,
+                    sw.stop()) + " kB/s)");
+            lBytesStart = rr.getByteCount();
+            sw.start();
+        }
+        return lBytesStart;
+    }
+
+    private static void putRecord(StopWatch swPut, RecordRetainer rr, Record record) throws IOException {
+        swPut.start();
+        rr.put(record);
+        swPut.stop();
+    }
+
+    private void readRecord(StopWatch swGet, ResultSet rs, Record record, MimeTypeHandler mimeTypeHandler) throws IOException, SQLException {
+        swGet.start();
+        getRecord(rs, record, mimeTypeHandler);
+        swGet.stop();
+    }
+
+    private static Record createRecord(StopWatch swCreate, RecordRetainer rr) throws IOException {
+        swCreate.start();
+        Record record = rr.create();
+        swCreate.stop();
+        return record;
+    }
 
     /**
      * download primary data of a schema.
@@ -345,75 +329,13 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      */
     private void getSchema(Schema schema)
             throws IOException, SQLException {
-        _il.enter(schema.getMetaSchema().getName());
+
         for (int iTable = 0; (iTable < schema.getTables()) && (!cancelRequested()); iTable++) {
             Table table = schema.getTable(iTable);
             getTable(table);
         }
-        _il.exit();
-    } /* getSchema */
 
-    /*------------------------------------------------------------------*/
+        LOG.debug("All data of schema '{}' successfully downloaded", schema.getMetaSchema().getName());
+    }
 
-    /**
-     * download primary data.
-     *
-     * @param progress receives progress notifications and sends cancel
-     *                 requests.
-     * @throws IOException  if an I/O error occurred.
-     * @throws SQLException if a database error occurred.
-     */
-    public void download(Progress progress)
-            throws IOException, SQLException {
-        _il.enter();
-        System.out.println("\r\nPrimary Data");
-        _progress = progress;
-        /* determine total number of records in the database */
-        _lRecordsTotal = 0;
-        for (int iSchema = 0; iSchema < _archive.getSchemas(); iSchema++) {
-            Schema schema = _archive.getSchema(iSchema);
-            for (int iTable = 0; iTable < schema.getTables(); iTable++) {
-                Table table = schema.getTable(iTable);
-                _lRecordsTotal = _lRecordsTotal + table.getMetaTable().getRows();
-            }
-        }
-        _lRecordsPercent = (_lRecordsTotal + 99) / 100;
-        _lRecordsDownloaded = 0;
-        /* now download */
-        for (int iSchema = 0; (iSchema < _archive.getSchemas()) && (!cancelRequested()); iSchema++) {
-            Schema schema = _archive.getSchema(iSchema);
-            getSchema(schema);
-        }
-        if (cancelRequested())
-            throw new IOException("\r\nDownload of primary data cancelled!");
-        System.out.println("\r\nDownload terminated successfully.");
-        _conn.rollback();
-        _il.exit();
-    } /* download */
-
-    /*------------------------------------------------------------------*/
-
-    /**
-     * constructor
-     *
-     * @param conn    database connection.
-     * @param archive SIARD archive.
-     */
-    private PrimaryDataFromDb(Connection conn, Archive archive) {
-        super(conn, archive, null, true, true, true);
-    } /* constructor PrimaryDataTransfer */
-
-    /*------------------------------------------------------------------*/
-
-    /**
-     * factory
-     *
-     * @param conn    database connection.
-     * @param archive SIARD archive.
-     * @return new instance of PrimaryDataFromDb.
-     */
-    public static PrimaryDataFromDb newInstance(Connection conn, Archive archive) {
-        return new PrimaryDataFromDb(conn, archive);
-    } /* newInstance */
-
-} /* class PrimaryDataFromDb */
+}
