@@ -179,11 +179,14 @@ task("createVersionsPropertiesFile") {
     description = "Creates a properties file which contains all needed versions information"
     group = "build"
 
-    val file = generatedResourcesDir.resolve("versions.properties").toFile()
+
 
     doLast {
+        val file = generatedResourcesDir.resolve("versions.properties").toFile()
         if (!file.exists()) {
+            file.parentFile.mkdirs()
             file.createNewFile()
+            logger.info("$file successfully created")
         }
 
         file.writer().use { writer ->
