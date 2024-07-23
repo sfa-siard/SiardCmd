@@ -6,6 +6,10 @@ public class SqlScripts {
     }
 
     public static class Postgres {
-        public final static String ISSUE_31 = "config/postgres/issue-31_case-sensitive-column-names.sql";
+        public final static String ISSUE_31 = "issues/siardcmd31/case-sensitive-column-names-postgres.sql";
+    }
+
+    public static class MySQL {
+        public final static String ISSUE_31 = "issues/siardcmd31/case-sensitive-column-names-mysql.sql";
     }
 }
