@@ -7,8 +7,10 @@ on:
   pull_request:
     branches: [ main ]
 
+  workflow_dispatch:
+
 jobs:
-  execute-unitand-integration-tests:
+  execute-unit-and-integration-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

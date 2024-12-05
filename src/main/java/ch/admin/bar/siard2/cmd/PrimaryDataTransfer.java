@@ -70,7 +70,11 @@ public class PrimaryDataTransfer
       String sExtendedColumnName = sbColumnName.toString();
       if (tm != null)
         sExtendedColumnName = tm.getMappedExtendedColumnName(sExtendedColumnName);
-      sbSql.append(SqlLiterals.formatId(sExtendedColumnName));
+      String formattedColumnName = SqlLiterals.formatId(sExtendedColumnName);
+      if (!formattedColumnName.startsWith("\"") && formattedColumnName.equals(formattedColumnName.toUpperCase())) {
+        formattedColumnName = "\"" + formattedColumnName.replace("\"", "\"\"") + "\"";
+      }
+      sbSql.append(formattedColumnName);
     }
     String sSchemaName = mt.getParentMetaSchema().getName();
     if (sm != null)

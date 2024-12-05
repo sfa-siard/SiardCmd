@@ -47,6 +47,8 @@ dependencies {
     implementation("com.mysql:mysql-connector-j:8.3.0") // transitive dependency from lib/jdbcmysql.jar
     implementation(fileTree("lib") { include("*.jar") })
 
+    implementation("ch.admin.bar:JdbcPostgres:v2.2.0")
+
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("io.chandler:ZipInputStreamPatch64:1.0.0") // needed because of a bug in java.util.zip (see https://github.com/cjgriscom/ZipInputStreamPatch64)
@@ -179,11 +181,14 @@ task("createVersionsPropertiesFile") {
     description = "Creates a properties file which contains all needed versions information"
     group = "build"
 
-    val file = generatedResourcesDir.resolve("versions.properties").toFile()
+
 
     doLast {
+        val file = generatedResourcesDir.resolve("versions.properties").toFile()
         if (!file.exists()) {
+            file.parentFile.mkdirs()
             file.createNewFile()
+            logger.info("$file successfully created")
         }
 
         file.writer().use { writer ->
