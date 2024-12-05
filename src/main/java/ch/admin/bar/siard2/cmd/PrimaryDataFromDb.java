@@ -197,7 +197,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      * @throws IOException  if an I/O error occurred.
      * @throws SQLException if a database error occurred.
      */
-    private void getRecord(ResultSet rs, Record record, MimeTypeHandler mimeTypeHandler) throws IOException, SQLException {
+    private void getRecord(ResultSet rs, ch.admin.bar.siard2.api.Record record, MimeTypeHandler mimeTypeHandler) throws IOException, SQLException {
         if (rs.getMetaData().getColumnCount() != record.getCells())
             throw new IOException("Invalid number of result columns found!");
         for (int cellIndex = 0; cellIndex < record.getCells(); cellIndex++) {
@@ -207,7 +207,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         }
     }
 
-    private Cell getCell(Record record, int cellIndex) throws IOException {
+    private Cell getCell(ch.admin.bar.siard2.api.Record record, int cellIndex) throws IOException {
         getCellStopWatch.start();
         Cell cell = record.getCell(cellIndex);
         getCellStopWatch.stop();
@@ -271,7 +271,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
 
         MimeTypeHandler mimeTypeHandler = new MimeTypeHandler(tika);
         while (rs.next() && (!cancelRequested())) {
-            Record record = createRecord(swCreate, rr);
+            ch.admin.bar.siard2.api.Record record = createRecord(swCreate, rr);
             readRecord(swGet, rs, record, mimeTypeHandler);
             putRecord(swPut, rr, record);
             lBytesStart = logRecordProgress(lRecord++, sw, rr, lBytesStart);
@@ -301,21 +301,21 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         return lBytesStart;
     }
 
-    private static void putRecord(StopWatch swPut, RecordRetainer rr, Record record) throws IOException {
+    private static void putRecord(StopWatch swPut, RecordRetainer rr, ch.admin.bar.siard2.api.Record record) throws IOException {
         swPut.start();
         rr.put(record);
         swPut.stop();
     }
 
-    private void readRecord(StopWatch swGet, ResultSet rs, Record record, MimeTypeHandler mimeTypeHandler) throws IOException, SQLException {
+    private void readRecord(StopWatch swGet, ResultSet rs, ch.admin.bar.siard2.api.Record record, MimeTypeHandler mimeTypeHandler) throws IOException, SQLException {
         swGet.start();
         getRecord(rs, record, mimeTypeHandler);
         swGet.stop();
     }
 
-    private static Record createRecord(StopWatch swCreate, RecordRetainer rr) throws IOException {
+    private static ch.admin.bar.siard2.api.Record createRecord(StopWatch swCreate, RecordRetainer rr) throws IOException {
         swCreate.start();
-        Record record = rr.create();
+        ch.admin.bar.siard2.api.Record record = rr.create();
         swCreate.stop();
         return record;
     }
