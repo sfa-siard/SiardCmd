@@ -42,4 +42,19 @@ public class MySQLZeroDateValueIT {
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
     }
+
+    @Test
+    public void shouldCreateSiardArchiveFromDbWithNoZeroDate() throws SQLException, IOException, ClassNotFoundException {
+        val actualArchive = siardArchivesHandler.prepareEmpty();
+
+        SiardFromDb siardFromDb = new SiardFromDb(new String[]{
+                "-o",
+                "-j:" + db.getJdbcUrl() + "?zeroDateTimeBehavior=convertToNull",
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
+                "-s:" + actualArchive.getPathToArchiveFile()
+        });
+
+        Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+    }
 }
