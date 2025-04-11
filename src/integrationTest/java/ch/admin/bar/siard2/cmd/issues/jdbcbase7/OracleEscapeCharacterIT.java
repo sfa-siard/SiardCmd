@@ -26,7 +26,7 @@ public class OracleEscapeCharacterIT {
             .withLogConsumer(new ConsoleLogConsumer())
             .withCopyFileToContainer(
                     MountableFile.forHostPath(TestResourcesResolver.resolve(SqlScripts.Oracle.JDBCBASE_7).toPath()),
-                    "/container-entrypoint-initdb.d/jdbcbase_7.sql");
+                    "/container-entrypoint-initdb.d/jdbcbase7.sql");
 
     @Test
     public void download_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
@@ -37,8 +37,8 @@ public class OracleEscapeCharacterIT {
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
-                "-u:" + "SIARDTEST",
-                "-p:" + "SIARDTEST",
+                "-u:" + "test",
+                "-p:" + "test",
                 "-s:" + actualArchive.getPathToArchiveFile()
         });
 
