@@ -363,7 +363,6 @@ public class MetaDataFromDb extends MetaDataBase {
                                             ((BaseDatabaseMetaData) _dmd).toPattern(qiType.getName()),
                                             new int[]{Types.DISTINCT, Types.STRUCT});
                 boolean hasNext = rs.next();
-                // Special case for Oracle PL/SQL BOOLEAN type which doesn't have UDT metadata
                 if (!hasNext && "PL/SQL BOOLEAN".equals(qiType.getName())) {
                     BaseSqlFactory bsf = new BaseSqlFactory();
                     PredefinedType pt = bsf.newPredefinedType();
