@@ -362,9 +362,15 @@ public class MetaDataFromDb extends MetaDataBase {
                                             ((BaseDatabaseMetaData) _dmd).toPattern(qiType.getSchema()),
                                             ((BaseDatabaseMetaData) _dmd).toPattern(qiType.getName()),
                                             new int[]{Types.DISTINCT, Types.STRUCT});
-                rs.next();
-                if (qiType.getName().equals(rs.getString("TYPE_NAME")) && qiType.getSchema()
-                                                                                .equals(rs.getString("TYPE_SCHEM"))) {
+                boolean hasNext = rs.next();
+                if (!hasNext && "PL/SQL BOOLEAN".equals(qiType.getName())) {
+                    BaseSqlFactory bsf = new BaseSqlFactory();
+                    PredefinedType pt = bsf.newPredefinedType();
+                    mt.setCategory(CategoryType.DISTINCT.value());
+                    pt.initialize(Types.BOOLEAN, 0, 0);
+                    mt.setBase(pt.format());
+                } else if (hasNext && qiType.getName().equals(rs.getString("TYPE_NAME")) && qiType.getSchema()
+                                                                                 .equals(rs.getString("TYPE_SCHEM"))) {
                     String sRemarks = rs.getString("REMARKS");
                     if (sRemarks != null) mt.setDescription(sRemarks);
                     BaseSqlFactory bsf = new BaseSqlFactory();
