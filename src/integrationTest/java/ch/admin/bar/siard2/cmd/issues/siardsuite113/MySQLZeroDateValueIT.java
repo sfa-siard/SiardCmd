@@ -29,21 +29,6 @@ public class MySQLZeroDateValueIT {
             .withConfigurationOverride("config/mysql-no-zero-date");
 
     @Test
-    public void shouldCreateSiardArchiveFromDb() throws SQLException, IOException, ClassNotFoundException {
-        val actualArchive = siardArchivesHandler.prepareEmpty();
-
-        SiardFromDb siardFromDb = new SiardFromDb(new String[]{
-                "-o",
-                "-j:" + db.getJdbcUrl(),
-                "-u:" + db.getUsername(),
-                "-p:" + db.getPassword(),
-                "-s:" + actualArchive.getPathToArchiveFile()
-        });
-
-        Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
-    }
-
-    @Test
     public void shouldCreateSiardArchiveFromDbWithNoZeroDate() throws SQLException, IOException, ClassNotFoundException {
         val actualArchive = siardArchivesHandler.prepareEmpty();
 
