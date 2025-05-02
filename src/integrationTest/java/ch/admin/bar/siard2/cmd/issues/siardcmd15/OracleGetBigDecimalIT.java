@@ -24,8 +24,8 @@ public class OracleGetBigDecimalIT {
     public final OracleContainer db = new OracleContainer("gvenzl/oracle-xe:21-slim-faststart")
             .withLogConsumer(new ConsoleLogConsumer())
             .withCopyFileToContainer(
-                    MountableFile.forHostPath(TestResourcesResolver.resolve(SqlScripts.Oracle.SIARDCMD_7).toPath()),
-                    "/container-entrypoint-initdb.d/jdbcbase7.sql");
+                    MountableFile.forHostPath(TestResourcesResolver.resolve(SqlScripts.Oracle.SIARDCMD_15).toPath()),
+                    "/container-entrypoint-initdb.d/siardcmd15.sql");
 
     @Test
     public void download_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
