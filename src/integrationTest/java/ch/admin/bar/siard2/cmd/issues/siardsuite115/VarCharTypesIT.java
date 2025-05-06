@@ -12,7 +12,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class VarCharIT {
+public class VarCharTypesIT {
 
     public final static String VARCHAR_TYPES = "issues/siardsuite115/varchar-types.sql";
 
