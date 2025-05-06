@@ -30,7 +30,7 @@ public class VarCharTypesIT {
 
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
-                "-j:" + db.getJdbcUrl(), // Connects to default DB (usually master)
+                "-j:" + db.getJdbcUrl(),
                 "-u:" + db.getUsername(),
                 "-p:" + db.getPassword(),
                 "-s:" + actualArchive.getPathToArchiveFile()
@@ -38,11 +38,5 @@ public class VarCharTypesIT {
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
         actualArchive.preserveArchive();
-
-        System.out.println("JDBC URL: " + db.getJdbcUrl());
-        System.out.println("Mapped port: " + db.getMappedPort(1433));
-        System.out.println("Username: " + db.getUsername());
-        System.out.println("Password: " + db.getPassword());
-
     }
 }
