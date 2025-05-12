@@ -38,7 +38,7 @@ public class BitTypeIT {
 
     //Assert that the provided siard archive fails with the expected error
     @Test
-    public void uploadBitType_expectException() throws SQLException, IOException {
+    public void uploadSubmittedArchive_expectException() throws SQLException, IOException {
         val siardArchive = siardArchivesHandler.prepareResource("issues/siardgui29/provided-bit-type.siard");
 
         try {
@@ -56,9 +56,9 @@ public class BitTypeIT {
         }
     }
 
-    //Test that siard archive created by siardcmd does not fail with the same exception
+    //Assert that siard archive created by siardcmd does not fail with the same exception
     @Test
-    public void uploadCreatedArchive() throws SQLException, IOException, ClassNotFoundException {
+    public void uploadCreatedArchive_expectNoException() throws SQLException, IOException, ClassNotFoundException {
         val createdArchive = siardArchivesHandler.prepareEmpty();
 
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
@@ -72,8 +72,6 @@ public class BitTypeIT {
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
 
         val siardArchive = siardArchivesHandler.prepareResource("issues/siardgui29/created-bit-type.siard");
-
-
         SiardToDb siardToDb = new SiardToDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
