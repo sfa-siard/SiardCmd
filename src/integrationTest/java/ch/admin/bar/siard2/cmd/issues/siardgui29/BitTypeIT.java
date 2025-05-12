@@ -42,7 +42,7 @@ public class BitTypeIT {
         val siardArchive = siardArchivesHandler.prepareResource("issues/siardgui29/provided-bit-type.siard");
 
         try {
-            SiardToDb siardToDb = new SiardToDb(new String[]{
+            SiardToDb siardToDb = new SiardToDb(new String[] {
                     "-o",
                     "-j:" + db.getJdbcUrl(),
                     "-u:" + db.getUsername(),
@@ -56,18 +56,17 @@ public class BitTypeIT {
         }
     }
 
-    //Test that a SIARD archive created by siardcmd does not fail with the same exception
+    //Test that siard archive created by siardcmd does not fail with the same exception
     @Test
     public void uploadCreatedArchive() throws SQLException, IOException, ClassNotFoundException {
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        String randomSiardLocation = "/home/cllorente/Desktop/bit_type_" + timestamp + ".siard";
+        val createdArchive = siardArchivesHandler.prepareEmpty();
 
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + uploadDb.getJdbcUrl(),
                 "-u:" + uploadDb.getUsername(),
                 "-p:" + uploadDb.getPassword(),
-                "-s:" + randomSiardLocation
+                "-s:" + createdArchive.getPathToArchiveFile()
         });
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
