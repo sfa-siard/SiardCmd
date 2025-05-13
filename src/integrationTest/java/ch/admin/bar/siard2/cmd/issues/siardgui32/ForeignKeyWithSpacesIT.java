@@ -35,7 +35,23 @@ public class ForeignKeyWithSpacesIT {
             .withInitScript(SqlScripts.MySQL.ISSUE_SIARDGUI_32)
             .withConfigurationOverride("config/mysql");
 
-    //Asser that siard archive created by siardcmd does not fail with the same exception
+
+    @Test
+    public void uploadSubmittedArchive_expectException() throws SQLException, IOException {
+        val siardArchive = siardArchivesHandler.prepareResource("issues/siardgui32/provided-foreign-key.siard");
+
+
+            SiardToDb siardToDb = new SiardToDb(new String[] {
+                    "-o",
+                    "-j:" + db.getJdbcUrl(),
+                    "-u:" + db.getUsername(),
+                    "-p:" + db.getPassword(),
+                    "-s:" + siardArchive.getPathToArchiveFile()
+            });
+
+        Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
+    }
+
     @Test
     public void uploadCreatedArchive_expectNoException() throws SQLException, IOException, ClassNotFoundException {
 
