@@ -12,5 +12,6 @@ public class SqlScripts {
 
     public static class MySQL {
         public final static String ISSUE_31 = "issues/siardcmd31/case-sensitive-column-names-mysql.sql";
+        public final static String SIARDGUI_29 = "issues/siardgui29/bit_type_schema.sql";
     }
 }

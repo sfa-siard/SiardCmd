@@ -4,6 +4,7 @@ import ch.admin.bar.siard2.cmd.SiardFromDb;
 import ch.admin.bar.siard2.cmd.SiardToDb;
 import ch.admin.bar.siard2.cmd.SupportedDbVersions;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
+import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import lombok.val;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -15,8 +16,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class BitTypeIT {
-
-    public static final String BIT_TYPE_SQL = "issues/siardgui29/bit_type_schema.sql";
 
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
@@ -33,7 +32,7 @@ public class BitTypeIT {
             .withUsername("root")
             .withPassword("public")
             .withDatabaseName("public")
-            .withInitScript(BIT_TYPE_SQL)
+            .withInitScript(SqlScripts.MySQL.SIARDGUI_29)
             .withConfigurationOverride("config/mysql");
 
     //Assert that the provided siard archive fails with the expected error
