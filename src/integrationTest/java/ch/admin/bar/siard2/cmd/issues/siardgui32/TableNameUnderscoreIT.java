@@ -15,7 +15,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class ForeignKeyWithSpacesIT {
+public class TableNameUnderscoreIT {
 
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
@@ -32,22 +32,21 @@ public class ForeignKeyWithSpacesIT {
             .withUsername("root")
             .withPassword("public")
             .withDatabaseName("public")
-            .withInitScript(SqlScripts.MySQL.SIARDGUI_32_FOREIGN_KEY)
+            .withInitScript(SqlScripts.MySQL.SIARDGUI_32_TABLE_NAME)
             .withConfigurationOverride("config/mysql");
-
 
     @Test
     public void uploadSubmittedArchive_expectNoException() throws SQLException, IOException {
-        val siardArchive = siardArchivesHandler.prepareResource("issues/siardgui32/provided-foreign-key.siard");
+        val siardArchive = siardArchivesHandler.prepareResource("issues/siardgui32/provided-table-names-underscore.siard");
 
 
-            SiardToDb siardToDb = new SiardToDb(new String[] {
-                    "-o",
-                    "-j:" + db.getJdbcUrl(),
-                    "-u:" + db.getUsername(),
-                    "-p:" + db.getPassword(),
-                    "-s:" + siardArchive.getPathToArchiveFile()
-            });
+        SiardToDb siardToDb = new SiardToDb(new String[] {
+                "-o",
+                "-j:" + db.getJdbcUrl(),
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
+                "-s:" + siardArchive.getPathToArchiveFile()
+        });
 
         Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
     }
@@ -62,12 +61,12 @@ public class ForeignKeyWithSpacesIT {
                 "-j:" + uploadDb.getJdbcUrl(),
                 "-u:" + uploadDb.getUsername(),
                 "-p:" + uploadDb.getPassword(),
-                "-s:" + createdArchive.getPathToArchiveFile()
+                "-s:" + createdArchive
         });
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
 
-        val siardArchive = siardArchivesHandler.prepareResource("issues/siardgui32/created-foreign-key.siard");
+        val siardArchive = siardArchivesHandler.prepareResource("issues/siardgui32/created-table-names-underscore.siard");
         SiardToDb siardToDb = new SiardToDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
