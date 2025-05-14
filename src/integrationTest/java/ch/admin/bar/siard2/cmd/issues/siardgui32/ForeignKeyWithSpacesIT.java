@@ -21,14 +21,14 @@ public class ForeignKeyWithSpacesIT {
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public MySQLContainer<?> db = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5))
+    public MySQLContainer<?> uploadDb = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5))
             .withUsername("root")
             .withPassword("public")
             .withDatabaseName("public")
             .withConfigurationOverride("config/mysql");
 
     @Rule
-    public MySQLContainer<?> uploadDb = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5))
+    public MySQLContainer<?> downloadDb = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5))
             .withUsername("root")
             .withPassword("public")
             .withDatabaseName("public")
@@ -43,9 +43,9 @@ public class ForeignKeyWithSpacesIT {
 
             SiardToDb siardToDb = new SiardToDb(new String[] {
                     "-o",
-                    "-j:" + db.getJdbcUrl(),
-                    "-u:" + db.getUsername(),
-                    "-p:" + db.getPassword(),
+                    "-j:" + uploadDb.getJdbcUrl(),
+                    "-u:" + uploadDb.getUsername(),
+                    "-p:" + uploadDb.getPassword(),
                     "-s:" + siardArchive.getPathToArchiveFile()
             });
 
@@ -59,9 +59,9 @@ public class ForeignKeyWithSpacesIT {
 
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
-                "-j:" + uploadDb.getJdbcUrl(),
-                "-u:" + uploadDb.getUsername(),
-                "-p:" + uploadDb.getPassword(),
+                "-j:" + downloadDb.getJdbcUrl(),
+                "-u:" + downloadDb.getUsername(),
+                "-p:" + downloadDb.getPassword(),
                 "-s:" + createdArchive.getPathToArchiveFile()
         });
 
@@ -70,9 +70,9 @@ public class ForeignKeyWithSpacesIT {
         val siardArchive = siardArchivesHandler.prepareResource("issues/siardgui32/created-foreign-key.siard");
         SiardToDb siardToDb = new SiardToDb(new String[]{
                 "-o",
-                "-j:" + db.getJdbcUrl(),
-                "-u:" + db.getUsername(),
-                "-p:" + db.getPassword(),
+                "-j:" + uploadDb.getJdbcUrl(),
+                "-u:" + uploadDb.getUsername(),
+                "-p:" + uploadDb.getPassword(),
                 "-s:" + siardArchive.getPathToArchiveFile()
         });
         Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
