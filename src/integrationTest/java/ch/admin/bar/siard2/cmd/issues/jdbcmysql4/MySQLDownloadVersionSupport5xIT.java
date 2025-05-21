@@ -13,7 +13,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class MySQLDownloadVersionSupportIT {
+public class MySQLDownloadVersionSupport5xIT {
 
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
