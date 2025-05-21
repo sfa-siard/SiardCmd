@@ -27,7 +27,7 @@ public class MySQLDownloadVersionSupport8xIT {
             .withInitScript(SqlScripts.MySQL.JDBCMYSQL_4)
             .withConfigurationOverride("config/mysql-version-support");
 
-    /*@Ignore*/
+    @Ignore
     @Test
     public void downloadDb_expectNoException() throws SQLException, IOException, ClassNotFoundException {
         val createdArchive = siardArchivesHandler.prepareEmpty();
