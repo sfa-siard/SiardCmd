@@ -73,7 +73,7 @@ public class SiardProjectExamples {
     /**
      * Archive that contains the archive exported from the nations.accdb file - exported with SIARD Suite 2.2.141
      */
-    public final static String MS_ACCESSS_NATIONS = "siard-projects/2_2/nations.siard";
+    public final static String MS_ACCESS_NATIONS = "siard-projects/2_2/nations.siard";
 
     private SiardProjectExamples() {
     }
