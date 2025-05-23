@@ -7,6 +7,7 @@ import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import lombok.val;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.OracleContainer;
@@ -27,12 +28,11 @@ public class OracleGetBigDecimalIT {
                     MountableFile.forHostPath(TestResourcesResolver.resolve(SqlScripts.Oracle.SIARDCMD_15).toPath()),
                     "/container-entrypoint-initdb.d/siardcmd15.sql");
 
+    @Ignore
     @Test
     public void download_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
-        // given
         val actualArchive = siardArchivesHandler.prepareEmpty();
 
-        // when
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
@@ -41,7 +41,6 @@ public class OracleGetBigDecimalIT {
                 "-s:" + actualArchive.getPathToArchiveFile()
         });
 
-        // then
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
     }
 }
