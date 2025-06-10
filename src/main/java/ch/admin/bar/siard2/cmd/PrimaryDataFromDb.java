@@ -202,7 +202,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             throw new IOException("Invalid number of result columns found!");
         for (int cellIndex = 0; cellIndex < record.getCells(); cellIndex++) {
             Cell cell = getCell(record, cellIndex);
-            Object oValue = getValue(rs, cell, cellIndex);
+            Object oValue = new ObjectValueReader(rs, cell.getMetaColumn(), cellIndex + 1).read();
             setValue(mimeTypeHandler, cell, oValue);
         }
     }
@@ -212,10 +212,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         Cell cell = record.getCell(cellIndex);
         getCellStopWatch.stop();
         return cell;
-    }
-
-    private Object getValue(ResultSet rs, Cell cell, int cellIndex) throws SQLException, IOException {
-        return new ObjectValueReader(rs, cell.getMetaColumn(), cellIndex + 1).read();
     }
 
     private void setValue(MimeTypeHandler mimeTypeHandler, Cell cell, Object oValue) throws IOException, SQLException {
