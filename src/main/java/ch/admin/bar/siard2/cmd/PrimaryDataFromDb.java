@@ -120,8 +120,14 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         return false;
     }
 
+    private void setValue(Cell cell, Object oValue, MimeTypeHandler mimeTypeHandler) throws IOException, SQLException {
+        if (cell.getMetaColumn().getTypeOriginal().equals("\"ROWID\"")) return;
+        setValue((Value) cell, oValue, mimeTypeHandler);
+    }
+
     private void setValue(Value value, Object oValue, MimeTypeHandler mimeTypeHandler)
             throws IOException, SQLException {
+
         if (oValue != null) {
             if (oValue instanceof String)
                 value.setString((String) oValue);
@@ -215,25 +221,9 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
     }
 
     private void setValue(MimeTypeHandler mimeTypeHandler, Cell cell, Object oValue) throws IOException, SQLException {
-        if (cell.getMetaColumn().getTypeOriginal().equals("\"ROWID\"")) {
-            setValueStopWatch.stop();
-            return;
-        }
         setValue(cell, oValue, mimeTypeHandler);
         mimeTypeHandler.applyMimeType(cell);
         setValueStopWatch.stop();
-    }
-
-    private int getDataType(MetaColumn mc) throws IOException {
-        int iDataType = mc.getPreType();
-        if (mc.getCardinality() >= 0) iDataType = Types.ARRAY;
-        MetaType mt = mc.getMetaType();
-        if (mt != null) {
-            CategoryType cat = mt.getCategoryType();
-            if (cat == CategoryType.DISTINCT) iDataType = mt.getBasePreType();
-            else iDataType = Types.STRUCT;
-        }
-        return iDataType;
     }
 
     /**
