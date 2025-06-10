@@ -9,7 +9,6 @@ Created    : 01.09.2016, Hartwig Thomas, Enter AG, Rüti ZH
 package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.api.generated.CategoryType;
 import ch.enterag.sqlparser.identifier.QualifiedId;
 import ch.enterag.utils.StopWatch;
 import ch.enterag.utils.background.Progress;
