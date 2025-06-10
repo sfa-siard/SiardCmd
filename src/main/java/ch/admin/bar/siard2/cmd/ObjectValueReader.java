@@ -1,6 +1,5 @@
 package ch.admin.bar.siard2.cmd;
 
-import ch.admin.bar.siard2.api.Cell;
 import ch.admin.bar.siard2.api.MetaColumn;
 import ch.admin.bar.siard2.api.MetaType;
 import ch.admin.bar.siard2.api.generated.CategoryType;
@@ -25,7 +24,6 @@ class ObjectValueReader {
     public ObjectValueReader(ResultSet resultSet, MetaColumn metaColumn, int position) throws IOException {
         this(resultSet, metaColumn, getDataType(metaColumn), position);
     }
-
 
     public Object read() throws SQLException {
 
