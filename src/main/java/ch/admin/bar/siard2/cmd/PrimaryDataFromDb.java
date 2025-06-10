@@ -215,11 +215,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
     }
 
     private Object getValue(ResultSet rs, Cell cell, int cellIndex) throws SQLException, IOException {
-        getValueStopWatch.start();
-        Object oValue = new ObjectValueReader(rs, getDataType(cell.getMetaColumn()), cellIndex + 1).read();
-        if (rs.wasNull()) oValue = null;
-        getValueStopWatch.stop();
-        return oValue;
+        return new ObjectValueReader(rs, cell.getMetaColumn(), cellIndex + 1).read();
     }
 
     private void setValue(MimeTypeHandler mimeTypeHandler, Cell cell, Object oValue) throws IOException, SQLException {

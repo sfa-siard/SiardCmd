@@ -18,11 +18,20 @@ import java.sql.Types;
 @AllArgsConstructor
 class ObjectValueReader {
     private final ResultSet resultSet;
+    private final MetaColumn metaColumn;
     private final int dataType;
     private final int position;
 
+    public ObjectValueReader(ResultSet resultSet, MetaColumn metaColumn, int position) throws IOException {
+        this(resultSet, metaColumn, getDataType(metaColumn), position);
+    }
+
 
     public Object read() throws SQLException {
+
+        if (metaColumn.getTypeOriginal().equals("\"ROWID\""))  return null;
+        
+        // TODO: when migrating to Java 17+, use switch expression
         Object oValue = null;
         switch (this.dataType) {
             case Types.CHAR:
@@ -95,8 +104,22 @@ class ObjectValueReader {
             default:
                 throw new SQLException("Invalid data type " + dataType + " (" + SqlTypes.getTypeName(dataType) + ") encountered!");
         }
+        if (resultSet.wasNull()) return null;
+
         return oValue;
     }
 
 
+    // TODO: this method should be moved to MetaColumn in SiardAPI
+    private static int getDataType(MetaColumn mc) throws IOException {
+        int iDataType = mc.getPreType();
+        if (mc.getCardinality() >= 0) iDataType = Types.ARRAY;
+        MetaType mt = mc.getMetaType();
+        if (mt != null) {
+            CategoryType cat = mt.getCategoryType();
+            if (cat == CategoryType.DISTINCT) iDataType = mt.getBasePreType();
+            else iDataType = Types.STRUCT;
+        }
+        return iDataType;
+    }
 }
