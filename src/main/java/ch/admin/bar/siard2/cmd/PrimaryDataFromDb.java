@@ -215,7 +215,10 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
     }
 
     private void setValue(MimeTypeHandler mimeTypeHandler, Cell cell, Object oValue) throws IOException, SQLException {
-        setValueStopWatch.start();
+        if (cell.getMetaColumn().getTypeOriginal().equals("\"ROWID\"")) {
+            setValueStopWatch.stop();
+            return;
+        }
         setValue(cell, oValue, mimeTypeHandler);
         mimeTypeHandler.applyMimeType(cell);
         setValueStopWatch.stop();
