@@ -216,7 +216,7 @@ public class ObjectValueReaderTest {
             doReturn(Types.BIGINT).when(objectValueReader)
                                   .getDataType(metaColumn);
             doReturn(BigDecimal.valueOf(99L)).when(resultSet)
-                         .getBigDecimal(0);
+                                             .getBigDecimal(0);
 
             assertEquals(BigInteger.valueOf(99L), objectValueReader.read());
 
@@ -317,7 +317,7 @@ public class ObjectValueReaderTest {
                                  .getDataType(metaColumn);
             Object expected = new Object();
             doReturn(expected).when(resultSet)
-                                  .getObject(0);
+                              .getObject(0);
 
             assertEquals(expected, objectValueReader.read());
         }
@@ -330,7 +330,7 @@ public class ObjectValueReaderTest {
                                   .getDataType(metaColumn);
             Object expected = new Object();
             doReturn(expected).when(resultSet)
-                                  .getObject(0);
+                              .getObject(0);
 
             assertEquals(expected, objectValueReader.read());
         }
@@ -343,7 +343,7 @@ public class ObjectValueReaderTest {
                                  .getDataType(metaColumn);
             Array array = mock(Array.class);
             doReturn(array).when(resultSet)
-                                  .getArray(0);
+                           .getArray(0);
 
             assertEquals(array, objectValueReader.read());
         }
