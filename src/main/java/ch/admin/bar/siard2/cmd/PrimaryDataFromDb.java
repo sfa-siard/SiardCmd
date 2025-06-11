@@ -37,7 +37,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
     private long recordsTotal = -1;
     private long recordsPercent = -1;
     private StopWatch getCellStopWatch = null;
-    private StopWatch getValueStopWatch = null;
     private StopWatch setValueStopWatch = null;
     private final Tika tika = new Tika();
 
@@ -236,7 +235,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
     private void getTable(Table table)
             throws IOException, SQLException {
         getCellStopWatch = StopWatch.getInstance();
-        getValueStopWatch = StopWatch.getInstance();
         setValueStopWatch = StopWatch.getInstance();
         QualifiedId qiTable = new QualifiedId(null,
                 table.getParentSchema().getMetaSchema().getName(),
