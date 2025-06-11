@@ -30,14 +30,14 @@ jobs:
         run: ./gradlew packDeliverables
       - name: Store reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: reports
           path: |
             **/build/reports/
             **/build/test-results/
       - name: upload deliverables
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.NAME_TAG }}
           path: build/deliverables/
