@@ -9,7 +9,6 @@ Created    : 01.09.2016, Hartwig Thomas, Enter AG, Rüti ZH
 package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.api.*;
-import ch.admin.bar.siard2.api.generated.CategoryType;
 import ch.enterag.sqlparser.identifier.QualifiedId;
 import ch.enterag.utils.StopWatch;
 import ch.enterag.utils.background.Progress;
@@ -38,7 +37,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
     private long recordsTotal = -1;
     private long recordsPercent = -1;
     private StopWatch getCellStopWatch = null;
-    private StopWatch getValueStopWatch = null;
     private StopWatch setValueStopWatch = null;
     private final Tika tika = new Tika();
 
@@ -120,8 +118,14 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         return false;
     }
 
+    private void setValue(Cell cell, Object oValue, MimeTypeHandler mimeTypeHandler) throws IOException, SQLException {
+        if (cell.getMetaColumn().getTypeOriginal().equals("\"ROWID\"")) return;
+        setValue((Value) cell, oValue, mimeTypeHandler);
+    }
+
     private void setValue(Value value, Object oValue, MimeTypeHandler mimeTypeHandler)
             throws IOException, SQLException {
+
         if (oValue != null) {
             if (oValue instanceof String)
                 value.setString((String) oValue);
@@ -202,7 +206,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             throw new IOException("Invalid number of result columns found!");
         for (int cellIndex = 0; cellIndex < record.getCells(); cellIndex++) {
             Cell cell = getCell(record, cellIndex);
-            Object oValue = getValue(rs, cell, cellIndex);
+            Object oValue = new ObjectValueReader(rs, cell.getMetaColumn(), cellIndex + 1).read();
             setValue(mimeTypeHandler, cell, oValue);
         }
     }
@@ -214,31 +218,10 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         return cell;
     }
 
-    private Object getValue(ResultSet rs, Cell cell, int cellIndex) throws SQLException, IOException {
-        getValueStopWatch.start();
-        Object oValue = new ObjectValueReader(rs, getDataType(cell.getMetaColumn()), cellIndex + 1).read();
-        if (rs.wasNull()) oValue = null;
-        getValueStopWatch.stop();
-        return oValue;
-    }
-
     private void setValue(MimeTypeHandler mimeTypeHandler, Cell cell, Object oValue) throws IOException, SQLException {
-        setValueStopWatch.start();
         setValue(cell, oValue, mimeTypeHandler);
         mimeTypeHandler.applyMimeType(cell);
         setValueStopWatch.stop();
-    }
-
-    private int getDataType(MetaColumn mc) throws IOException {
-        int iDataType = mc.getPreType();
-        if (mc.getCardinality() >= 0) iDataType = Types.ARRAY;
-        MetaType mt = mc.getMetaType();
-        if (mt != null) {
-            CategoryType cat = mt.getCategoryType();
-            if (cat == CategoryType.DISTINCT) iDataType = mt.getBasePreType();
-            else iDataType = Types.STRUCT;
-        }
-        return iDataType;
     }
 
     /**
@@ -252,7 +235,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
     private void getTable(Table table)
             throws IOException, SQLException {
         getCellStopWatch = StopWatch.getInstance();
-        getValueStopWatch = StopWatch.getInstance();
         setValueStopWatch = StopWatch.getInstance();
         QualifiedId qiTable = new QualifiedId(null,
                 table.getParentSchema().getMetaSchema().getName(),

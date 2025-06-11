@@ -66,6 +66,11 @@ dependencies {
     testImplementation("org.mariadb.jdbc:mariadb-java-client:2.7.4") // Used by mariadb testcontainer
     testImplementation("org.testcontainers:oracle-xe:1.19.0")
     testImplementation("org.testcontainers:db2:1.19.0")
+
+    testImplementation(platform("org.junit:junit-bom:5.13.1"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.13.1")
 }
 
 tasks.withType(Jar::class) {
@@ -119,8 +124,16 @@ task<Test>("integrationTest") {
     testClassesDirs = sourceSets["integrationTest"].output.classesDirs
     classpath = sourceSets["integrationTest"].runtimeClasspath
     mustRunAfter(tasks["test"])
-    useJUnit()
+    useJUnitPlatform()
 }
+
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+}
+
 
 task<Zip>("packDeliverables") {
     description = "Creates ZIP-file which contains all deliverables"

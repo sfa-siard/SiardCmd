@@ -1,11 +1,9 @@
 package ch.admin.bar.siard2.cmd;
 
-import ch.admin.bar.siard2.api.Cell;
 import ch.admin.bar.siard2.api.MetaColumn;
 import ch.admin.bar.siard2.api.MetaType;
 import ch.admin.bar.siard2.api.generated.CategoryType;
 import ch.enterag.utils.database.SqlTypes;
-import lombok.AllArgsConstructor;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -15,16 +13,26 @@ import java.sql.Types;
 
 
 // understands how to read the value for a given cell from a result set
-@AllArgsConstructor
 class ObjectValueReader {
     private final ResultSet resultSet;
-    private final int dataType;
+    private final MetaColumn metaColumn;
     private final int position;
 
+    public ObjectValueReader(ResultSet resultSet, MetaColumn metaColumn, int position) {
+        this.resultSet = resultSet;
+        this.metaColumn = metaColumn;
+        this.position = position;
+    }
 
-    public Object read() throws SQLException {
+    public Object read() throws SQLException, IOException {
+
+        if (metaColumn.getTypeOriginal()
+                      .equals("\"ROWID\"")) return null;
+
+        // TODO: when migrating to Java 17+, use switch expression
+        int dataType = getDataType(metaColumn);
         Object oValue = null;
-        switch (this.dataType) {
+        switch (dataType) {
             case Types.CHAR:
             case Types.VARCHAR:
                 oValue = resultSet.getString(position);
@@ -95,8 +103,22 @@ class ObjectValueReader {
             default:
                 throw new SQLException("Invalid data type " + dataType + " (" + SqlTypes.getTypeName(dataType) + ") encountered!");
         }
+        if (resultSet.wasNull()) return null;
+
         return oValue;
     }
 
 
+    // TODO: this method should be moved to MetaColumn in SiardAPI
+    int getDataType(MetaColumn mc) throws IOException {
+        int iDataType = mc.getPreType();
+        if (mc.getCardinality() >= 0) iDataType = Types.ARRAY;
+        MetaType mt = mc.getMetaType();
+        if (mt != null) {
+            CategoryType cat = mt.getCategoryType();
+            if (cat == CategoryType.DISTINCT) iDataType = mt.getBasePreType();
+            else iDataType = Types.STRUCT;
+        }
+        return iDataType;
+    }
 }
