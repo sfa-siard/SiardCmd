@@ -8,7 +8,6 @@ import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import ch.admin.bar.siard2.cmd.utils.siard.model.utils.Id;
 import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedTableId;
 import lombok.val;
-import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +33,7 @@ public class MultipleSchemasIT {
                     "/container-entrypoint-initdb.d/00_create_schemas.sql");
 
     @Test
-    public void download() throws IOException, SQLException, ClassNotFoundException {
+    public void download_as_user_a() throws IOException, SQLException, ClassNotFoundException {
         // given
         val actualArchive = siardArchivesHandler.prepareEmpty();
 
@@ -59,6 +58,42 @@ public class MultipleSchemasIT {
                                                                   .tableId(Id.of("TABLE_A"))
                                                                   .build()))
                 .isPresent();
+
+        assertThat(
+                metadataExplorer.tryFindByTableId(QualifiedTableId.builder()
+                                                                  .schemaId(Id.of("USER_B"))
+                                                                  .tableId(Id.of("TABLE_B"))
+                                                                  .build()))
+                .isPresent();
+
+    }
+
+    @Test
+    public void download_as_user_b() throws IOException, SQLException, ClassNotFoundException {
+        // given
+        val actualArchive = siardArchivesHandler.prepareEmpty();
+
+        // when
+        SiardFromDb siardFromDb = new SiardFromDb(new String[]{
+                "-o",
+                "-j:" + db.getJdbcUrl(),
+                "-u:" + "user_b",
+                "-p:" + "password_b",
+                "-s:" + actualArchive.getPathToArchiveFile()
+        });
+
+        // then
+        Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+
+        actualArchive.preserveArchive();
+        val metadataExplorer = actualArchive.exploreMetadata();
+
+        assertThat(
+                metadataExplorer.tryFindByTableId(QualifiedTableId.builder()
+                                                                  .schemaId(Id.of("USER_A"))
+                                                                  .tableId(Id.of("TABLE_A"))
+                                                                  .build()))
+                .isNotPresent();
 
         assertThat(
                 metadataExplorer.tryFindByTableId(QualifiedTableId.builder()
