@@ -5,6 +5,7 @@ public class SqlScripts {
         public final static String CREATE_USER_WITH_ALL_PRIVILEGES = "config/oracle/00_create_user.sql";
         public final static String JDBCBASE_7 = "issues/jdbcbase7/jdbcbase7.sql";
         public final static String SIARDCMD_15 = "issues/siardcmd15/siardcmd_15.sql";
+        public final static String SCHEMA_PACKAGES = "databases/oracle/schema-packages.sql";
     }
 
     public static class Postgres {

@@ -1174,7 +1174,7 @@ public class MetaDataFromDb extends MetaDataBase {
         rs.close();
         _iTablesPercent = (_iTables + 99) / 100;
         _iTablesAnalyzed = 0;
-        rs = _dmd.getTables(null, "%", "%", asTypes);
+        rs = _dmd.getTables(null, "TESTUSER", "%", asTypes);
         while ((rs.next()) && (!cancelRequested())) {
             String sTableSchema = rs.getString("TABLE_SCHEM");
             String sTableName = rs.getString("TABLE_NAME");
