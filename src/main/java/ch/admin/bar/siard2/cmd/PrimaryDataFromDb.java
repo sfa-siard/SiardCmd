@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
 import java.sql.*;
-import java.sql.Date;
 
 /**
  * Transfers primary data from databases to SIARD files.
@@ -48,8 +47,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
     /**
      * Factory method to create an instance of {@link PrimaryDataFromDb}
      *
-     * @param connection    database connection.
-     * @param archive SIARD archive.
+     * @param connection database connection.
+     * @param archive    SIARD archive.
      * @return new instance of PrimaryDataFromDb.
      */
     public static PrimaryDataFromDb newInstance(Connection connection, Archive archive) {
@@ -67,7 +66,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
     public void download(Progress progress) throws IOException, SQLException {
 
         LOG.info("Start primary data download to archive {}",
-                this._archive.getFile().getAbsoluteFile());
+                 this._archive.getFile()
+                              .getAbsoluteFile());
 
         System.out.println("\r\nPrimary Data");
         this.progress = progress;
@@ -76,7 +76,9 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         for (int iSchema = 0; iSchema < _archive.getSchemas(); iSchema++) {
             Schema schema = _archive.getSchema(iSchema);
             for (int iTable = 0; iTable < schema.getTables(); iTable++) {
-                recordsTotal = recordsTotal + schema.getTable(iTable).getMetaTable().getRows();
+                recordsTotal = recordsTotal + schema.getTable(iTable)
+                                                    .getMetaTable()
+                                                    .getRows();
             }
         }
         recordsPercent = (recordsTotal + 99) / 100;
@@ -119,7 +121,9 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
     }
 
     private void setValue(Cell cell, Object oValue, MimeTypeHandler mimeTypeHandler) throws IOException, SQLException {
-        if (cell.getMetaColumn().getTypeOriginal().equals("\"ROWID\"")) return;
+        if (cell.getMetaColumn()
+                .getTypeOriginal()
+                .equals("\"ROWID\"")) return;
         setValue((Value) cell, oValue, mimeTypeHandler);
     }
 
@@ -190,9 +194,11 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                     setValue(value.getAttribute(iAttribute), ao[iAttribute], mimeTypeHandler);
                 }
             } else
-                throw new SQLException("Invalid value type " + oValue.getClass().getName() + " encountered!");
+                throw new SQLException("Invalid value type " + oValue.getClass()
+                                                                     .getName() + " encountered!");
         }
     }
+
     /**
      * extract primary data of a record from the result set.
      *
@@ -202,7 +208,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
      * @throws SQLException if a database error occurred.
      */
     private void getRecord(ResultSet rs, ch.admin.bar.siard2.api.Record record, MimeTypeHandler mimeTypeHandler) throws IOException, SQLException {
-        if (rs.getMetaData().getColumnCount() != record.getCells())
+        if (rs.getMetaData()
+              .getColumnCount() != record.getCells())
             throw new IOException("Invalid number of result columns found!");
         for (int cellIndex = 0; cellIndex < record.getCells(); cellIndex++) {
             Cell cell = getCell(record, cellIndex);
@@ -237,8 +244,11 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         getCellStopWatch = StopWatch.getInstance();
         setValueStopWatch = StopWatch.getInstance();
         QualifiedId qiTable = new QualifiedId(null,
-                table.getParentSchema().getMetaSchema().getName(),
-                table.getMetaTable().getName());
+                                              table.getParentSchema()
+                                                   .getMetaSchema()
+                                                   .getName(),
+                                              table.getMetaTable()
+                                                   .getName());
         System.out.println("  Table: " + qiTable.format());
         long lRecord = 0;
         RecordRetainer rr = table.createRecords();
@@ -260,7 +270,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             incDownloaded();
         }
         System.out.println("    Record " + lRecord + " (" + sw.formatRate(rr.getByteCount() - lBytesStart,
-                sw.stop()) + " kB/s)");
+                                                                          sw.stop()) + " kB/s)");
         System.out.println("    Total: " + StopWatch.formatLong(lRecord) + " records (" + StopWatch.formatLong(rr.getByteCount()) + " bytes in " + sw.formatMs() + " ms)");
         if (!rs.isClosed())
             rs.close();
@@ -269,14 +279,14 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         rr.close();
 
         LOG.debug("All data of table '{}.{}' successfully downloaded",
-                qiTable.getSchema(),
-                qiTable.getName());
+                  qiTable.getSchema(),
+                  qiTable.getName());
     }
 
     private static long logRecordProgress(long lRecord, StopWatch sw, RecordRetainer rr, long lBytesStart) {
         if ((lRecord % REPORT_RECORDS) == 0) {
             System.out.println("    Record " + lRecord + " (" + sw.formatRate(rr.getByteCount() - lBytesStart,
-                    sw.stop()) + " kB/s)");
+                                                                              sw.stop()) + " kB/s)");
             lBytesStart = rr.getByteCount();
             sw.start();
         }
@@ -317,7 +327,8 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             getTable(table);
         }
 
-        LOG.debug("All data of schema '{}' successfully downloaded", schema.getMetaSchema().getName());
+        LOG.debug("All data of schema '{}' successfully downloaded", schema.getMetaSchema()
+                                                                           .getName());
     }
 
 }
