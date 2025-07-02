@@ -1,6 +1,9 @@
 package ch.admin.bar.siard2.cmd;
 
-import ch.admin.bar.siard2.api.*;
+import ch.admin.bar.siard2.api.Cell;
+import ch.admin.bar.siard2.api.Field;
+import ch.admin.bar.siard2.api.MetaValue;
+import ch.admin.bar.siard2.api.Value;
 import org.apache.tika.Tika;
 
 import java.io.IOException;
@@ -79,18 +82,21 @@ class MimeTypeHandler {
     }
 
     private void add(Cell cell, String mimeType) {
-        add(mimeType, cell.getMetaColumn().getName());
+        add(mimeType, cell.getMetaColumn()
+                          .getName());
     }
 
     private void add(Field field, String mimeType) {
-        add(mimeType, field.getMetaField().getName());
+        add(mimeType, field.getMetaField()
+                           .getName());
     }
 
     private void add(String mimeType, String name) {
         if (!mimeTypes.containsKey(name)) {
             mimeTypes.put(name, new HashSet<>(Collections.singletonList(mimeType)));
         } else {
-            mimeTypes.get(name).add(mimeType);
+            mimeTypes.get(name)
+                     .add(mimeType);
         }
     }
 
