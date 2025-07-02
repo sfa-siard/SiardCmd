@@ -1,11 +1,3 @@
-/*======================================================================
-MetaDataToDb transfers meta data from SIARD files to databases. 
-Application : Siard2
-Description : Transfers meta data from SIARD files to databases.
-------------------------------------------------------------------------
-Copyright  : Swiss Federal Archives, Berne, Switzerland, 2008
-Created    : 29.08.2016, Hartwig Thomas, Enter AG, Rüti ZH
-======================================================================*/
 package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.api.*;
@@ -24,7 +16,7 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 
-/*====================================================================*/
+
 
 /**
  * Transfers meta data from databases to SIARD files and back.
@@ -47,7 +39,7 @@ public class MetaDataToDb
     private int _iTables = -1;
     private int _iTablesPercent = -1;
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * increment the number or tables created, issuing a notification,
@@ -59,7 +51,7 @@ public class MetaDataToDb
             int iPercent = (100 * _iTablesCreated) / _iTables;
             _progress.notifyProgress(iPercent);
         }
-    } /* incTablesCreated */
+    }
 
     /**
      * check if cancel was requested.
@@ -74,7 +66,7 @@ public class MetaDataToDb
         return false;
     }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * create an attribute definition for a CREATE TYPE statement from
@@ -100,9 +92,9 @@ public class MetaDataToDb
             sbSql.append(qiType.format());
         }
         return sbSql.toString();
-    } /* createMetaAttribute */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * create a CREATE TYPE statement from type meta data and execute it.
@@ -116,7 +108,7 @@ public class MetaDataToDb
         TypeMapping tm = sm.getTypeMapping(mt.getName());
         QualifiedId qiType = new QualifiedId(null,
                                              sm.getMappedSchemaName(), tm.getMappedTypeName());
-        /* type was not dropped if drop was not necessary */
+
         if (!existsType(qiType.getSchema(), qiType.getName())) {
             CategoryType cat = mt.getCategoryType();
             if ((cat != CategoryType.DISTINCT) || supportsDistincts()) {
@@ -144,7 +136,7 @@ public class MetaDataToDb
                 val sqlStatement = sbSql.toString();
                 LOG.trace("SQL statement: '{}'", sqlStatement);
 
-                /* now execute it */
+
                 Statement stmt = _dmd.getConnection()
                                      .createStatement();
                 stmt.setQueryTimeout(_iQueryTimeoutSeconds);
@@ -154,9 +146,9 @@ public class MetaDataToDb
                 LOG.debug("Type '{}.{}' successfully created", qiType.getSchema(), qiType.getName());
             }
         }
-    } /* createType */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * create all types of a schema.
@@ -176,9 +168,9 @@ public class MetaDataToDb
                     createType(mt, sm);
             }
         }
-    } /* createTypes */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * check, whether a type exists in the database.
@@ -199,9 +191,9 @@ public class MetaDataToDb
             bExists = true;
         rs.close();
         return bExists;
-    } /* existsType */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * drop all types that will be created within a schema.
@@ -252,9 +244,9 @@ public class MetaDataToDb
                 }
             }
         }
-    } /* dropTypes */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * create a column definition for a CREATE TABLE statement
@@ -289,9 +281,9 @@ public class MetaDataToDb
         if (!mc.isNullable())
             sbSql.append(" NOT NULL");
         return sbSql.toString();
-    } /* createColumn */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * get the set of available tables in the database.
@@ -312,9 +304,9 @@ public class MetaDataToDb
         }
         rs.close();
         return setTables;
-    } /* getTables */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * create a CREATE TABLE statement from table meta data and execute it.
@@ -351,7 +343,7 @@ public class MetaDataToDb
                 sbSql.append(mt.getType(llColumnNames.get(iExtendedColumn)));
             }
         }
-        /* add primary key */
+
         MetaUniqueKey mpk = mt.getMetaPrimaryKey();
         if (mpk != null) {
             StringBuilder sbPrimaryKey = new StringBuilder();
@@ -366,9 +358,9 @@ public class MetaDataToDb
             sbSql.append(",\r\n");
             sbSql.append(sbPrimaryKey);
         }
-        /* unique and foreign keys are added in the end of upload */
+
         sbSql.append(")");
-        /* now execute it */
+
 
         val sqlStatement = sbSql.toString();
         LOG.trace("SQL statement: '{}'", sqlStatement);
@@ -384,7 +376,7 @@ public class MetaDataToDb
             throw ex;
         }
 
-        /* record names of created table and columns */
+
         Set<QualifiedId> setCreated = getTables();
         setCreated.removeAll(setBefore);
         if (!setCreated.contains(qiTable)) {
@@ -414,9 +406,9 @@ public class MetaDataToDb
         rsColumns.close();
 
         LOG.debug("Table '{}.{}' successfully created", sm.getMappedSchemaName(), tm.getMappedTableName());
-    } /* createTable */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * create all tables of a schema.
@@ -436,9 +428,9 @@ public class MetaDataToDb
             createTable(mt, sm);
             incTablesCreated();
         }
-    } /* createTables */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * check, whether table exists in the database.
@@ -459,9 +451,9 @@ public class MetaDataToDb
             bExists = true;
         rs.close();
         return bExists;
-    } /* existsTable */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * drop all tables that will be created within a schema.
@@ -498,9 +490,9 @@ public class MetaDataToDb
                 stmt.close();
             }
         }
-    } /* dropTables */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * check, whether schema exists in the database.
@@ -517,9 +509,9 @@ public class MetaDataToDb
             bExists = true;
         rs.close();
         return bExists;
-    } /* existsSchema */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * create the schema if it does not exist.
@@ -552,15 +544,15 @@ public class MetaDataToDb
                         se);
                 stmt.getConnection()
                     .rollback();
-                /* rethrow it (only caught for finally clause) */
+
                 throw new SQLException(se.getMessage(), se.getCause());
             } finally {
                 stmt.close();
             }
         }
-    } /* createSchema */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * upload creates all types and tables in the database.
@@ -577,7 +569,7 @@ public class MetaDataToDb
 
         System.out.println("Meta Data");
         _progress = progress;
-        /* compute number of tables to create */
+
         _iTables = 0;
         for (int iSchema = 0; iSchema < _md.getMetaSchemas(); iSchema++) {
             MetaSchema ms = _md.getMetaSchema(iSchema);
@@ -633,9 +625,9 @@ public class MetaDataToDb
             .commit();
 
         LOG.info("Meta data upload finished");
-    } /* upload */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * returns the number of tables that exist in the database and will
@@ -656,9 +648,9 @@ public class MetaDataToDb
             }
         }
         return iTablesDropped;
-    } /* tablesDroppedByUpload */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * matchAttributes returns true, if the attributes of the given
@@ -691,7 +683,7 @@ public class MetaDataToDb
             String sAttributeName = rs.getString("ATTR_NAME");
             // int iAttrSize = rs.getInt("ATTR_SIZE");
             // int iDecimalDigits = rs.getInt("DECIMAL_DIGITS");
-            /* find attribute with this mangled name */
+
             MetaAttribute ma = null;
             for (int iAttribute = 0; (ma == null) && (iAttribute < mt.getMetaAttributes()); iAttribute++) {
                 MetaAttribute maTemp = mt.getMetaAttribute(iAttribute);
@@ -722,7 +714,7 @@ public class MetaDataToDb
                         QualifiedId qiAttrType = new QualifiedId(sAttrTypeName);
                         if (qiAttrType.getSchema() == null)
                             qiAttrType.setSchema(sm.getMappedSchemaName());
-                        /* find schema with this mangled name */
+
                         MetaSchema msAttr = null;
                         SchemaMapping smAttr = null;
                         for (int iSchema = 0; (msAttr == null) && (iSchema < _md.getMetaSchemas()); iSchema++) {
@@ -735,7 +727,7 @@ public class MetaDataToDb
                             }
                         }
                         if (msAttr != null) {
-                            /* find type with this mangled name */
+
                             MetaType mtAttr = null;
                             for (int iType = 0; (mtAttr == null) && (iType < msAttr.getMetaTypes()); iType++) {
                                 MetaType mtTemp = msAttr.getMetaType(iType);
@@ -760,9 +752,9 @@ public class MetaDataToDb
         if (iPosition < mt.getMetaAttributes())
             bMatches = false;
         return bMatches;
-    } /* matchAttributes */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * matchType returns true, if a type of the given name exists in the
@@ -802,9 +794,9 @@ public class MetaDataToDb
         }
         rs.close();
         return bMatches;
-    } /* matchType */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * returns the number of types that exist in the database and will be
@@ -829,9 +821,9 @@ public class MetaDataToDb
             }
         }
         return iTypesDropped;
-    } /* typesDroppedByUpload */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * constructor
@@ -851,9 +843,9 @@ public class MetaDataToDb
         _iMaxColumnNameLength = _dmd.getMaxColumnNameLength();
         _am = ArchiveMapping.newInstance(supportsArrays(), supportsUdts(),
                                          mapSchemas, _md, _iMaxTableNameLength, _iMaxColumnNameLength);
-    } /* constructor */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * factory
@@ -868,6 +860,6 @@ public class MetaDataToDb
     public static MetaDataToDb newInstance(DatabaseMetaData dmd, MetaData md, Map<String, String> mapSchemas)
             throws IOException, SQLException {
         return new MetaDataToDb(dmd, md, mapSchemas);
-    } /* factory */
+    }
 
-} /* class MetaDataTransfer */
+}

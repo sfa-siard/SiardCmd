@@ -1,11 +1,3 @@
-/*======================================================================
-PrimaryDataFromDb transfers primary data from databases to SIARD files. 
-Application : Siard2
-Description : Transfers primary data from databases to SIARD files.
-------------------------------------------------------------------------
-Copyright  : Swiss Federal Archives, Berne, Switzerland, 2008
-Created    : 01.09.2016, Hartwig Thomas, Enter AG, Rüti ZH
-======================================================================*/
 package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.api.*;
@@ -71,7 +63,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
 
         System.out.println("\r\nPrimary Data");
         this.progress = progress;
-        /* determine total number of records in the database */
+
         recordsTotal = 0;
         for (int iSchema = 0; iSchema < _archive.getSchemas(); iSchema++) {
             Schema schema = _archive.getSchema(iSchema);
@@ -83,7 +75,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         }
         recordsPercent = (recordsTotal + 99) / 100;
         recordsDownloaded = 0;
-        /* now download */
+
         for (int iSchema = 0; (iSchema < _archive.getSchemas()) && (!cancelRequested()); iSchema++) {
             getSchema(_archive.getSchema(iSchema));
         }

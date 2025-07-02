@@ -1,11 +1,3 @@
-/*======================================================================
-Loads the appropriate JDBC driver associated with a JDBC URL.
-Application : Siard2
-Description : Loads the appropriate JDBC driver associated with a JDBC URL.
-------------------------------------------------------------------------
-Copyright  : Swiss Federal Archives, Berne, Switzerland, 2008
-Created    : 08.05.2017, Hartwig Thomas, Enter AG, Rüti ZH
-======================================================================*/
 package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.jdbc.*;
@@ -27,7 +19,7 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.*;
 
-/*====================================================================*/
+
 
 /**
  * Loads the appropriate JDBC driver associated with a JDBC URL.
@@ -44,7 +36,7 @@ public class SiardConnection extends Properties {
     public static final int iDEFAULT_QUERY_TIMEOUT_SECONDS = 75;
     public static final int iDEFAULT_LOGIN_TIMEOUT_SECONDS = 300;
 
-    /*--------------------------------------------------------------------*/
+
     /**
      * Properties file containing the map from JDBC sub schemes to
      * JDBC driver class names is located in ../etc/jdbcdrivers.properties
@@ -75,9 +67,9 @@ public class SiardConnection extends Properties {
         }
         // System.out.println("Drivers file: "+fileDrivers.getAbsolutePath());
         return fileDrivers;
-    } /* getJdbcDriversPropertiesFile */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * Default properties mapping JDCB sub schemes to JDBC driver class names.
@@ -105,9 +97,9 @@ public class SiardConnection extends Properties {
         propDrivers.put(AccessDriver.sACCESS_SCHEME + sTITLE_SUFFIX, "Microsoft Access");
         propDrivers.put(AccessDriver.sACCESS_SCHEME + sSAMPLE_SUFFIX, "jdbc:access:D:\\Projekte\\SIARD2\\JdbcAccess\\testfiles\\dbfile.mdb");
         return propDrivers;
-    } /* getJdbcDriversDefaultProperties */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * make keys() return elements in alphabetic order.
@@ -116,9 +108,9 @@ public class SiardConnection extends Properties {
     @Override
     public synchronized Enumeration<Object> keys() {
         return Collections.enumeration(new TreeSet<Object>(super.keySet()));
-    } /* keys */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * constructor loads properties.
@@ -145,9 +137,9 @@ public class SiardConnection extends Properties {
         } catch (IOException ie) {
             System.err.println(EU.getExceptionMessage(ie));
         }
-    } /* constructor */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * factory
@@ -158,7 +150,7 @@ public class SiardConnection extends Properties {
         if (_sc == null)
             _sc = new SiardConnection();
         return _sc;
-    } /* getSiardConnection */
+    }
 
     static String extractSubSchema(final String jdbcUrl) {
         val split = jdbcUrl.split(":");
@@ -240,7 +232,7 @@ public class SiardConnection extends Properties {
         LOG.info(sb.toString());
     }
 
-    /*--------------------------------------------------------------------*/
+
 
     /**
      * load JDBC driver for given JDBC URL.
@@ -261,7 +253,7 @@ public class SiardConnection extends Properties {
             if (iSubScheme >= 0) {
                 sSubScheme = sSubScheme.substring(0, iSubScheme);
                 // System.out.println("Sub scheme "+sSubScheme);
-                /* open JDBC driver */
+
                 String sJdbcDriverClass = getProperty(sSubScheme);
                 if (sJdbcDriverClass != null) {
                     // System.out.println("Driver class "+sJdbcDriverClass);
@@ -279,9 +271,9 @@ public class SiardConnection extends Properties {
         if (sError != null)
             System.err.println(sError);
         return sError;
-    } /* loadDriver */
+    }
 
-    /*--------------------------------------------------------------------*/
+
 
     /**
      * getSchemes returns the list of JDBC schemes configured in properties.
@@ -296,9 +288,9 @@ public class SiardConnection extends Properties {
                 listSchemes.add(sKey);
         }
         return listSchemes.toArray(new String[]{});
-    } /* getSchemes */
+    }
 
-    /*--------------------------------------------------------------------*/
+
 
     /**
      * getDriverClass returns the name of the JDBC driver class for a JDBC scheme.
@@ -308,9 +300,9 @@ public class SiardConnection extends Properties {
      */
     public String getDriverClass(String sScheme) {
         return getProperty(sScheme);
-    } /* getDriverClass */
+    }
 
-    /*--------------------------------------------------------------------*/
+
 
     /**
      * getTitle returns the title for the database type for a JDBC scheme.
@@ -320,9 +312,9 @@ public class SiardConnection extends Properties {
      */
     public String getTitle(String sScheme) {
         return getProperty(sScheme + sTITLE_SUFFIX);
-    } /* getTitle */
+    }
 
-    /*--------------------------------------------------------------------*/
+
 
     /**
      * getOptions returns the number of sample JDBC URLs for the JDBC scheme.
@@ -332,9 +324,9 @@ public class SiardConnection extends Properties {
      */
     public int getOptions(String sScheme) {
         return getProperty(sScheme + sSAMPLE_SUFFIX).split("\\|").length;
-    } /* getOptions */
+    }
 
-    /*--------------------------------------------------------------------*/
+
 
     /**
      * getSampleUrl returns a sample JDBC URL for the JDBC scheme.
@@ -351,9 +343,9 @@ public class SiardConnection extends Properties {
         String sSampleUrl = getProperty(sScheme + sSAMPLE_SUFFIX);
         sSampleUrl = sSampleUrl.split("\\|")[iOption];
         return MessageFormat.format(sSampleUrl, sHost, sFolder.replace("\\", "/"), sDatabase);
-    } /* getSampleUrl */
+    }
 
-    /*--------------------------------------------------------------------*/
+
 
     /**
      * getOption returns a name for the sample JDBC URL for the JDBC scheme
@@ -367,9 +359,9 @@ public class SiardConnection extends Properties {
         String sOption = getProperty(sScheme + sOPTION_SUFFIX);
         sOption = sOption.split("\\|")[iOption];
         return sOption;
-    } /* getOption */
+    }
 
-    /*--------------------------------------------------------------------*/
+
 
     /**
      * getSampleUrl returns a sample JDBC URL for the JDBC scheme.
@@ -383,11 +375,11 @@ public class SiardConnection extends Properties {
      */
     public String getSampleUrl(String sScheme, String sHost, String sFolder, String sDatabase) {
         return getSampleUrl(sScheme, sHost, sFolder, sDatabase, 0);
-    } /* getSampleUrl */
+    }
 
     public boolean isLocal(String sScheme) {
         boolean bLocal = getProperty(sScheme + sSAMPLE_SUFFIX).indexOf("{0}") < 0;
         return bLocal;
     }
 
-} /* class SiardConnection */
+}

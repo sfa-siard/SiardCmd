@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-/*====================================================================*/
+
 
 /**
  * Loads the data from a siard file to a database instance.
@@ -41,17 +41,11 @@ import java.util.Map;
  */
 @Slf4j
 public class SiardToDb {
-    /*====================================================================
-    (private) constants
-    ====================================================================*/
     public static final int iRETURN_OK = 0;
     public static final int iRETURN_WARNING = 4;
     public static final int iRETURN_ERROR = 8;
     public static final int iRETURN_FATAL = 12;
 
-  /*====================================================================
-  (private) data members
-  ====================================================================*/
     /**
      * info
      */
@@ -92,9 +86,6 @@ public class SiardToDb {
         return _iReturn;
     }
   
-  /*====================================================================
-  methods
-  ====================================================================*/
 
     /**
      * prints usage information
@@ -126,9 +117,9 @@ public class SiardToDb {
         System.out.println("  <siard file>        name of .siard file (will be overwritten. if it exists!)");
         System.out.println("  <schema>            schema name in SIARD file");
         System.out.println("  <mappedschema>      schema name to be used in database");
-    } /* printUsage */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * reads the parameters from the command line or from the config file.
@@ -138,29 +129,29 @@ public class SiardToDb {
         Arguments args = Arguments.newInstance(asArgs);
         if (args.getOption("h") != null)
             _iReturn = iRETURN_WARNING;
-        /* login time out */
+
         String sLoginTimeoutSeconds = args.getOption("l");
-        /* query time out */
+
         String sQueryTimeoutSeconds = args.getOption("q");
-        /* overwrite */
+       
         if (args.getOption("o") != null)
             _bOverwrite = true;
-        /* JDBC URI */
+
         _sJdbcUrl = args.getOption("j");
-        /* db user */
+
         _sDatabaseUser = args.getOption("u");
-        /* db password */
+
         _sDatabasePassword = args.getOption("p");
-        /* siard file */
+
         String sSiardFile = args.getOption("s");
-        /* schema mapping */
+
         for (int i = 0; i < args.getArguments() / 2; i++) {
             String sSchema = args.getArgument(2 * i);
             String sMappedSchema = args.getArgument(2 * i + 1);
             _mapSchemas.put(sSchema, sMappedSchema);
         }
 
-        /* analyze the parameters */
+
         if (_iReturn == iRETURN_OK) {
             if (sLoginTimeoutSeconds != null) {
                 try {
@@ -203,7 +194,7 @@ public class SiardToDb {
                 _iReturn = iRETURN_ERROR;
             }
         }
-        /* print and log the parameters */
+
         if (_iReturn == iRETURN_OK) {
             val sb = new StringBuilder()
                     .append("\n")
@@ -247,12 +238,9 @@ public class SiardToDb {
             System.out.println(message);
         } else
             printUsage();
-    } /* getParameters */
+    }
 
-  /*====================================================================
-  constructor
-  ====================================================================*/
-    /*------------------------------------------------------------------*/
+
 
     /**
      * runs main program of SiardFromDb.
@@ -260,13 +248,13 @@ public class SiardToDb {
     public SiardToDb(String[] asArgs)
             throws IOException, SQLException {
         super();
-        /* parameters */
+       
         getParameters(asArgs);
         if (_iReturn == iRETURN_OK) {
-            /* open SIARD file */
+
             _archive = ArchiveImpl.newInstance();
             _archive.open(_fileSiard);
-            /* open connection */
+
             String sError = null;
 
             val siardConnection = SiardConnection.getSiardConnection();
@@ -277,7 +265,7 @@ public class SiardToDb {
                     System.out.println("Connected to " + _conn.getMetaData()
                                                               .getURL());
                     _conn.setAutoCommit(false);
-                    /* create types and tables */
+
                     MetaData md = _archive.getMetaData();
                     MetaDataToDb mdtd = MetaDataToDb.newInstance(_conn.getMetaData(), md, _mapSchemas);
                     mdtd.setQueryTimeout(_iQueryTimeoutSeconds);
@@ -296,7 +284,7 @@ public class SiardToDb {
                             }
                         }
                         mdtd.upload(null);
-                        /* upload primary data from DB */
+
                         PrimaryDataToDb pdtd = PrimaryDataToDb.newInstance(_conn, _archive,
                                                                            mdtd.getArchiveMapping(), mdtd.supportsArrays(), mdtd.supportsDistincts(), mdtd.supportsUdts());
                         pdtd.setQueryTimeout(_iQueryTimeoutSeconds);
@@ -315,12 +303,9 @@ public class SiardToDb {
                 System.err.println("Connection to " + _sJdbcUrl + " not supported (" + sError + ")!");
             _archive.close();
         }
-    } /* constructor SiardToDb */
+    }
 
-  /*====================================================================
-  factory
-  ====================================================================*/
-    /*------------------------------------------------------------------*/
+
 
     /**
      * main entry point starts logging and creates running instance.
@@ -333,11 +318,11 @@ public class SiardToDb {
             _pi.printStart();
             _pi.logStart();
             LOG.info(RuntimeHelper.getRuntimeInformation());
-            /* run application */
+
             SiardToDb stdb = new SiardToDb(asArgs);
-            /* log termination info */
+
             _pi.logTermination();
-            /* termination information */
+
             _pi.printTermination();
             iReturn = stdb.getReturn();
         } catch (Exception e) {
@@ -350,6 +335,6 @@ public class SiardToDb {
             iReturn = iRETURN_FATAL;
         }
         System.exit(iReturn);
-    } /* main */
+    }
 
-} /* class SiardToDb */
+}

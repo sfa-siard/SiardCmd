@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Mapping {
-    /*------------------------------------------------------------------*/
+
 
     /**
      * limitations on maximum length of identifiers leads to a need to
@@ -32,6 +32,6 @@ public class Mapping {
             map.put(sOriginalName, sMappedName);
         }
         return map;
-    } /* getDisambiguated */
+    }
 
-} /* Mapping */
+}

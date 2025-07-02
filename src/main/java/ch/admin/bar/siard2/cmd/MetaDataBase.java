@@ -37,7 +37,7 @@ public abstract class MetaDataBase {
 
     private Set<QualifiedId> _setUsedTypes = null;
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * if a type is only used for procedure parameters but not for table
@@ -68,9 +68,9 @@ public abstract class MetaDataBase {
             rs.close();
         }
         return _setUsedTypes.contains(qiType);
-    } /* isUsedInColumn */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * constructor
@@ -105,6 +105,6 @@ public abstract class MetaDataBase {
         } catch (SQLFeatureNotSupportedException sfnse) {
             _bSupportsArrays = false;
         }
-    } /* constructor */
+    }
 
-} /* MetaDataBase */
+}
