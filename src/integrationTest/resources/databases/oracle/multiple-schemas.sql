@@ -28,3 +28,16 @@ END;
 
 -- 5. Grant USER_A access to USER_B's table
 GRANT SELECT ON user_b.table_b TO user_a;
+
+
+-- 6. Create table in PUBLIC schema
+BEGIN
+EXECUTE IMMEDIATE 'CREATE TABLE public.persons (
+                                                   id NUMBER PRIMARY KEY,
+                                                   name VARCHAR2(200)
+                   )';
+END;
+/
+
+-- 7. Grant USER_A access to PUBLIC's table
+GRANT SELECT ON public.persons TO user_a;

@@ -6,6 +6,7 @@ public class SqlScripts {
         public final static String JDBCBASE_7 = "issues/jdbcbase7/jdbcbase7.sql";
         public final static String SIARDCMD_15 = "issues/siardcmd15/siardcmd_15.sql";
         public final static String MULTIPLE_SCHEMAS = "databases/oracle/multiple-schemas.sql";
+        public final static String ADVANCED_SETUP = "databases/oracle/advanced_setup.sql";
     }
 
     public static class Postgres {
