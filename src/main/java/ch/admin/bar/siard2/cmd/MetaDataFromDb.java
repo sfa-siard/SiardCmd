@@ -1,11 +1,3 @@
-/*======================================================================
-MetaDataFromDb transfers meta data from databases to SIARD files. 
-Application : Siard2
-Description : Transfers meta data from databases to SIARD files.
-------------------------------------------------------------------------
-Copyright  : Swiss Federal Archives, Berne, Switzerland, 2008
-Created    : 29.08.2016, Hartwig Thomas, Enter AG, Rüti ZH
-======================================================================*/
 package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.api.*;
@@ -474,7 +466,7 @@ public class MetaDataFromDb extends MetaDataBase {
             int iOrdinalPosition = rs.getInt("ORDINAL_POSITION");
             String sSpecificName = rs.getString("SPECIFIC_NAME");
             if (sSpecificName == null) sSpecificName = sProcedureName;
-            /* we are only interested in the parameters of this specific routine */
+
             if (sSpecificName.equals(mr.getSpecificName())) {
                 if ((iColumnType == DatabaseMetaData.procedureColumnReturn) || (iColumnType == DatabaseMetaData.procedureColumnResult)) {
                     mr.setReturnType(sTypeName);
@@ -572,7 +564,7 @@ public class MetaDataFromDb extends MetaDataBase {
             int iOrdinalPosition = rs.getInt("ORDINAL_POSITION");
             String sSpecificName = rs.getString("SPECIFIC_NAME");
             if (sSpecificName == null) sSpecificName = sFunctionName;
-            /* we are only interested in the parameters of this specific routine */
+
             if (sSpecificName.equals(mr.getSpecificName())) {
                 /* the functionColumn... constants are defined inconsistently and
                  * probably were supposed to be identical with the corresponding
@@ -648,7 +640,7 @@ public class MetaDataFromDb extends MetaDataBase {
     private void addReferences(MetaTable mt, String sForeignKeyName, Map<Integer, String> mapFkColumns,
                                Map<String, String> mapPkColumns) throws IOException {
         if (sForeignKeyName != null) {
-            /* add the columns in the proper order */
+
             MetaForeignKey mfk = mt.getMetaForeignKey(sForeignKeyName);
             for (int iColumn = 0; iColumn < mapFkColumns.size(); iColumn++) {
                 String sFkColumnName = mapFkColumns.get(Integer.valueOf(iColumn + 1));
@@ -760,7 +752,7 @@ public class MetaDataFromDb extends MetaDataBase {
      * @throws SQLException in a database error occurred.
      */
     private void getRoles() throws IOException, SQLException {
-        /* all grantees that are not users (probably) are roles */
+
         for (int iPrivilege = 0; iPrivilege < _md.getMetaPrivileges(); iPrivilege++) {
             MetaPrivilege mp = _md.getMetaPrivilege(iPrivilege);
             String sGrantee = mp.getGrantee();
@@ -781,7 +773,7 @@ public class MetaDataFromDb extends MetaDataBase {
      */
     private void getUsers() throws IOException, SQLException {
         _md.createMetaUser(_dmd.getUserName());
-        /* all grantors are users */
+
         for (int iPrivilege = 0; iPrivilege < _md.getMetaPrivileges(); iPrivilege++) {
             MetaPrivilege mp = _md.getMetaPrivilege(iPrivilege);
             String sGrantor = mp.getGrantor();
@@ -937,7 +929,7 @@ public class MetaDataFromDb extends MetaDataBase {
      * @throws SQLException if a database error occurred.
      */
     private void getRows(MetaTable mt) throws IOException, SQLException {
-        /* query rows and LOB sizes */
+
         int iLobs = 0;
         String sQuery = "SELECT COUNT(*) AS RECORDS";
         if (_bMaxLobNeeded) {
@@ -1011,7 +1003,7 @@ public class MetaDataFromDb extends MetaDataBase {
             if (bNonUnique) throw new IOException("Invalid non-unique unique index found!");
             String sIndexName = rs.getString("INDEX_NAME");
             int iIndexType = rs.getInt("TYPE");
-            /* do not list primary key among the candidate keys */
+
             boolean bPrimary = (mt.getMetaPrimaryKey() != null) && (mt.getMetaPrimaryKey()
                                                                       .getName()
                                                                       .equals(sIndexName));
@@ -1068,9 +1060,9 @@ public class MetaDataFromDb extends MetaDataBase {
             String sFkName = rs.getString("FK_NAME");
             MetaForeignKey mfk = mt.getMetaForeignKey(sFkName);
             if (mfk == null) {
-                /* add references to previous foreign key */
+
                 addReferences(mt, sForeignKeyName, mapFkColumns, mapPkColumns);
-                /* create a new foreign key */
+
                 sForeignKeyName = sFkName;
                 mfk = mt.createMetaForeignKey(sForeignKeyName);
             }
@@ -1087,7 +1079,7 @@ public class MetaDataFromDb extends MetaDataBase {
                       sPkTableName);
         }
         rs.close();
-        /* add references to last foreign key */
+
         addReferences(mt, sForeignKeyName, mapFkColumns, mapPkColumns);
     }
 
@@ -1178,11 +1170,11 @@ public class MetaDataFromDb extends MetaDataBase {
      * @throws SQLException in a database error occurred.
      */
     private void getGlobalMetaData() throws IOException, SQLException {
-        /* get table privileges for all tables */
+
         getPrivileges();
-        /* get the current user and all users that are grantor in a table privilege */
+
         getUsers();
-        /* get all roles that are grantees in a table privilege and not users */
+
         getRoles();
     }
 
@@ -1209,7 +1201,7 @@ public class MetaDataFromDb extends MetaDataBase {
      * @throws SQLException in a database error occurred.
      */
     private void getTables() throws IOException, SQLException {
-        /* first count the tables for progress */
+
         String[] asTypes = new String[]{"TABLE"};
         if (_bViewsAsTables) asTypes = new String[]{"TABLE", "VIEW"};
         ResultSet rs = _dmd.getTables(null, "%", "%", asTypes);
@@ -1270,9 +1262,9 @@ public class MetaDataFromDb extends MetaDataBase {
         }
         /* database product (incl. version) */
         _md.setDatabaseProduct(_dmd.getDatabaseProductName() + " " + _dmd.getDatabaseProductVersion());
-        /* connection */
+       
         _md.setConnection(_dmd.getURL());
-        /* database user */
+
         _md.setDatabaseUser(_dmd.getUserName());
     }
 
@@ -1301,9 +1293,9 @@ public class MetaDataFromDb extends MetaDataBase {
         _progress = progress;
         _bViewsAsTables = bViewsAsTables;
         _bMaxLobNeeded = bMaxLobNeeded;
-        /* global meta data */
+
         logDownload();
-        /* get tables (and Types and relevant schemas) */
+
         getTables();
         /* get schema meta data (Views, Routines and Types) */
         if (!cancelRequested()) getSchemaMetaData();

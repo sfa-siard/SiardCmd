@@ -119,31 +119,31 @@ public class SiardFromDb {
         _iReturn = iRETURN_OK;
         Arguments args = Arguments.newInstance(asArgs);
         if (args.getOption("h") != null) _iReturn = iRETURN_WARNING;
-        /* overwrite */
+       
         if (args.getOption("o") != null) _bOverwrite = true;
-        /* views as tables */
+
         if (args.getOption("v") != null) _bViewsAsTables = true;
-        /* login time out */
+
         String sLoginTimeoutSeconds = args.getOption("l");
-        /* query time out */
+
         String sQueryTimeoutSeconds = args.getOption("q");
-        /* import XML */
+
         String sImportXml = args.getOption("i");
-        /* export XML */
+
         String sExportXml = args.getOption("e");
-        /* external LOB folder */
+
         String sExternalLobFolder = args.getOption("x");
-        /* MIME type for external LOB */
+
         _sMimeType = args.getOption("m");
-        /* JDBC URI */
+
         _sJdbcUrl = args.getOption("j");
-        /* db user */
+
         _sDatabaseUser = args.getOption("u");
-        /* db password */
+
         _sDatabasePassword = args.getOption("p");
-        /* siard file */
+
         String sSiardFile = args.getOption("s");
-        /* analyze the parameters */
+
         if (_iReturn == iRETURN_OK) {
             if (sSiardFile != null) _fileSiard = new File(sSiardFile);
             if (sExportXml != null) _fileExportXml = new File(sExportXml);
@@ -218,7 +218,7 @@ public class SiardFromDb {
                 _iReturn = iRETURN_ERROR;
             }
         }
-        /* print and log the parameters */
+
         if (_iReturn == iRETURN_OK) {
             val sb = new StringBuilder()
                     .append("\n")
@@ -271,7 +271,7 @@ public class SiardFromDb {
             LOG.info(message);
             System.out.println(message);
         } else printUsage();
-    } /* getParameters */
+    }
 
 
     /**
@@ -279,7 +279,7 @@ public class SiardFromDb {
      */
     public SiardFromDb(String[] asArgs) throws SQLException, IOException, ClassNotFoundException {
         super();
-        /* parameters */
+       
         getParameters(asArgs);
         if (_iReturn == iRETURN_OK) {
             if (_bOverwrite) {
@@ -291,7 +291,7 @@ public class SiardFromDb {
                 }
             }
             if (((_fileSiard == null) || !_fileSiard.exists()) && ((_fileExportXml == null) || !_fileExportXml.exists())) {
-                /* open connection */
+
                 String sError = null;
 
                 val siardConnection = SiardConnection.getSiardConnection();
@@ -302,7 +302,7 @@ public class SiardFromDb {
                         System.out.println("Connected to " + _conn.getMetaData()
                                                                   .getURL());
                         _conn.setAutoCommit(false);
-                        /* open SIARD archive */
+
                         _archive = ArchiveImpl.newInstance();
                         File fileSiard = _fileSiard;
                         if (fileSiard == null) {
@@ -315,11 +315,11 @@ public class SiardFromDb {
                             _archive.importMetaDataTemplate(fis);
                             fis.close();
                         }
-                        /* get meta data from DB */
+
                         MetaDataFromDb mdfd = MetaDataFromDb.newInstance(_conn.getMetaData(), _archive.getMetaData());
                         mdfd.setQueryTimeout(_iQueryTimeoutSeconds);
                         mdfd.download(_bViewsAsTables, (_uriExternalLobFolder != null), null);
-                        /* set external LOB stuff */
+
                         if (_uriExternalLobFolder != null) {
                             MetaColumn mcMaxLob = mdfd.getMaxLobColumn();
                             if (mcMaxLob != null) {
@@ -338,26 +338,26 @@ public class SiardFromDb {
                                 System.out.println(sMessage);
                             } else System.out.println("No LOB column found to be externalized!");
                         }
-                        /* export meta data XML from DB */
+
                         if (_fileExportXml != null) {
                             OutputStream osXml = new FileOutputStream(_fileExportXml);
                             _archive.exportMetaData(osXml);
                             osXml.close();
                         }
                         if (_fileSiard != null) {
-                            /* export primary data from DB */
+
                             PrimaryDataFromDb pdfd = PrimaryDataFromDb.newInstance(_conn, _archive);
                             pdfd.setQueryTimeout(_iQueryTimeoutSeconds);
                             pdfd.download(null);
                         } else fileSiard.deleteOnExit();
-                        /* close SIARD archive */
+
                         /***
                          FileOutputStream fosXml = new FileOutputStream("D:\\Projekte\\SIARD2\\SiardCmd\\tmp\\export.xml");
                          _archive.exportMetaData(fosXml);
                          fosXml.close();
                          ***/
                         _archive.close();
-                        /* close connection */
+
                         _conn.rollback();
                         _conn.close();
                     } else System.out.println("Connection to " + _conn.getMetaData()
@@ -373,7 +373,7 @@ public class SiardFromDb {
                 _iReturn = iRETURN_WARNING;
             }
         }
-    } /* constructor SiardFromDb */
+    }
 
 
     /**

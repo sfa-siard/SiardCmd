@@ -1,11 +1,3 @@
-/*======================================================================
-PrimaryDataTransfer opens a record set to a database for up- or download. 
-Application : Siard2
-Description : Opens a record set to a database for up- or download.
-------------------------------------------------------------------------
-Copyright  : Swiss Federal Archives, Berne, Switzerland, 2008
-Created    : 01.09.2016, Hartwig Thomas, Enter AG, Rüti ZH
-======================================================================*/
 package ch.admin.bar.siard2.cmd;
 
 import ch.admin.bar.siard2.api.Archive;
@@ -23,7 +15,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-/*====================================================================*/
+
 
 /**
  * Opens a record set to a database for up- or download.
@@ -59,7 +51,7 @@ public class PrimaryDataTransfer {
         return _bSupportsUdts;
     }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * issue a SELECT query for all fields of the table.
@@ -72,11 +64,11 @@ public class PrimaryDataTransfer {
     protected ResultSet openTable(Table table, SchemaMapping sm)
             throws IOException, SQLException {
         MetaTable mt = table.getMetaTable();
-        /* schema mapping is null on download */
+
         TableMapping tm = null;
         if (sm != null)
             tm = sm.getTableMapping(mt.getName());
-        /* create query */
+
         StringBuilder sbSql = new StringBuilder("SELECT\r\n");
         List<List<String>> llColumnNames = mt.getColumnNames(supportsArrays(), supportsUdts());
         for (int iColumn = 0; iColumn < llColumnNames.size(); iColumn++) {
@@ -108,7 +100,7 @@ public class PrimaryDataTransfer {
             sTableName = tm.getMappedTableName();
         QualifiedId qiTable = new QualifiedId(null, sSchemaName, sTableName);
         sbSql.append("\r\n FROM " + qiTable.format());
-        /* execute query */
+
         val sqlStatement = sbSql.toString();
         LOG.trace("SQL statement: '{}'", sqlStatement);
 
@@ -129,9 +121,9 @@ public class PrimaryDataTransfer {
         LOG.debug("Data from table '{}.{}' successfully loaded", qiTable.getSchema(), qiTable.getName());
 
         return rs;
-    } /* openTable */
+    }
 
-    /*------------------------------------------------------------------*/
+
 
     /**
      * constructor
@@ -151,6 +143,6 @@ public class PrimaryDataTransfer {
         _bSupportsArrays = bSupportsArrays;
         _bSupportsDistincts = bSupportsDistincts;
         _bSupportsUdts = bSupportsUdts;
-    } /* constructor PrimaryDataTransfer */
+    }
 
-} /* class PrimaryDataTransfer */
+}
