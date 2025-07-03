@@ -58,15 +58,15 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
     public void download(Progress progress) throws IOException, SQLException {
 
         LOG.info("Start primary data download to archive {}",
-                 this._archive.getFile()
-                              .getAbsoluteFile());
+                 this.archive.getFile()
+                             .getAbsoluteFile());
 
         System.out.println("\r\nPrimary Data");
         this.progress = progress;
 
         recordsTotal = 0;
-        for (int iSchema = 0; iSchema < _archive.getSchemas(); iSchema++) {
-            Schema schema = _archive.getSchema(iSchema);
+        for (int iSchema = 0; iSchema < archive.getSchemas(); iSchema++) {
+            Schema schema = archive.getSchema(iSchema);
             for (int iTable = 0; iTable < schema.getTables(); iTable++) {
                 recordsTotal = recordsTotal + schema.getTable(iTable)
                                                     .getMetaTable()
@@ -76,13 +76,13 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         recordsPercent = (recordsTotal + 99) / 100;
         recordsDownloaded = 0;
 
-        for (int iSchema = 0; (iSchema < _archive.getSchemas()) && (!cancelRequested()); iSchema++) {
-            getSchema(_archive.getSchema(iSchema));
+        for (int iSchema = 0; (iSchema < archive.getSchemas()) && (!cancelRequested()); iSchema++) {
+            getSchema(archive.getSchema(iSchema));
         }
         if (cancelRequested())
             throw new IOException("\r\nDownload of primary data cancelled!");
         System.out.println("\r\nDownload terminated successfully.");
-        _conn.rollback();
+        connection.rollback();
 
         LOG.info("Primary data download finished");
     }

@@ -99,8 +99,8 @@ public class PrimaryDataToDb extends PrimaryDataTransfer {
     public void addCandidateKeys(Connection conn, MetaTable mt)
             throws SQLException {
         if (mt.getMetaCandidateKeys() > 0) {
-            SchemaMapping sm = _am.getSchemaMapping(mt.getParentMetaSchema()
-                                                      .getName());
+            SchemaMapping sm = archiveMapping.getSchemaMapping(mt.getParentMetaSchema()
+                                                                 .getName());
             TableMapping tm = sm.getTableMapping(mt.getName());
             QualifiedId qiTable = new QualifiedId(null, sm.getMappedSchemaName(), tm.getMappedTableName());
             String sSql = "ALTER TABLE " + qiTable.format();
@@ -119,7 +119,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer {
                 LOG.trace("SQL statement: '{}'", sqlStatement);
 
                 Statement stmt = conn.createStatement();
-                stmt.setQueryTimeout(_iQueryTimeoutSeconds);
+                stmt.setQueryTimeout(queryTimeout);
                 stmt.execute(sbSql.toString());
                 stmt.close();
 
@@ -134,8 +134,8 @@ public class PrimaryDataToDb extends PrimaryDataTransfer {
     public void addForeignKeys(Connection conn, MetaTable mt)
             throws SQLException {
         if (mt.getMetaForeignKeys() > 0) {
-            SchemaMapping sm = _am.getSchemaMapping(mt.getParentMetaSchema()
-                                                      .getName());
+            SchemaMapping sm = archiveMapping.getSchemaMapping(mt.getParentMetaSchema()
+                                                                 .getName());
             TableMapping tm = sm.getTableMapping(mt.getName());
             QualifiedId qiTable = new QualifiedId(null, sm.getMappedSchemaName(), tm.getMappedTableName());
             String sSql = "ALTER TABLE " + qiTable.format();
@@ -144,7 +144,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer {
                 StringBuilder sbSql = new StringBuilder(sSql + " ADD CONSTRAINT " + mfk.getName() + " FOREIGN KEY(");
                 SchemaMapping smReferenced = sm;
                 if (mfk.getReferencedSchema() != null)
-                    smReferenced = _am.getSchemaMapping(mfk.getReferencedSchema());
+                    smReferenced = archiveMapping.getSchemaMapping(mfk.getReferencedSchema());
                 TableMapping tmReferenced = smReferenced.getTableMapping(mfk.getReferencedTable());
                 QualifiedId qiReferenced = new QualifiedId(null,
                                                            smReferenced.getMappedSchemaName(), tmReferenced.getMappedTableName());
@@ -165,7 +165,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer {
                 LOG.trace("SQL statement: '{}'", sqlStatement);
 
                 Statement stmt = conn.createStatement();
-                stmt.setQueryTimeout(_iQueryTimeoutSeconds);
+                stmt.setQueryTimeout(queryTimeout);
                 stmt.execute(sqlStatement);
                 stmt.close();
 
@@ -181,12 +181,12 @@ public class PrimaryDataToDb extends PrimaryDataTransfer {
         for (int iTable = 0; (iTable < ms.getMetaTables()) && (!cancelRequested()); iTable++) {
             MetaTable mt = ms.getMetaTable(iTable);
             try {
-                addCandidateKeys(_conn, mt);
+                addCandidateKeys(connection, mt);
             } catch (SQLException se) {
                 System.err.println(EU.getExceptionMessage(se));
             }
             try {
-                addForeignKeys(_conn, mt);
+                addForeignKeys(connection, mt);
             } catch (SQLException se) {
                 System.err.println(EU.getExceptionMessage(se));
             }
@@ -201,7 +201,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer {
      * (Rationale: DB systems differ too much in constraint handling.)
      */
     private void enableConstraints() {
-        MetaData md = _archive.getMetaData();
+        MetaData md = archive.getMetaData();
         for (int iSchema = 0; iSchema < md.getMetaSchemas(); iSchema++) {
             MetaSchema ms = md.getMetaSchema(iSchema);
             enableConstraints(ms);
@@ -336,8 +336,8 @@ public class PrimaryDataToDb extends PrimaryDataTransfer {
                 o = conn.createArrayOf(sType, aoValues);
                 setResources.add(o);
             } else if (cat == CategoryType.UDT) {
-                SchemaMapping sm = _am.getSchemaMapping(mt.getParentMetaSchema()
-                                                          .getName());
+                SchemaMapping sm = archiveMapping.getSchemaMapping(mt.getParentMetaSchema()
+                                                                     .getName());
                 QualifiedId qiType = new QualifiedId(null,
                                                      sm.getMappedSchemaName(),
                                                      sm.getMappedTypeName(mt.getName()));
@@ -431,7 +431,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer {
         if (!stmt.isClosed())
             stmt.close();
         rd.close();
-        _conn.commit();
+        connection.commit();
         LOG.debug("Records of table '{}.{}' successfully uploaded", qiTable.getSchema(), qiTable.getName());
     }
 
@@ -447,12 +447,12 @@ public class PrimaryDataToDb extends PrimaryDataTransfer {
     private void putSchema(Schema schema)
             throws IOException, SQLException {
         MetaSchema ms = schema.getMetaSchema();
-        SchemaMapping sm = _am.getSchemaMapping(ms.getName());
+        SchemaMapping sm = archiveMapping.getSchemaMapping(ms.getName());
         for (int iTable = 0; (iTable < schema.getTables()) && (!cancelRequested()); iTable++) {
             Table table = schema.getTable(iTable);
             putTable(table, sm);
         }
-        _conn.commit();
+        connection.commit();
 
         LOG.debug("Records of schema '{}' successfully uploaded", ms.getName());
     }
@@ -468,15 +468,15 @@ public class PrimaryDataToDb extends PrimaryDataTransfer {
     public void upload(Progress progress)
             throws IOException, SQLException {
         LOG.info("Start primary data upload of archive {}",
-                 this._archive.getFile()
-                              .getAbsoluteFile());
+                 this.archive.getFile()
+                             .getAbsoluteFile());
 
         System.out.println("\r\nPrimary Data");
         _progress = progress;
 
         _lRecordsTotal = 0;
-        for (int iSchema = 0; iSchema < _archive.getSchemas(); iSchema++) {
-            Schema schema = _archive.getSchema(iSchema);
+        for (int iSchema = 0; iSchema < archive.getSchemas(); iSchema++) {
+            Schema schema = archive.getSchema(iSchema);
             for (int iTable = 0; iTable < schema.getTables(); iTable++) {
                 Table table = schema.getTable(iTable);
                 _lRecordsTotal = _lRecordsTotal + table.getMetaTable()
@@ -486,8 +486,8 @@ public class PrimaryDataToDb extends PrimaryDataTransfer {
         _lRecordsPercent = (_lRecordsTotal + 99) / 100;
         _lRecordsUploaded = 0;
 
-        for (int iSchema = 0; (iSchema < _archive.getSchemas()) && (!cancelRequested()); iSchema++) {
-            Schema schema = _archive.getSchema(iSchema);
+        for (int iSchema = 0; (iSchema < archive.getSchemas()) && (!cancelRequested()); iSchema++) {
+            Schema schema = archive.getSchema(iSchema);
             putSchema(schema);
         }
         if (!cancelRequested())
@@ -495,7 +495,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer {
         if (cancelRequested())
             throw new IOException("\r\nUpload of primary data cancelled!");
         System.out.println("\r\nUpload terminated successfully.");
-        _conn.commit();
+        connection.commit();
 
         LOG.info("Primary data upload finished");
     }

@@ -24,34 +24,48 @@ import java.util.List;
  */
 @Slf4j
 public class PrimaryDataTransfer {
-    protected Connection _conn = null;
-    protected Archive _archive = null;
-    protected ArchiveMapping _am = null;
-    protected int _iQueryTimeoutSeconds = 30;
+    protected Connection connection = null;
+    protected Archive archive = null;
+    protected ArchiveMapping archiveMapping = null;
+    protected int queryTimeout = 30;
+    protected boolean supportsUdts = false;
+    protected boolean supportsArrays = false;
+    protected boolean supportsDistincts = false;
 
-    public void setQueryTimeout(int iQueryTimeoutSeconds) {
-        _iQueryTimeoutSeconds = iQueryTimeoutSeconds;
+    /**
+     *
+     * @param connection               database connection.
+     * @param archive            SIARD archive.
+     * @param archiveMapping                 mapping of names in archive.
+     * @param supportsArrays    true, if database supports Arrays.
+     * @param supportsDistincts true, if database supports DISTINCTs.
+     * @param supportsUdts      true, if database supports UDTs.
+     */
+    protected PrimaryDataTransfer(Connection connection, Archive archive, ArchiveMapping archiveMapping,
+                                  boolean supportsArrays, boolean supportsDistincts, boolean supportsUdts) {
+        this.connection = connection;
+        this.archive = archive;
+        this.archiveMapping = archiveMapping;
+        this.supportsArrays = supportsArrays;
+        this.supportsDistincts = supportsDistincts;
+        this.supportsUdts = supportsUdts;
     }
 
-    protected boolean _bSupportsArrays = false;
+    public void setQueryTimeout(int queryTimeout) {
+        this.queryTimeout = queryTimeout;
+    }
 
     public boolean supportsArrays() {
-        return _bSupportsArrays;
+        return supportsArrays;
     }
-
-    protected boolean _bSupportsDistincts = false;
 
     public boolean supportsDistincts() {
-        return _bSupportsDistincts;
+        return supportsDistincts;
     }
-
-    protected boolean _bSupportsUdts = false;
 
     public boolean supportsUdts() {
-        return _bSupportsUdts;
+        return supportsUdts;
     }
-
-
 
     /**
      * issue a SELECT query for all fields of the table.
@@ -113,36 +127,13 @@ public class PrimaryDataTransfer {
         int iType = ResultSet.TYPE_FORWARD_ONLY;
         if (sm == null)
             iType = ResultSet.TYPE_FORWARD_ONLY;
-        _conn.setHoldability(iHoldability);
-        Statement stmt = _conn.createStatement(iType, iConcurrency, iHoldability);
-        stmt.setQueryTimeout(_iQueryTimeoutSeconds);
+        connection.setHoldability(iHoldability);
+        Statement stmt = connection.createStatement(iType, iConcurrency, iHoldability);
+        stmt.setQueryTimeout(queryTimeout);
         ResultSet rs = stmt.executeQuery(sbSql.toString());
 
         LOG.debug("Data from table '{}.{}' successfully loaded", qiTable.getSchema(), qiTable.getName());
 
         return rs;
     }
-
-
-
-    /**
-     * constructor
-     *
-     * @param conn               database connection.
-     * @param archive            SIARD archive.
-     * @param am                 mapping of names in archive.
-     * @param bSupportsArrays    true, if database supports Arrays.
-     * @param bSupportsDistincts true, if database supports DISTINCTs.
-     * @param bSupportsUdts      true, if database supports UDTs.
-     */
-    protected PrimaryDataTransfer(Connection conn, Archive archive, ArchiveMapping am,
-                                  boolean bSupportsArrays, boolean bSupportsDistincts, boolean bSupportsUdts) {
-        _conn = conn;
-        _archive = archive;
-        _am = am;
-        _bSupportsArrays = bSupportsArrays;
-        _bSupportsDistincts = bSupportsDistincts;
-        _bSupportsUdts = bSupportsUdts;
-    }
-
 }
