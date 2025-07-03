@@ -17,16 +17,21 @@ public class Mapping {
     protected static Map<String, String> getDisambiguated(List<String> identifiers, int maxLength) {
         Map<String, String> mappedIdentifiers = new HashMap<>();
         for (String identifier : identifiers) {
-            String mappedName = identifier;
-            if (maxLength > 0) {
-                if (identifier.length() > maxLength) mappedName = identifier.substring(0, maxLength - 1) + "_";
-                for (int i = 0; mappedIdentifiers.containsValue(mappedName); i++) {
-                    String sSuffix = "_" + i;
-                    mappedName = identifier.substring(0, maxLength - sSuffix.length()) + sSuffix;
-                }
-            }
+            String mappedName = disambiguate(maxLength, identifier, mappedIdentifiers);
             mappedIdentifiers.put(identifier, mappedName);
         }
         return mappedIdentifiers;
+    }
+
+    private static String disambiguate(int maxLength, String identifier, Map<String, String> mappedIdentifiers) {
+        String mappedName = identifier;
+        if (maxLength > 0) {
+            if (identifier.length() > maxLength) mappedName = identifier.substring(0, maxLength - 1) + "_";
+            for (int i = 0; mappedIdentifiers.containsValue(mappedName); i++) {
+                String sSuffix = "_" + i;
+                mappedName = identifier.substring(0, maxLength - sSuffix.length()) + sSuffix;
+            }
+        }
+        return mappedName;
     }
 }
