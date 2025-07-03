@@ -8,36 +8,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ArchiveMapping {
-    private final Map<String, SchemaMapping> _mapSchemas = new HashMap<String, SchemaMapping>();
+    private final Map<String, SchemaMapping> schemas = new HashMap<String, SchemaMapping>();
 
-    public SchemaMapping getSchemaMapping(String sSchemaName) {
-        return _mapSchemas.get(sSchemaName);
+    public SchemaMapping getSchemaMapping(String schemaName) {
+        return schemas.get(schemaName);
     }
 
-    public String getMappedSchemaName(String sSchemaName) {
-        return getSchemaMapping(sSchemaName).getMappedSchemaName();
+    public String getMappedSchemaName(String schemaName) {
+        return getSchemaMapping(schemaName).getMappedSchemaName();
     }
 
-    private ArchiveMapping(boolean bSupportsArrays, boolean bSupportsUdts,
-                           Map<String, String> mapSchemas, MetaData md,
-                           int iMaxTableNameLength, int iMaxColumnNameLength)
-            throws IOException {
-        for (int iSchema = 0; iSchema < md.getMetaSchemas(); iSchema++) {
-            MetaSchema ms = md.getMetaSchema(iSchema);
-            String sMappedSchemaName = mapSchemas.get(ms.getName());
-            if (sMappedSchemaName == null)
-                sMappedSchemaName = ms.getName();
-            _mapSchemas.put(ms.getName(),
-                            SchemaMapping.newInstance(bSupportsArrays, bSupportsUdts,
-                                                      sMappedSchemaName, ms, iMaxTableNameLength, iMaxColumnNameLength));
+    private ArchiveMapping(boolean supportsArrays, boolean supportsUdts, Map<String, String> schemas, MetaData metadata, int maxTableNameLength, int maxColumnNameLength) throws IOException {
+        for (int i = 0; i < metadata.getMetaSchemas(); i++) {
+            MetaSchema metaSchema = metadata.getMetaSchema(i);
+            String mappedSchemaName = schemas.get(metaSchema.getName());
+            if (mappedSchemaName == null) {
+                mappedSchemaName = metaSchema.getName();
+            }
+            this.schemas.put(metaSchema.getName(), SchemaMapping.newInstance(supportsArrays, supportsUdts, mappedSchemaName, metaSchema, maxTableNameLength, maxColumnNameLength));
         }
     }
 
-    public static ArchiveMapping newInstance(boolean bSupportsArrays, boolean bSupportsUdts,
-                                             Map<String, String> mapSchemas,
-                                             MetaData md, int iMaxTableNameLength, int iMaxColumnNameLength)
-            throws IOException {
-        return new ArchiveMapping(bSupportsArrays, bSupportsUdts,
-                                  mapSchemas, md, iMaxTableNameLength, iMaxColumnNameLength);
+    public static ArchiveMapping newInstance(boolean supportsArrays, boolean supportsUdts, Map<String, String> schemas, MetaData metaData, int axTableNameLength, int maxColumnNameLength) throws IOException {
+        return new ArchiveMapping(supportsArrays, supportsUdts, schemas, metaData, axTableNameLength, maxColumnNameLength);
     }
 }
