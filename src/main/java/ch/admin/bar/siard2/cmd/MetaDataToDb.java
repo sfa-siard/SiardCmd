@@ -137,9 +137,9 @@ public class MetaDataToDb
                 LOG.trace("SQL statement: '{}'", sqlStatement);
 
 
-                Statement stmt = _dmd.getConnection()
-                                     .createStatement();
-                stmt.setQueryTimeout(_iQueryTimeoutSeconds);
+                Statement stmt = databaseMetaData.getConnection()
+                                                 .createStatement();
+                stmt.setQueryTimeout(queryTimeout);
                 stmt.executeUpdate(sbSql.toString());
                 stmt.close();
 
@@ -183,10 +183,10 @@ public class MetaDataToDb
     private boolean existsType(String sMangledSchema, String sMangledType)
             throws SQLException {
         boolean bExists = false;
-        ResultSet rs = _dmd.getUDTs(null,
-                                    ((BaseDatabaseMetaData) _dmd).toPattern(sMangledSchema),
-                                    ((BaseDatabaseMetaData) _dmd).toPattern(sMangledType),
-                                    new int[]{Types.STRUCT, Types.DISTINCT});
+        ResultSet rs = databaseMetaData.getUDTs(null,
+                                                ((BaseDatabaseMetaData) databaseMetaData).toPattern(sMangledSchema),
+                                                ((BaseDatabaseMetaData) databaseMetaData).toPattern(sMangledType),
+                                                new int[]{Types.STRUCT, Types.DISTINCT});
         while (rs.next())
             bExists = true;
         rs.close();
@@ -226,9 +226,9 @@ public class MetaDataToDb
                             String sSql = "DROP TYPE " + qiType.format() + " RESTRICT";
                             LOG.trace("SQL statement: '{}'", sSql);
 
-                            Statement stmt = _dmd.getConnection()
-                                                 .createStatement();
-                            stmt.setQueryTimeout(_iQueryTimeoutSeconds);
+                            Statement stmt = databaseMetaData.getConnection()
+                                                             .createStatement();
+                            stmt.setQueryTimeout(queryTimeout);
                             try {
                                 stmt.executeUpdate(sSql);
                                 iterType.remove();
@@ -294,7 +294,7 @@ public class MetaDataToDb
     private Set<QualifiedId> getTables()
             throws SQLException {
         Set<QualifiedId> setTables = new HashSet<QualifiedId>();
-        ResultSet rs = _dmd.getTables(null, "%", "%", new String[]{"TABLE"});
+        ResultSet rs = databaseMetaData.getTables(null, "%", "%", new String[]{"TABLE"});
         while (rs.next()) {
             String sCatalog = rs.getString("TABLE_CAT");
             String sSchema = rs.getString("TABLE_SCHEM");
@@ -366,9 +366,9 @@ public class MetaDataToDb
         LOG.trace("SQL statement: '{}'", sqlStatement);
 
         try {
-            Statement stmt = _dmd.getConnection()
-                                 .createStatement();
-            stmt.setQueryTimeout(_iQueryTimeoutSeconds);
+            Statement stmt = databaseMetaData.getConnection()
+                                             .createStatement();
+            stmt.setQueryTimeout(queryTimeout);
             stmt.executeUpdate(sqlStatement);
             stmt.close();
         } catch (Exception ex) {
@@ -385,10 +385,10 @@ public class MetaDataToDb
             sm.setMappedSchemaName(qiTable.getSchema());
             tm.setMappedTableName(qiTable.getName());
         }
-        ResultSet rsColumns = _dmd.getColumns(null,
-                                              ((BaseDatabaseMetaData) _dmd).toPattern(qiTable.getSchema()),
-                                              ((BaseDatabaseMetaData) _dmd).toPattern(qiTable.getName()),
-                                              "%");
+        ResultSet rsColumns = databaseMetaData.getColumns(null,
+                                                          ((BaseDatabaseMetaData) databaseMetaData).toPattern(qiTable.getSchema()),
+                                                          ((BaseDatabaseMetaData) databaseMetaData).toPattern(qiTable.getName()),
+                                                          "%");
         while (rsColumns.next()) {
             String sMappedColumnName = rsColumns.getString("COLUMN_NAME");
             int iOrdinalPosition = rsColumns.getInt("ORDINAL_POSITION");
@@ -443,10 +443,10 @@ public class MetaDataToDb
     private boolean existsTable(String sMangledSchema, String sMangledTable)
             throws SQLException {
         boolean bExists = false;
-        ResultSet rs = _dmd.getTables(null,
-                                      ((BaseDatabaseMetaData) _dmd).toPattern(sMangledSchema),
-                                      ((BaseDatabaseMetaData) _dmd).toPattern(sMangledTable),
-                                      new String[]{"TABLE"});
+        ResultSet rs = databaseMetaData.getTables(null,
+                                                  ((BaseDatabaseMetaData) databaseMetaData).toPattern(sMangledSchema),
+                                                  ((BaseDatabaseMetaData) databaseMetaData).toPattern(sMangledTable),
+                                                  new String[]{"TABLE"});
         if (rs.next())
             bExists = true;
         rs.close();
@@ -468,9 +468,9 @@ public class MetaDataToDb
             String sTableName = ms.getMetaTable(iTable)
                                   .getName();
             TableMapping tm = sm.getTableMapping(sTableName);
-            Statement stmt = _dmd.getConnection()
-                                 .createStatement();
-            stmt.setQueryTimeout(_iQueryTimeoutSeconds);
+            Statement stmt = databaseMetaData.getConnection()
+                                             .createStatement();
+            stmt.setQueryTimeout(queryTimeout);
             try {
                 if (existsTable(sm.getMappedSchemaName(), tm.getMappedTableName())) {
                     QualifiedId qiTable = new QualifiedId(null,
@@ -504,7 +504,7 @@ public class MetaDataToDb
     private boolean existsSchema(String sMangledSchema)
             throws SQLException {
         boolean bExists = false;
-        ResultSet rs = _dmd.getSchemas(null, ((BaseDatabaseMetaData) _dmd).toPattern(sMangledSchema));
+        ResultSet rs = databaseMetaData.getSchemas(null, ((BaseDatabaseMetaData) databaseMetaData).toPattern(sMangledSchema));
         if (rs.next())
             bExists = true;
         rs.close();
@@ -526,9 +526,9 @@ public class MetaDataToDb
             String sSql = "CREATE SCHEMA \"" + sm.getMappedSchemaName() + "\"";
             LOG.trace("SQL statement: '{}'", sSql);
 
-            Statement stmt = _dmd.getConnection()
-                                 .createStatement();
-            stmt.setQueryTimeout(_iQueryTimeoutSeconds);
+            Statement stmt = databaseMetaData.getConnection()
+                                             .createStatement();
+            stmt.setQueryTimeout(queryTimeout);
             try {
                 stmt.executeUpdate(sSql);
                 stmt.getConnection()
@@ -563,28 +563,28 @@ public class MetaDataToDb
     public void upload(Progress progress)
             throws IOException, SQLException {
         LOG.info("Start meta data upload of archive {}",
-                 this._md.getArchive()
-                         .getFile()
-                         .getAbsoluteFile());
+                 this.metaData.getArchive()
+                              .getFile()
+                              .getAbsoluteFile());
 
         System.out.println("Meta Data");
         _progress = progress;
 
         _iTables = 0;
-        for (int iSchema = 0; iSchema < _md.getMetaSchemas(); iSchema++) {
-            MetaSchema ms = _md.getMetaSchema(iSchema);
+        for (int iSchema = 0; iSchema < metaData.getMetaSchemas(); iSchema++) {
+            MetaSchema ms = metaData.getMetaSchema(iSchema);
             for (int iTable = 0; iTable < ms.getMetaTables(); iTable++)
                 _iTables++;
         }
         _iTablesPercent = (_iTables + 99) / 100;
         _iTablesCreated = 0;
-        for (int iSchema = 0; (iSchema < _md.getMetaSchemas()) && (!cancelRequested()); iSchema++) {
-            MetaSchema ms = _md.getMetaSchema(iSchema);
+        for (int iSchema = 0; (iSchema < metaData.getMetaSchemas()) && (!cancelRequested()); iSchema++) {
+            MetaSchema ms = metaData.getMetaSchema(iSchema);
             SchemaMapping sm = _am.getSchemaMapping(ms.getName());
             createSchema(ms, sm);
         }
-        for (int iSchema = 0; (iSchema < _md.getMetaSchemas()) && (!cancelRequested()); iSchema++) {
-            MetaSchema ms = _md.getMetaSchema(iSchema);
+        for (int iSchema = 0; (iSchema < metaData.getMetaSchemas()) && (!cancelRequested()); iSchema++) {
+            MetaSchema ms = metaData.getMetaSchema(iSchema);
             SchemaMapping sm = _am.getSchemaMapping(ms.getName());
             if (existsSchema(sm.getMappedSchemaName()))
                 dropTables(ms, sm);
@@ -592,8 +592,8 @@ public class MetaDataToDb
                 throw new SQLException("Schema \"" + sm.getMappedSchemaName() + "\" could not be created! " +
                                                "Map \"" + ms.getName() + "\" to existing schema.");
         }
-        for (int iSchema = 0; (iSchema < _md.getMetaSchemas()) && (!cancelRequested()); iSchema++) {
-            MetaSchema ms = _md.getMetaSchema(iSchema);
+        for (int iSchema = 0; (iSchema < metaData.getMetaSchemas()) && (!cancelRequested()); iSchema++) {
+            MetaSchema ms = metaData.getMetaSchema(iSchema);
             SchemaMapping sm = _am.getSchemaMapping(ms.getName());
             if (existsSchema(sm.getMappedSchemaName()))
                 dropTypes(ms, sm);
@@ -601,8 +601,8 @@ public class MetaDataToDb
                 throw new SQLException("Schema \"" + sm.getMappedSchemaName() + "\" could not be created! " +
                                                "Map \"" + ms.getName() + "\" to existing schema.");
         }
-        for (int iSchema = 0; (iSchema < _md.getMetaSchemas()) && (!cancelRequested()); iSchema++) {
-            MetaSchema ms = _md.getMetaSchema(iSchema);
+        for (int iSchema = 0; (iSchema < metaData.getMetaSchemas()) && (!cancelRequested()); iSchema++) {
+            MetaSchema ms = metaData.getMetaSchema(iSchema);
             SchemaMapping sm = _am.getSchemaMapping(ms.getName());
             if (existsSchema(sm.getMappedSchemaName()))
                 createTypes(ms, sm);
@@ -610,8 +610,8 @@ public class MetaDataToDb
                 throw new SQLException("Schema \"" + sm.getMappedSchemaName() + "\" could not be created! " +
                                                "Map \"" + ms.getName() + "\" to existing schema.");
         }
-        for (int iSchema = 0; (iSchema < _md.getMetaSchemas()) && (!cancelRequested()); iSchema++) {
-            MetaSchema ms = _md.getMetaSchema(iSchema);
+        for (int iSchema = 0; (iSchema < metaData.getMetaSchemas()) && (!cancelRequested()); iSchema++) {
+            MetaSchema ms = metaData.getMetaSchema(iSchema);
             SchemaMapping sm = _am.getSchemaMapping(ms.getName());
             if (existsSchema(sm.getMappedSchemaName()))
                 createTables(ms, sm);
@@ -621,8 +621,8 @@ public class MetaDataToDb
         }
         if (cancelRequested())
             throw new IOException("Upload of meta data cancelled!");
-        _dmd.getConnection()
-            .commit();
+        databaseMetaData.getConnection()
+                        .commit();
 
         LOG.info("Meta data upload finished");
     }
@@ -638,8 +638,8 @@ public class MetaDataToDb
     public int tablesDroppedByUpload()
             throws SQLException {
         int iTablesDropped = 0;
-        for (int iSchema = 0; iSchema < _md.getMetaSchemas(); iSchema++) {
-            MetaSchema ms = _md.getMetaSchema(iSchema);
+        for (int iSchema = 0; iSchema < metaData.getMetaSchemas(); iSchema++) {
+            MetaSchema ms = metaData.getMetaSchema(iSchema);
             SchemaMapping sm = _am.getSchemaMapping(ms.getName());
             for (int iTable = 0; iTable < ms.getMetaTables(); iTable++) {
                 MetaTable mt = ms.getMetaTable(iTable);
@@ -668,9 +668,9 @@ public class MetaDataToDb
         boolean bMatches = true;
         TypeMapping tm = sm.getTypeMapping(mt.getName());
         int iPosition = 0;
-        ResultSet rs = _dmd.getAttributes(null,
-                                          ((BaseDatabaseMetaData) _dmd).toPattern(sm.getMappedSchemaName()),
-                                          ((BaseDatabaseMetaData) _dmd).toPattern(tm.getMappedTypeName()), "%");
+        ResultSet rs = databaseMetaData.getAttributes(null,
+                                                      ((BaseDatabaseMetaData) databaseMetaData).toPattern(sm.getMappedSchemaName()),
+                                                      ((BaseDatabaseMetaData) databaseMetaData).toPattern(tm.getMappedTypeName()), "%");
         while (bMatches && rs.next()) {
             iPosition++;
             String sTypeSchema = rs.getString("TYPE_SCHEM");
@@ -717,8 +717,8 @@ public class MetaDataToDb
 
                         MetaSchema msAttr = null;
                         SchemaMapping smAttr = null;
-                        for (int iSchema = 0; (msAttr == null) && (iSchema < _md.getMetaSchemas()); iSchema++) {
-                            MetaSchema msTemp = _md.getMetaSchema(iSchema);
+                        for (int iSchema = 0; (msAttr == null) && (iSchema < metaData.getMetaSchemas()); iSchema++) {
+                            MetaSchema msTemp = metaData.getMetaSchema(iSchema);
                             SchemaMapping smTemp = _am.getSchemaMapping(msTemp.getName());
                             if (smTemp.getMappedSchemaName()
                                       .equals(qiAttrType.getSchema())) {
@@ -774,9 +774,9 @@ public class MetaDataToDb
         int iDataType = Types.STRUCT;
         if (cat == CategoryType.DISTINCT)
             iDataType = Types.DISTINCT;
-        ResultSet rs = _dmd.getUDTs(null,
-                                    ((BaseDatabaseMetaData) _dmd).toPattern(sm.getMappedSchemaName()),
-                                    ((BaseDatabaseMetaData) _dmd).toPattern(tm.getMappedTypeName()), null);
+        ResultSet rs = databaseMetaData.getUDTs(null,
+                                                ((BaseDatabaseMetaData) databaseMetaData).toPattern(sm.getMappedSchemaName()),
+                                                ((BaseDatabaseMetaData) databaseMetaData).toPattern(tm.getMappedTypeName()), null);
         while (rs.next()) {
             /* the type only needs to be dropped if its base type
              * or its attributes are different */
@@ -810,8 +810,8 @@ public class MetaDataToDb
             throws IOException, SQLException {
         int iTypesDropped = 0;
         if (supportsUdts()) {
-            for (int iSchema = 0; iSchema < _md.getMetaSchemas(); iSchema++) {
-                MetaSchema ms = _md.getMetaSchema(iSchema);
+            for (int iSchema = 0; iSchema < metaData.getMetaSchemas(); iSchema++) {
+                MetaSchema ms = metaData.getMetaSchema(iSchema);
                 SchemaMapping sm = _am.getSchemaMapping(ms.getName());
                 for (int iType = 0; iType < ms.getMetaTypes(); iType++) {
                     MetaType mt = ms.getMetaType(iType);
@@ -839,10 +839,10 @@ public class MetaDataToDb
         super(dmd, md);
         dmd.getConnection()
            .setAutoCommit(false);
-        _iMaxTableNameLength = _dmd.getMaxTableNameLength();
-        _iMaxColumnNameLength = _dmd.getMaxColumnNameLength();
+        _iMaxTableNameLength = databaseMetaData.getMaxTableNameLength();
+        _iMaxColumnNameLength = databaseMetaData.getMaxColumnNameLength();
         _am = ArchiveMapping.newInstance(supportsArrays(), supportsUdts(),
-                                         mapSchemas, _md, _iMaxTableNameLength, _iMaxColumnNameLength);
+                                         mapSchemas, metaData, _iMaxTableNameLength, _iMaxColumnNameLength);
     }
 
 
