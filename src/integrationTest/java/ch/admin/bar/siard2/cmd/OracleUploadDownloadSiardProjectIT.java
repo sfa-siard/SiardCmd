@@ -46,7 +46,7 @@ public class OracleUploadDownloadSiardProjectIT {
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
-                "-u:" + "IT_USER",
+                "-u:" + "MY_TEST",
                 "-p:" + "password",
                 "-s:" + actualArchive.getPathToArchiveFile()
         });
