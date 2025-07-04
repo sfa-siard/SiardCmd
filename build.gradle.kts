@@ -48,6 +48,11 @@ dependencies {
     implementation(fileTree("lib") { include("*.jar") })
 
     implementation("ch.admin.bar:JdbcPostgres:v2.2.0")
+    implementation("ch.admin.bar:jdbcoracle") {
+        version {
+            branch = "fix/6-restrict-to-single-schema"
+        }
+    }
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
