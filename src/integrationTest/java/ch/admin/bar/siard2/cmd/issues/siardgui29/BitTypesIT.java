@@ -16,63 +16,63 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class BitTypeIT {
+public class BitTypesIT {
 
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public MySQLContainer<?> uploadDb = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5))
+    public MySQLContainer<?> emptyDb = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5))
             .withUsername("root")
             .withPassword("public")
             .withDatabaseName("public")
             .withConfigurationOverride("config/mysql");
 
     @Rule
-    public MySQLContainer<?> downloadDb = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5))
+    public MySQLContainer<?> customDb = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5))
             .withUsername("root")
             .withPassword("public")
             .withDatabaseName("public")
-            .withInitScript(SqlScripts.MySQL.SIARDGUI_29)
+            .withInitScript(SqlScripts.MySQL.SIARDGUI_29_BIT)
             .withConfigurationOverride("config/mysql");
 
-    //This test will fail until type BIT(1) is supported
+    //This test fails using the archive provided in the issue because typeOriginal BIT was converted to BIT(1)
     @Ignore
     @Test
     public void uploadSubmittedArchive_expectNoException() throws SQLException, IOException {
-        val siardArchive = siardArchivesHandler.prepareResource("issues/siardgui29/provided-bit-type.siard");
+        val siardArchive = siardArchivesHandler.prepareResource("issues/siardgui29/provided-bit-types.siard");
 
             SiardToDb siardToDb = new SiardToDb(new String[] {
                     "-o",
-                    "-j:" + uploadDb.getJdbcUrl(),
-                    "-u:" + uploadDb.getUsername(),
-                    "-p:" + uploadDb.getPassword(),
+                    "-j:" + emptyDb.getJdbcUrl(),
+                    "-u:" + emptyDb.getUsername(),
+                    "-p:" + emptyDb.getPassword(),
                     "-s:" + siardArchive.getPathToArchiveFile()
             });
         Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
     }
 
-    //Assert that siard archive created by siardcmd does not fail with the same exception
+    //Assert that siard archive created by siardcmd does not fail with the same exception when uploaded to db
     @Test
     public void uploadCreatedArchive_expectNoException() throws SQLException, IOException, ClassNotFoundException {
         val createdArchive = siardArchivesHandler.prepareEmpty();
 
-        SiardFromDb siardFromDb = new SiardFromDb(new String[]{
+        SiardFromDb dbtoSiard = new SiardFromDb(new String[]{
                 "-o",
-                "-j:" + downloadDb.getJdbcUrl(),
-                "-u:" + downloadDb.getUsername(),
-                "-p:" + downloadDb.getPassword(),
+                "-j:" + customDb.getJdbcUrl(),
+                "-u:" + customDb.getUsername(),
+                "-p:" + customDb.getPassword(),
                 "-s:" + createdArchive.getPathToArchiveFile()
         });
 
-        Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+        Assert.assertEquals(SiardFromDb.iRETURN_OK, dbtoSiard.getReturn());
 
-        val siardArchive = siardArchivesHandler.prepareResource("issues/siardgui29/created-bit-type.siard");
+        val siardArchive = siardArchivesHandler.prepareResource("issues/siardgui29/created-bit-types.siard");
         SiardToDb siardToDb = new SiardToDb(new String[]{
                 "-o",
-                "-j:" + uploadDb.getJdbcUrl(),
-                "-u:" + uploadDb.getUsername(),
-                "-p:" + uploadDb.getPassword(),
+                "-j:" + emptyDb.getJdbcUrl(),
+                "-u:" + emptyDb.getUsername(),
+                "-p:" + emptyDb.getPassword(),
                 "-s:" + siardArchive.getPathToArchiveFile()
         });
         Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());

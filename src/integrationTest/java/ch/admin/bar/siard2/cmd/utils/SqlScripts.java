@@ -14,7 +14,8 @@ public class SqlScripts {
 
     public static class MySQL {
         public final static String ISSUE_31 = "issues/siardcmd31/case-sensitive-column-names-mysql.sql";
-        public final static String SIARDGUI_29 = "issues/siardgui29/bit-type-schema.sql";
+        public final static String SIARDGUI_29_BIT = "issues/siardgui29/bit-types-schema.sql";
+        public final static String SIARDGUI_29_VARCHAR = "issues/siardgui29/varchar-types-schema.sql";
         public final static String SIARDGUI_32_FOREIGN_KEY = "issues/siardgui32/foreign-key-with-spaces.sql";
         public final static String SIARDGUI_32_TABLE_NAME = "issues/siardgui32/table-with-underscore.sql";
     }
