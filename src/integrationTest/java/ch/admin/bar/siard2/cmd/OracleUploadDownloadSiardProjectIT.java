@@ -46,7 +46,7 @@ public class OracleUploadDownloadSiardProjectIT {
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
-                "-u:" + "MY_TEST",
+                "-u:" + "MY_TEST", // TODO: revert 00_create_user.sql version to before BAZG-Quickfix and change user back to IT_USER?
                 "-p:" + "password",
                 "-s:" + actualArchive.getPathToArchiveFile()
         });

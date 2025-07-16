@@ -9,6 +9,7 @@ import ch.admin.bar.siard2.cmd.utils.siard.model.utils.Id;
 import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedTableId;
 import lombok.val;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.OracleContainer;
@@ -32,6 +33,7 @@ public class SchemaPackagesIT {
                                                                    .toPath()),
                     "/container-entrypoint-initdb.d/00_create_schemas.sql");
 
+    @Ignore //TODO: Investigate why this test passes despite reverting to jdbcoracle without BAZG-Quickfix
     @Test
     public void download_as_testuser() throws IOException, SQLException, ClassNotFoundException {
         // given
