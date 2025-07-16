@@ -48,7 +48,7 @@ dependencies {
     implementation(fileTree("lib") { include("*.jar") })
 
     implementation("ch.admin.bar:JdbcPostgres:v2.2.0")
-    implementation("ch.admin.bar:jdbcoracle:v2.2.2")
+    implementation("ch.admin.bar:jdbcoracle:v2.2.3")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
