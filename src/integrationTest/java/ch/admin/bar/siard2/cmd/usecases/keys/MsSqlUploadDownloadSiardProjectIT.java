@@ -44,7 +44,7 @@ public class MsSqlUploadDownloadSiardProjectIT {
                 "-p:" + db.getPassword(),
                 "-s:" + expectedArchive.getPathToArchiveFile()
         });
-        SiardFromDb siardFromDb = new SiardFromDb(new String[]{
+        SiardFromDb dbToSiard = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
                 "-u:" + db.getUsername(),
@@ -54,7 +54,7 @@ public class MsSqlUploadDownloadSiardProjectIT {
 
         // then
         Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
-        Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+        Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
 
         SiardArchiveAssertions.builder()
                 .expectedArchive(expectedArchive)

@@ -1,4 +1,4 @@
-package ch.admin.bar.siard2.cmd.issues.siardsuite115;
+package ch.admin.bar.siard2.cmd.issues.siarduite125;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
 import ch.admin.bar.siard2.cmd.SiardToDb;
@@ -14,7 +14,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class VarCharTypesIT {
+public class MsSqlBitTypesIT {
 
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
@@ -26,9 +26,9 @@ public class VarCharTypesIT {
     @Rule
     public MSSQLServerContainer<?> customDb = new MSSQLServerContainer<>(DockerImageName.parse("mcr.microsoft.com/mssql/server:2017-CU12"))
             .acceptLicense()
-            .withInitScript(SqlScripts.MsSQL.SIARDSUITE_115);
+            .withInitScript(SqlScripts.MsSQL.SIARDSUITE_125);
 
-    //Assert that siard archive created by siardcmd is uploaded back to db
+    // Assert that siard archive created by siardcmd is uploaded back to db
     @Test
     public void uploadCreatedArchive_expectNoException() throws SQLException, IOException, ClassNotFoundException {
         val actualArchive = siardArchivesHandler.prepareEmpty();
@@ -43,7 +43,7 @@ public class VarCharTypesIT {
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
 
-        val expectedArchive = siardArchivesHandler.prepareResource("issues/siardsuite115/mssql-created-varchar-types.siard");
+        val expectedArchive = siardArchivesHandler.prepareResource("issues/siardsuite125/mssql-created-bit-types.siard");
 
         SiardToDb siardToDb = new SiardToDb(new String[]{
                 "-o",
