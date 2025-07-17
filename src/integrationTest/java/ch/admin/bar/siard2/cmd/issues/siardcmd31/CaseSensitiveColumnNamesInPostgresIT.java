@@ -31,7 +31,7 @@ public class CaseSensitiveColumnNamesInPostgresIT {
                     .withTimes(2)
                     .withStartupTimeout(Duration.of(60, SECONDS)))
             .withEnv("LANG", "de_DE.utf8")
-            .withInitScript(SqlScripts.Postgres.ISSUE_31);
+            .withInitScript(SqlScripts.Postgres.SIARDCMD_31);
 
     @Test
     public void download_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {

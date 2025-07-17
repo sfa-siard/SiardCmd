@@ -30,7 +30,7 @@ public class CaseSensitiveColumnNamesInMySqlT {
                     .withRegEx(".*Ready for connections.*\\s")
                     .withTimes(2)
                     .withStartupTimeout(Duration.of(60, SECONDS)))
-            .withInitScript(SqlScripts.MySQL.ISSUE_31);
+            .withInitScript(SqlScripts.MySQL.SIARDCMD_31);
 
     @Test
     public void download_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
