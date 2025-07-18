@@ -20,4 +20,8 @@ sourceControl {
     gitRepository(URI.create("https://github.com/sfa-siard/JdbcOracle")) {
         producesModule("ch.admin.bar:jdbcoracle")
     }
+
+    gitRepository(URI.create("https://github.com/sfa-siard/JdbcMsSql")) {
+        producesModule("ch.admin.bar:jdbcmssql")
+    }
 }
