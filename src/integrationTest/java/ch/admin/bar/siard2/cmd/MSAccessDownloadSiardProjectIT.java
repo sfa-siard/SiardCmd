@@ -19,7 +19,7 @@ public class MSAccessDownloadSiardProjectIT {
     @Test
     public void shouldDownloadNationsDb() throws SQLException, IOException, ClassNotFoundException {
 
-        val expectedArchive = siardArchivesHandler.prepareResource(SiardProjectExamples.MS_ACCESSS_NATIONS);
+        val expectedArchive = siardArchivesHandler.prepareResource(SiardProjectExamples.MS_ACCESS_NATIONS);
         val actualArchive = siardArchivesHandler.prepareEmpty();
 
         String path = this.getClass().getResource("/databases/nations.accdb").getPath();
