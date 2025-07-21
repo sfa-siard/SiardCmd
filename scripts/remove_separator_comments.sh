@@ -4,7 +4,7 @@
 # This will remove comments like /*------------------------------------------------------------------*/
 # and /*====================================================================*/
 
-find /home/mburri/git/siard/SiardCmd/src/main/java -name "*.java" | while read file; do
+find ./src/main/java -name "*.java" | while read file; do
   # Use sed to remove the separator comments
   
   # Remove simple separator comments like /*------------------------------------------------------------------*/

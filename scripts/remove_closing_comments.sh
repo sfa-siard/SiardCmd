@@ -3,7 +3,7 @@
 # Script to remove closing comments from Java files
 # This will remove comments like /* constructor */, /* newInstance */, /* class ClassName */
 
-find /home/mburri/git/siard/SiardCmd/src/main/java -name "*.java" | while read file; do
+find ./src/main/java -name "*.java" | while read file; do
   # Use sed to remove the closing comments
   # This pattern matches comments that appear at the end of a line, typically after a closing brace or semicolon
   sed -i 's/ \/\* \(constructor\|newInstance\|[a-zA-Z0-9_]*\) \*\///' "$file"
