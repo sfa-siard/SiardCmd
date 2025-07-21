@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 // tests download of multiple schemas
 public class MultipleSchemasIT {
+
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
@@ -33,8 +34,9 @@ public class MultipleSchemasIT {
                                                                    .toPath()),
                     "/container-entrypoint-initdb.d/00_create_schemas.sql");
 
+    // due to non-resolved issue https://github.com/sfa-siard/JdbcOracle/issues/8 expect an exception instead of ignoring the test.
     @Test(expected = SQLSyntaxErrorException.class)
-    public void download_as_testuser() throws IOException, SQLException, ClassNotFoundException {
+    public void download() throws IOException, SQLException, ClassNotFoundException {
         // given
         val actualArchive = siardArchivesHandler.prepareEmpty();
 

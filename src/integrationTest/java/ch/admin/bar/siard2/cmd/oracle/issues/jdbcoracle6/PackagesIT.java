@@ -15,6 +15,7 @@ import org.testcontainers.utility.MountableFile;
 import java.io.IOException;
 import java.sql.SQLException;
 
+// tests download of oracle db with a package/ an overloaded function
 public class PackagesIT {
 
     @Rule
@@ -28,6 +29,7 @@ public class PackagesIT {
                                                                    .toPath()),
                     "/container-entrypoint-initdb.d/00_create_package.sql");
 
+    // due to non-resolved issue https://github.com/sfa-siard/JdbcOracle/issues/8 expect an exception instead of ignoring the test.
     @Test(expected = IOException.class)
     public void download() throws IOException, SQLException, ClassNotFoundException {
         // given
@@ -44,6 +46,5 @@ public class PackagesIT {
 
         // then
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
-
     }
 }
