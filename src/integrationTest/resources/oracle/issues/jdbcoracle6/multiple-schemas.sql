@@ -31,10 +31,4 @@ CREATE TABLE simple_table (
                               value VARCHAR2(100)
 );
 
-CREATE OR REPLACE PACKAGE overload_demo AS
-  PROCEDURE log_msg(p_msg VARCHAR2);
-  PROCEDURE log_msg(p_msg VARCHAR2, p_level NUMBER);
-  PROCEDURE log_msg(p_msg VARCHAR2, p_level NUMBER, p_user VARCHAR2);
-END overload_demo;
-
-GRANT INSERT ON otheruser.simple_table TO testuser; -- INSERT instead of SELECT
+GRANT INSERT ON otheruser.simple_table TO testuser;
