@@ -34,7 +34,7 @@ public class MultipleSchemasIT {
                                                                    .toPath()),
                     "/container-entrypoint-initdb.d/00_create_schemas.sql");
 
-    // due to non-resolved issue https://github.com/sfa-siard/JdbcOracle/issues/8 expect an exception instead of ignoring the test.
+    // due to non-resolved issue https://github.com/sfa-siard/JdbcOracle/issues/10 expect an exception instead of ignoring the test.
     @Test(expected = SQLSyntaxErrorException.class)
     public void download() throws IOException, SQLException, ClassNotFoundException {
         // given

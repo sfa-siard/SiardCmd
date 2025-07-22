@@ -29,7 +29,7 @@ public class PackagesIT {
                                                                    .toPath()),
                     "/container-entrypoint-initdb.d/00_create_package.sql");
 
-    // due to non-resolved issue https://github.com/sfa-siard/JdbcOracle/issues/8 expect an exception instead of ignoring the test.
+    // due to non-resolved issue https://github.com/sfa-siard/JdbcOracle/issues/9 expect an exception instead of ignoring the test.
     @Test(expected = IOException.class)
     public void download() throws IOException, SQLException, ClassNotFoundException {
         // given
