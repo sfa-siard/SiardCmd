@@ -1,4 +1,4 @@
-package ch.admin.bar.siard2.cmd.mssql.issues.siarduite125;
+package ch.admin.bar.siard2.cmd.mssql.issues.siardsuite125;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
 import ch.admin.bar.siard2.cmd.SiardToDb;
