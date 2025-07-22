@@ -18,14 +18,14 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class VarCharTypesPostgresIT {
+public class PrecisionTypesPostgresIT {
 
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
     public PostgreSQLContainer<?> db = new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"))
-            .withInitScript(SqlScripts.Postgres.SIARDSUITE_128_VARCHAR);
+            .withInitScript(SqlScripts.Postgres.SIARDSUITE_128_PRECISION_TYPES);
 
     @Test
     public void uploadAndDownload_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
