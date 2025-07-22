@@ -53,6 +53,8 @@ dependencies {
     implementation("ch.admin.bar:jdbcoracle:v2.2.3")
     implementation("ch.admin.bar:jdbcmssql:v2.2.3")
 
+    implementation("ch.admin.bar:enterutilities:v2.2.3")
+
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("io.chandler:ZipInputStreamPatch64:1.0.0") // needed because of a bug in java.util.zip (see https://github.com/cjgriscom/ZipInputStreamPatch64)

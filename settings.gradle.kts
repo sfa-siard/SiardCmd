@@ -13,6 +13,10 @@ rootProject.name = "siardcmd"
 
 
 sourceControl {
+    gitRepository(URI.create("https://github.com/sfa-siard/EnterUtilities")) {
+        producesModule("ch.admin.bar:enterutilities")
+    }
+
     gitRepository(URI.create("https://github.com/sfa-siard/JdbcPostgres")) {
         producesModule("ch.admin.bar:JdbcPostgres")
     }

@@ -126,7 +126,7 @@ public class SiardToDb
 	private void getParameters(String[] asArgs)
   {
     _iReturn = iRETURN_OK;
-    Arguments args = Arguments.newInstance(asArgs);
+    Arguments args = new Arguments(asArgs);
     if (args.getOption("h") != null)
       _iReturn = iRETURN_WARNING;
     /* login time out */
