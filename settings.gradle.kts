@@ -24,4 +24,8 @@ sourceControl {
     gitRepository(URI.create("https://github.com/sfa-siard/JdbcMsSql")) {
         producesModule("ch.admin.bar:jdbcmssql")
     }
+
+    gitRepository(URI.create("https://github.com/sfa-siard/SiardApi")) {
+        producesModule("ch.admin.bar:siard-api")
+    }
 }

@@ -47,6 +47,8 @@ dependencies {
     implementation("com.mysql:mysql-connector-j:8.3.0") // transitive dependency from lib/jdbcmysql.jar
     implementation(fileTree("lib") { include("*.jar") })
 
+    implementation("ch.admin.bar:siard-api:v2.2.126")
+
     implementation("ch.admin.bar:JdbcPostgres:v2.2.0")
     implementation("ch.admin.bar:jdbcoracle:v2.2.3")
     implementation("ch.admin.bar:jdbcmssql:v2.2.3")
