@@ -50,7 +50,7 @@ sourceControl {
     }
 
     gitRepository(URI.create("https://github.com/sfa-siard/JdbcBase")) {
-        producesModule("ch.admin.bar:JdbcBase")
+        producesModule("ch.admin.bar:jdbc-base")
     }
 
 }
