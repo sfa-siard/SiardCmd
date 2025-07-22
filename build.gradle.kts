@@ -48,10 +48,15 @@ dependencies {
     implementation(fileTree("lib") { include("*.jar") })
 
     implementation("ch.admin.bar:siard-api:v2.2.126")
+    implementation("ch.admin.bar:SqlParser:v2.2.2")
+    implementation("ch.admin.bar:Zip64File:v2.2.2")
 
+    implementation("ch.admin.bar:JdbcBase:v2.2.2")
     implementation("ch.admin.bar:JdbcPostgres:v2.2.0")
     implementation("ch.admin.bar:jdbcoracle:v2.2.3")
     implementation("ch.admin.bar:jdbcmssql:v2.2.3")
+    implementation("ch.admin.bar:jdbc-mysql:v2.2.3")
+
 
     implementation("ch.admin.bar:enterutilities:v2.2.3")
 
