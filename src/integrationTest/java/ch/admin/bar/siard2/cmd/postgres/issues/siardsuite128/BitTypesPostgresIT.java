@@ -1,6 +1,7 @@
 package ch.admin.bar.siard2.cmd.postgres.issues.siardsuite128;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
+import ch.admin.bar.siard2.cmd.SiardToDb;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import lombok.val;
@@ -48,17 +49,17 @@ public class BitTypesPostgresIT {
         System.out.println("Archive copied to: " + destFile.getAbsolutePath());
 
 
-//        val siardArchive = siardArchivesHandler.prepareResource("issues/siardgui29/created-bit-type.siard");
-//        SiardToDb siardToDb = new SiardToDb(new String[]{
-//                "-o",
-//                "-j:" + db.getJdbcUrl(),
-//                "-u:" + db.getUsername(),
-//                "-p:" + db.getPassword(),
-//                "-s:" + siardArchive.getPathToArchiveFile()
-//        });
+        val siardArchive = siardArchivesHandler.prepareResource("postgres/issues/siardsuite128/postgres-created-bit-types.siard");
+        SiardToDb siardToDb = new SiardToDb(new String[]{
+                "-o",
+                "-j:" + db.getJdbcUrl(),
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
+                "-s:" + siardArchive.getPathToArchiveFile()
+        });
 
         // then
         Assert.assertEquals(SiardFromDb.iRETURN_OK, dbtoSiard.getReturn());
-        //Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
+        Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
     }
 }
