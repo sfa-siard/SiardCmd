@@ -5,18 +5,6 @@ Created    : 29.08.2016, Hartwig Thomas, Enter AG, Rüti ZH
 
 package ch.admin.bar.siard2.cmd;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Arrays;
-
 import ch.admin.bar.siard2.api.Archive;
 import ch.admin.bar.siard2.api.MetaColumn;
 import ch.admin.bar.siard2.api.MetaSchema;
@@ -29,6 +17,14 @@ import ch.enterag.utils.ProgramInfo;
 import ch.enterag.utils.cli.Arguments;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Arrays;
 
 
 /**
@@ -43,16 +39,16 @@ public class SiardFromDb {
     public static final int iRETURN_ERROR = 8;
     public static final int iRETURN_FATAL = 12;
 
-    private static ProgramInfo _pi = ProgramInfo.getProgramInfo("SIARD Suite",
-                                                                VersionsExplorer.INSTANCE.getSiardVersion(),
-                                                                "SiardFromDb",
-                                                                VersionsExplorer.INSTANCE.getAppVersion(),
-                                                                "Program to store database content in a .siard file",
-                                                                "Swiss Federal Archives, Berne, Switzerland, 2008-2016",
-                                                                Arrays.asList((new String[]{"Hartwig Thomas, Enter AG, Rüti ZH, Switzerland", "Andreas Voss, Swiss Federal Archives, Berne, Switzerland", "Anders Bo Nielsen, Danish National Archives, Denmark", "Claire Röthlisberger-Jourdan, KOST, Berne, Switzerland"})),
-                                                                Arrays.asList((new String[]{"Hartwig Thomas, Enter AG, Rüti ZH, Switzerland", "Simon Jutz, Cytex GmbH, Zurich, Switzerland"})),
-                                                                Arrays.asList((new String[]{"Claudia Matthys, POOL Computer AG, Zurich, Switzerland", "Marcel Büchler, Swiss Federal Archives, Berne, Switzerland", "Yvan Dutoit, Swiss Federal Archives, Berne, Switzerland"})),
-                                                                Arrays.asList((new String[]{"Hartwig Thomas, Enter AG, Rüti ZH, Switzerland", "Marcel Büchler, Swiss Federal Archives, Berne, Switzerland", "Alain Mast, Swiss Federal Archives, Berne, Switzerland", "Krystyna Ohnesorge, Swiss Federal Archives, Berne, Switzerland"})));
+    private static final ProgramInfo _pi = ProgramInfo.getProgramInfo("SIARD Suite",
+                                                                      VersionsExplorer.INSTANCE.getSiardVersion(),
+                                                                      "SiardFromDb",
+                                                                      VersionsExplorer.INSTANCE.getAppVersion(),
+                                                                      "Program to store database content in a .siard file",
+                                                                      "Swiss Federal Archives, Berne, Switzerland, 2008-2016",
+                                                                      Arrays.asList("Hartwig Thomas, Enter AG, Rüti ZH, Switzerland", "Andreas Voss, Swiss Federal Archives, Berne, Switzerland", "Anders Bo Nielsen, Danish National Archives, Denmark", "Claire Röthlisberger-Jourdan, KOST, Berne, Switzerland"),
+                                                                      Arrays.asList("Hartwig Thomas, Enter AG, Rüti ZH, Switzerland", "Simon Jutz, Cytex GmbH, Zurich, Switzerland"),
+                                                                      Arrays.asList("Claudia Matthys, POOL Computer AG, Zurich, Switzerland", "Marcel Büchler, Swiss Federal Archives, Berne, Switzerland", "Yvan Dutoit, Swiss Federal Archives, Berne, Switzerland"),
+                                                                      Arrays.asList("Hartwig Thomas, Enter AG, Rüti ZH, Switzerland", "Marcel Büchler, Swiss Federal Archives, Berne, Switzerland", "Alain Mast, Swiss Federal Archives, Berne, Switzerland", "Krystyna Ohnesorge, Swiss Federal Archives, Berne, Switzerland"));
 
     private boolean _bOverwrite = false;
     private boolean _bViewsAsTables = false;
@@ -92,10 +88,8 @@ public class SiardFromDb {
         System.out.println("  -h (help)            prints this usage information");
         System.out.println("  -o (overwrite)       overwrite existing siard file");
         System.out.println("  -v (views as tables) archive views as tables");
-        System.out.println("  <login timeout>      login timeout in seconds (default: " + String.valueOf(
-                _iLoginTimeoutSeconds) + "), 0 for unlimited");
-        System.out.println("  <query timeout>      query timeout in seconds (default: " + String.valueOf(
-                _iQueryTimeoutSeconds) + "), 0 for unlimited");
+        System.out.println("  <login timeout>      login timeout in seconds (default: " + _iLoginTimeoutSeconds + "), 0 for unlimited");
+        System.out.println("  <query timeout>      query timeout in seconds (default: " + _iQueryTimeoutSeconds + "), 0 for unlimited");
         System.out.println("  <import xml>         name of meta data XML file to be used as a template");
         System.out.println("  <lob folder>         folder for storing largest LOB column of database externally");
         System.out.println("                       (contents will be deleted if they exist!)");
@@ -125,31 +119,31 @@ public class SiardFromDb {
         _iReturn = iRETURN_OK;
         Arguments args = Arguments.newInstance(asArgs);
         if (args.getOption("h") != null) _iReturn = iRETURN_WARNING;
-        /* overwrite */
+       
         if (args.getOption("o") != null) _bOverwrite = true;
-        /* views as tables */
+
         if (args.getOption("v") != null) _bViewsAsTables = true;
-        /* login time out */
+
         String sLoginTimeoutSeconds = args.getOption("l");
-        /* query time out */
+
         String sQueryTimeoutSeconds = args.getOption("q");
-        /* import XML */
+
         String sImportXml = args.getOption("i");
-        /* export XML */
+
         String sExportXml = args.getOption("e");
-        /* external LOB folder */
+
         String sExternalLobFolder = args.getOption("x");
-        /* MIME type for external LOB */
+
         _sMimeType = args.getOption("m");
-        /* JDBC URI */
+
         _sJdbcUrl = args.getOption("j");
-        /* db user */
+
         _sDatabaseUser = args.getOption("u");
-        /* db password */
+
         _sDatabasePassword = args.getOption("p");
-        /* siard file */
+
         String sSiardFile = args.getOption("s");
-        /* analyze the parameters */
+
         if (_iReturn == iRETURN_OK) {
             if (sSiardFile != null) _fileSiard = new File(sSiardFile);
             if (sExportXml != null) _fileExportXml = new File(sExportXml);
@@ -195,11 +189,12 @@ public class SiardFromDb {
                     File fileRelative = _fileSiard.getParentFile()
                                                   .getAbsoluteFile()
                                                   .toPath()
-                                                  .relativize(_fileExternalLobFolder.getAbsoluteFile().toPath())
+                                                  .relativize(_fileExternalLobFolder.getAbsoluteFile()
+                                                                                    .toPath())
                                                   .toFile();
                     /* prepend a ../ for exiting the SIARD file and append a / to indicate that it is a folder */
                     try {
-                        _uriExternalLobFolder = new URI("../" + fileRelative.toString() + "/");
+                        _uriExternalLobFolder = new URI("../" + fileRelative + "/");
                     } catch (URISyntaxException use) {
                         System.out.println("External LOB folder  " + _fileExternalLobFolder.getAbsolutePath() + " could not be relativized!");
                         _iReturn = iRETURN_ERROR;
@@ -207,9 +202,10 @@ public class SiardFromDb {
                 }
 
             }
-            String sError = SiardConnection.getSiardConnection().loadDriver(_sJdbcUrl);
+            String sError = SiardConnection.getSiardConnection()
+                                           .loadDriver(_sJdbcUrl);
             if (sError != null) {
-                System.out.println("JDBC URL " + String.valueOf(_sJdbcUrl) + " is not valid!");
+                System.out.println("JDBC URL " + _sJdbcUrl + " is not valid!");
                 System.out.println(sError);
                 _iReturn = iRETURN_ERROR;
             }
@@ -222,46 +218,68 @@ public class SiardFromDb {
                 _iReturn = iRETURN_ERROR;
             }
         }
-        /* print and log the parameters */
+
         if (_iReturn == iRETURN_OK) {
             val sb = new StringBuilder()
                     .append("\n")
                     .append("Parameters\n")
-                    .append("  SIARD file             : ").append(_fileSiard.getAbsolutePath()).append("\n")
-                    .append("  JDBC URL               : ").append(_sJdbcUrl).append("\n")
-                    .append("  Database user          : ").append(_sDatabaseUser).append("\n")
+                    .append("  SIARD file             : ")
+                    .append(_fileSiard.getAbsolutePath())
+                    .append("\n")
+                    .append("  JDBC URL               : ")
+                    .append(_sJdbcUrl)
+                    .append("\n")
+                    .append("  Database user          : ")
+                    .append(_sDatabaseUser)
+                    .append("\n")
                     .append("  Database password      : ***\n");
             if (_fileSiard != null)
-                sb.append("  SIARD file             : ").append( _fileSiard.getAbsolutePath()).append("\n");
+                sb.append("  SIARD file             : ")
+                  .append(_fileSiard.getAbsolutePath())
+                  .append("\n");
             if (_fileExportXml != null)
-                sb.append("  Export meta data XML   : ").append(_fileExportXml.getAbsolutePath()).append("\n");
+                sb.append("  Export meta data XML   : ")
+                  .append(_fileExportXml.getAbsolutePath())
+                  .append("\n");
             if (sLoginTimeoutSeconds != null)
-                sb.append("  Login timeout          : ").append(_iLoginTimeoutSeconds).append(" seconds\n");
+                sb.append("  Login timeout          : ")
+                  .append(_iLoginTimeoutSeconds)
+                  .append(" seconds\n");
             if (sQueryTimeoutSeconds != null)
-                sb.append("  Query timeout          : ").append(_iQueryTimeoutSeconds).append(" seconds\n");
+                sb.append("  Query timeout          : ")
+                  .append(_iQueryTimeoutSeconds)
+                  .append(" seconds\n");
             if (_fileImportXml != null)
-                sb.append("  Import meta data XML   : ").append(_fileImportXml.getAbsolutePath()).append("\n");
+                sb.append("  Import meta data XML   : ")
+                  .append(_fileImportXml.getAbsolutePath())
+                  .append("\n");
             if (_uriExternalLobFolder != null)
-                sb.append("  External LOB folder    : ").append(_uriExternalLobFolder).append("\n");
+                sb.append("  External LOB folder    : ")
+                  .append(_uriExternalLobFolder)
+                  .append("\n");
             if (_sMimeType != null)
-                sb.append("  External LOB MIME type : ").append(_sMimeType).append("\n");
+                sb.append("  External LOB MIME type : ")
+                  .append(_sMimeType)
+                  .append("\n");
             if (_bViewsAsTables)
-                sb.append("  Archive views as tables: ").append(_bViewsAsTables).append("\n");
+                sb.append("  Archive views as tables: ")
+                  .append(_bViewsAsTables)
+                  .append("\n");
             sb.append("\n");
 
             val message = sb.toString();
             LOG.info(message);
             System.out.println(message);
         } else printUsage();
-    } /* getParameters */
+    }
 
 
     /**
      * runs main program of SiardFromDb.
      */
-    public SiardFromDb(String asArgs[]) throws SQLException, IOException, ClassNotFoundException {
+    public SiardFromDb(String[] asArgs) throws SQLException, IOException, ClassNotFoundException {
         super();
-        /* parameters */
+       
         getParameters(asArgs);
         if (_iReturn == iRETURN_OK) {
             if (_bOverwrite) {
@@ -273,7 +291,7 @@ public class SiardFromDb {
                 }
             }
             if (((_fileSiard == null) || !_fileSiard.exists()) && ((_fileExportXml == null) || !_fileExportXml.exists())) {
-                /* open connection */
+
                 String sError = null;
 
                 val siardConnection = SiardConnection.getSiardConnection();
@@ -281,9 +299,10 @@ public class SiardFromDb {
                     DriverManager.setLoginTimeout(_iLoginTimeoutSeconds);
                     _conn = siardConnection.createValidConnection(_sJdbcUrl, _sDatabaseUser, _sDatabasePassword);
                     if ((_conn != null) && (!_conn.isClosed())) {
-                        System.out.println("Connected to " + _conn.getMetaData().getURL().toString());
+                        System.out.println("Connected to " + _conn.getMetaData()
+                                                                  .getURL());
                         _conn.setAutoCommit(false);
-                        /* open SIARD archive */
+
                         _archive = ArchiveImpl.newInstance();
                         File fileSiard = _fileSiard;
                         if (fileSiard == null) {
@@ -296,11 +315,11 @@ public class SiardFromDb {
                             _archive.importMetaDataTemplate(fis);
                             fis.close();
                         }
-                        /* get meta data from DB */
+
                         MetaDataFromDb mdfd = MetaDataFromDb.newInstance(_conn.getMetaData(), _archive.getMetaData());
                         mdfd.setQueryTimeout(_iQueryTimeoutSeconds);
                         mdfd.download(_bViewsAsTables, (_uriExternalLobFolder != null), null);
-                        /* set external LOB stuff */
+
                         if (_uriExternalLobFolder != null) {
                             MetaColumn mcMaxLob = mdfd.getMaxLobColumn();
                             if (mcMaxLob != null) {
@@ -309,8 +328,7 @@ public class SiardFromDb {
                                 String sTableName = mtLob.getName();
                                 MetaSchema msLob = mtLob.getParentMetaSchema();
                                 String sSchemaName = msLob.getName();
-                                String sMessage = "LOBs in database column \"" + sColumnName + "\" in table \"" + sTableName + "\" in schema \"" + sSchemaName + "\" will be stored externally in folder \"" + _fileExternalLobFolder.getAbsolutePath()
-                                                                                                                                                                                                                                     .toString() + "\"";
+                                String sMessage = "LOBs in database column \"" + sColumnName + "\" in table \"" + sTableName + "\" in schema \"" + sSchemaName + "\" will be stored externally in folder \"" + _fileExternalLobFolder.getAbsolutePath() + "\"";
                                 mcMaxLob.setLobFolder(_uriExternalLobFolder);
                                 if (_sMimeType != null) {
                                     mcMaxLob.setMimeType(_sMimeType);
@@ -320,29 +338,30 @@ public class SiardFromDb {
                                 System.out.println(sMessage);
                             } else System.out.println("No LOB column found to be externalized!");
                         }
-                        /* export meta data XML from DB */
+
                         if (_fileExportXml != null) {
                             OutputStream osXml = new FileOutputStream(_fileExportXml);
                             _archive.exportMetaData(osXml);
                             osXml.close();
                         }
                         if (_fileSiard != null) {
-                            /* export primary data from DB */
+
                             PrimaryDataFromDb pdfd = PrimaryDataFromDb.newInstance(_conn, _archive);
                             pdfd.setQueryTimeout(_iQueryTimeoutSeconds);
                             pdfd.download(null);
                         } else fileSiard.deleteOnExit();
-                        /* close SIARD archive */
+
                         /***
                          FileOutputStream fosXml = new FileOutputStream("D:\\Projekte\\SIARD2\\SiardCmd\\tmp\\export.xml");
                          _archive.exportMetaData(fosXml);
                          fosXml.close();
                          ***/
                         _archive.close();
-                        /* close connection */
+
                         _conn.rollback();
                         _conn.close();
-                    } else System.out.println("Connection to " + _conn.getMetaData().getURL().toString() + " failed!");
+                    } else System.out.println("Connection to " + _conn.getMetaData()
+                                                                      .getURL() + " failed!");
                 } else System.out.println("Connection to " + _sJdbcUrl + " not supported (" + sError + ")!");
             } else {
                 String sMessage = "File " + _fileSiard.getAbsolutePath();
@@ -354,7 +373,7 @@ public class SiardFromDb {
                 _iReturn = iRETURN_WARNING;
             }
         }
-    } /* constructor SiardFromDb */
+    }
 
 
     /**
