@@ -42,13 +42,6 @@ public class BitTypesPostgresIT {
                 "-s:" + createdArchive.getPathToArchiveFile()
         });
 
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File desktopDir = new File("/home/bbertagna/Desktop");
-        File destFile = new File(desktopDir, "bit_type_test_" + timestamp + ".siard");
-        Files.copy(createdArchive.getPathToArchiveFile().toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        System.out.println("Archive copied to: " + destFile.getAbsolutePath());
-
-
         val siardArchive = siardArchivesHandler.prepareResource("postgres/issues/siardsuite128/postgres-created-bit-types.siard");
         SiardToDb siardToDb = new SiardToDb(new String[]{
                 "-o",
