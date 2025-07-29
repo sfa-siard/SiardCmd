@@ -133,11 +133,16 @@ public class Metadata implements Updatable<Metadata> {
 
         @NonNull
         @Builder.Default
+        @JacksonXmlProperty(localName = "type")
         Optional<Id<Type>> typeName = Optional.empty();
 
         @NonNull
         @Builder.Default
         Optional<Id<MimeType>> mimeType = Optional.empty();
+
+        @NonNull
+        @Builder.Default
+        Optional<Id<Type>> typeOriginal = Optional.empty();
 
         @Override
         public Column applyUpdates(Updater updater) {
@@ -148,7 +153,8 @@ public class Metadata implements Updatable<Metadata> {
                     updatedThis.nullable,
                     updatedThis.typeSchema.map(typeId -> typeId.applyUpdates(updater)),
                     updatedThis.typeName.map(typeId -> typeId.applyUpdates(updater)),
-                    updatedThis.mimeType.map(mimeType -> mimeType.applyUpdates(updater))
+                    updatedThis.mimeType.map(mimeType -> mimeType.applyUpdates(updater)),
+                    updatedThis.typeOriginal.map(typeId -> typeId.applyUpdates(updater))
             );
         }
     }
