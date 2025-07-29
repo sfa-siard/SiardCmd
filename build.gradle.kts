@@ -43,6 +43,8 @@ sourceSets {
 
 dependencies {
     implementation("org.apache.tika:tika-core:2.9.1") // used for getting mime-type from binary data
+    implementation("commons-lang:commons-lang:2.6")
+    implementation("commons-logging:commons-logging:1.1.3")
     implementation("ch.qos.logback:logback-classic:1.3.14") // latest version which supports java 8
     implementation("com.mysql:mysql-connector-j:8.3.0") // transitive dependency from lib/jdbcmysql.jar
     implementation(fileTree("lib") { include("*.jar") })
