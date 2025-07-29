@@ -16,8 +16,7 @@ CREATE TABLE typed_precision_test
     col_char_10      CHAR(10),
     -- Numeric types with scale/precision
     col_numeric_10_2 NUMERIC(10, 2),
-    col_numeric_8    NUMERIC(8),
-    col_integer      INTEGER
+    col_numeric_8    NUMERIC(8)
 );
 
 -- Insert sample data
@@ -28,8 +27,7 @@ INSERT INTO typed_precision_test (id,
                                   col_text,
                                   col_char_10,
                                   col_numeric_10_2,
-                                  col_numeric_8,
-                                  col_integer)
+                                  col_numeric_8)
 VALUES (1,
         'X',
         'This is varchar(255)',
@@ -37,5 +35,4 @@ VALUES (1,
         'Unlimited text field',
         'abc',
         12345.67,
-        99999999,
-        42);
+        99999999);
