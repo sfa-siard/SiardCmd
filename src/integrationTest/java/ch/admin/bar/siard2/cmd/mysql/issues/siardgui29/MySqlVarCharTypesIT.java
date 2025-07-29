@@ -50,6 +50,9 @@ public class MySqlVarCharTypesIT {
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
 
+        //TODO: explore metadata and check column types and typeOriginal,
+        // as in PrecisionTypesPostgresIT.java, after https://github.com/sfa-siard/Zip64File/issues/11 is resolved
+
         val siardArchive = siardArchivesHandler.prepareResource("mysql/issues/siardgui29/created-varchar-types.siard");
         SiardToDb siardToDb = new SiardToDb(new String[]{
                 "-o",

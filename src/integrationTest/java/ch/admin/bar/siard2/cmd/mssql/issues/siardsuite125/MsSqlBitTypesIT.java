@@ -43,6 +43,9 @@ public class MsSqlBitTypesIT {
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
 
+        //TODO: explore metadata and check column types and typeOriginal,
+        // as in PrecisionTypesPostgresIT.java, after https://github.com/sfa-siard/Zip64File/issues/11 is resolved
+
         val expectedArchive = siardArchivesHandler.prepareResource("mssql/issues/siardsuite125/mssql-created-bit-types.siard");
 
         SiardToDb siardToDb = new SiardToDb(new String[]{
