@@ -9,6 +9,8 @@ import org.testcontainers.utility.DockerImageName;
 
 public class MySql5KeysUploadIT {
 
+    public final static String SIARD_ARCHIVE_MYSQL_5 = "mysql/usecases/keys/upload/simple-teams-example_mysql5.siard";
+
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
@@ -21,6 +23,6 @@ public class MySql5KeysUploadIT {
 
     @Test
     public void executeTest() {
-        MySqlKeysUpload.executeTest(siardArchivesHandler, db.getJdbcUrl());
+        MySqlKeysUpload.executeTest(siardArchivesHandler, db.getJdbcUrl(), SIARD_ARCHIVE_MYSQL_5);
     }
 }

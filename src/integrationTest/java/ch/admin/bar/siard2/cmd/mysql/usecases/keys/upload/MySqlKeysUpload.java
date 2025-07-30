@@ -18,9 +18,9 @@ public class MySqlKeysUpload {
     public final static String CREATE_IT_USER_SQL_SCRIPT = "mysql/usecases/keys/upload/create-it-user.sql";
 
     @SneakyThrows
-    public static void executeTest(SiardArchivesHandler siardArchivesHandler, String jdbcUrl) {
+    public static void executeTest(SiardArchivesHandler siardArchivesHandler, String jdbcUrl, String siardArchivePath) {
         // given
-        val expectedArchive = siardArchivesHandler.prepareResource(SIARD_ARCHIVE);
+        val expectedArchive = siardArchivesHandler.prepareResource(siardArchivePath);
         val actualArchive = siardArchivesHandler.prepareEmpty();
 
         // when

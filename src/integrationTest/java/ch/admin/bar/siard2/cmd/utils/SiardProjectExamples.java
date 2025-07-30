@@ -24,6 +24,13 @@ public class SiardProjectExamples {
     /**
      * Trivial example with just two tables (Teams and Teammembers). Can be used for basic tests.
      * <p>
+     * Exported from a Db2 11 DB.
+     */
+    public final static String SIMPLE_TEAMS_EXAMPLE_DB2 = "siard-project-examples/2_2/simple-teams-example_db2_11_5_8.siard";
+
+    /**
+     * Trivial example with just two tables (Teams and Teammembers). Can be used for basic tests.
+     * <p>
      * Exported from an Oracle 18 DB.
      */
     public final static String SIMPLE_TEAMS_EXAMPLE_ORACLE18_2_2 = "siard-project-examples/2_2/simple-teams-example_oracle18_2-2.siard";
@@ -31,21 +38,21 @@ public class SiardProjectExamples {
     /**
      * Trivial example with just two tables (Teams and Teammembers). Can be used for basic tests.
      * <p>
-     * Exported from an Oracle 18 DB.
+     * Exported from an Postgres 13 DB.
      */
     public final static String SIMPLE_TEAMS_EXAMPLE_POSTGRES13_2_2 = "siard-project-examples/2_2/simple-teams-example_postgres13_2-2.siard";
 
     /**
      * Trivial example with just two tables (Teams and Teammembers). Can be used for basic tests.
      * <p>
-     * Exported from an Oracle 18 DB.
+     * Exported from a MsSQL 12 DB.
      */
     public final static String SIMPLE_TEAMS_EXAMPLE_MSSQL2017CU12_2_2 = "siard-project-examples/2_2/simple-teams-example_mssql2017cu12_2-2.siard";
 
     /**
      * Trivial example with just two tables (Teams and Teammembers). Can be used for basic tests.
      * <p>
-     * Exported from an Oracle 18 DB.
+     * Exported from an MySQL 5 DB.
      */
     public final static String SIMPLE_TEAMS_EXAMPLE_MYSQL5_2_2 = "siard-project-examples/2_2/simple-teams-example_mysql5_2-2.siard";
 

@@ -15,11 +15,7 @@ import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 import lombok.val;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Value
@@ -133,8 +129,11 @@ public class Metadata implements Updatable<Metadata> {
 
         @NonNull
         @Builder.Default
-        @JacksonXmlProperty(localName = "type")
         Optional<Id<Type>> typeName = Optional.empty();
+
+        @NonNull
+        @Builder.Default
+        Optional<Id<Type>> type = Optional.empty();
 
         @NonNull
         @Builder.Default
@@ -153,6 +152,7 @@ public class Metadata implements Updatable<Metadata> {
                     updatedThis.nullable,
                     updatedThis.typeSchema.map(typeId -> typeId.applyUpdates(updater)),
                     updatedThis.typeName.map(typeId -> typeId.applyUpdates(updater)),
+                    updatedThis.type.map(typeId -> typeId.applyUpdates(updater)),
                     updatedThis.mimeType.map(mimeType -> mimeType.applyUpdates(updater)),
                     updatedThis.typeOriginal.map(typeId -> typeId.applyUpdates(updater))
             );
