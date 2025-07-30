@@ -43,13 +43,22 @@ sourceSets {
 
 dependencies {
     implementation("org.apache.tika:tika-core:2.9.1") // used for getting mime-type from binary data
+    implementation("commons-lang:commons-lang:2.6")
+    implementation("commons-logging:commons-logging:1.1.3")
     implementation("ch.qos.logback:logback-classic:1.3.14") // latest version which supports java 8
     implementation("com.mysql:mysql-connector-j:8.3.0") // transitive dependency from lib/jdbcmysql.jar
     implementation(fileTree("lib") { include("*.jar") })
 
+    implementation("ch.admin.bar:siard-api:v2.2.126")
+    implementation("ch.admin.bar:SqlParser:v2.2.2")
+    implementation("ch.admin.bar:Zip64File:v2.2.2")
+    implementation("ch.admin.bar:enterutilities:v2.2.3")
+
+    implementation("ch.admin.bar:jdbc-base:v2.2.3")
     implementation("ch.admin.bar:JdbcPostgres:v2.2.0")
     implementation("ch.admin.bar:jdbcoracle:v2.2.3")
     implementation("ch.admin.bar:jdbcmssql:v2.2.3")
+    implementation("ch.admin.bar:jdbc-mysql:v2.2.3")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
