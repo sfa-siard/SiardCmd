@@ -59,6 +59,11 @@ dependencies {
     implementation("ch.admin.bar:jdbcoracle:v2.2.4")
     implementation("ch.admin.bar:jdbcmssql:v2.2.3")
     implementation("ch.admin.bar:jdbc-mysql:v2.2.3")
+    implementation("ch.admin.bar:jdbc-access:v2.2.3") {
+        version {
+            branch = "chore/gradle-migration"
+        }
+    }
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
@@ -165,8 +170,8 @@ task<Zip>("packDeliverables") {
     from(layout.projectDirectory.dir("lib")) {
         into("lib")
         exclude(
-                "*-test.jar",
-                "hamcrest-core-1.3.jar"
+            "*-test.jar",
+            "hamcrest-core-1.3.jar"
         )
     }
     from(jarFile) {
@@ -179,13 +184,14 @@ task<Zip>("packDeliverables") {
     }
     from(layout.projectDirectory) {
         include(
-                "LICENSE.txt",
-                "RELEASE.txt"
+            "LICENSE.txt",
+            "RELEASE.txt"
         )
     }
     from(layout.projectDirectory.dir("bin")) {
         include("*.sh")
-        fileMode = 0b111101101 // = 755 (needs to be defined in binary format https://github.com/gradle/kotlin-dsl-samples/issues/1412)
+        fileMode =
+            0b111101101 // = 755 (needs to be defined in binary format https://github.com/gradle/kotlin-dsl-samples/issues/1412)
     }
     from(layout.projectDirectory.dir("bin")) {
         exclude("*.sh")
