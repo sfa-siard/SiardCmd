@@ -53,4 +53,7 @@ sourceControl {
         producesModule("ch.admin.bar:jdbc-base")
     }
 
+    gitRepository(URI.create("https://github.com/sfa-siard/JdbcAccess")) {
+        producesModule("ch.admin.bar:jdbc-access")
+    }
 }
