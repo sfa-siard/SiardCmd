@@ -34,7 +34,7 @@ public class OracleUploadDownloadSiardProjectIT {
     @Test
     public void uploadAndDownload_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
         // given
-        val expectedArchive = siardArchivesHandler.prepareResource(SiardProjectExamples.SIMPLE_TEAMS_EXAMPLE_ORACLE18_2_2);
+        val expectedArchive = siardArchivesHandler.prepareResource(SiardProjectExamples.SIMPLE_TEAMS_EXAMPLE_ORACLE21_2_2);
         val actualArchive = siardArchivesHandler.prepareEmpty();
 
         // when
@@ -45,17 +45,17 @@ public class OracleUploadDownloadSiardProjectIT {
                 "-p:" + "password",
                 "-s:" + expectedArchive.getPathToArchiveFile()
         });
-        SiardFromDb siardFromDb = new SiardFromDb(new String[]{
+        SiardFromDb dbToSiard = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
-                "-u:" + "MY_TEST",
+                "-u:" + "IT_USER",
                 "-p:" + "password",
                 "-s:" + actualArchive.getPathToArchiveFile()
         });
 
         // then
         Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
-        Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+        Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
 
         SiardArchiveAssertions.builder()
                 .expectedArchive(expectedArchive)
