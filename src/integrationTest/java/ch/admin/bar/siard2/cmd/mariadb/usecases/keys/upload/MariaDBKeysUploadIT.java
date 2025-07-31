@@ -11,6 +11,8 @@ import org.testcontainers.utility.MountableFile;
 
 public class MariaDBKeysUploadIT {
 
+    public final static String SIARD_ARCHIVE_MYSQL_5 = "mysql/usecases/keys/upload/simple-teams-example_mysql5.siard";
+
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
@@ -25,6 +27,6 @@ public class MariaDBKeysUploadIT {
 
     @Test
     public void executeTest() {
-        MySqlKeysUpload.executeTest(siardArchivesHandler, db.getJdbcUrl().replace("jdbc:mariadb", "jdbc:mysql"));
+        MySqlKeysUpload.executeTest(siardArchivesHandler, db.getJdbcUrl().replace("jdbc:mariadb", "jdbc:mysql"), SIARD_ARCHIVE_MYSQL_5);
     }
 }

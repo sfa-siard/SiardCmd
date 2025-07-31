@@ -3,8 +3,8 @@ package ch.admin.bar.siard2.cmd.mysql.issues.siardgui29;
 import ch.admin.bar.siard2.cmd.SiardFromDb;
 import ch.admin.bar.siard2.cmd.SiardToDb;
 import ch.admin.bar.siard2.cmd.SupportedDbVersions;
-import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
+import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import lombok.val;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -66,6 +66,9 @@ public class BitTypesIT {
         });
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, dbtoSiard.getReturn());
+
+        //TODO: explore metadata and check column types and typeOriginal,
+        // as in PrecisionTypesPostgresIT.java, after https://github.com/sfa-siard/Zip64File/issues/11 is resolved
 
         val siardArchive = siardArchivesHandler.prepareResource("mysql/issues/siardgui29/created-bit-types.siard");
         SiardToDb siardToDb = new SiardToDb(new String[]{
