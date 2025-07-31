@@ -23,8 +23,11 @@ public class BitTypesPostgresIT {
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public PostgreSQLContainer<?> db = new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"))
+    public PostgreSQLContainer<?> customDb = new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"))
             .withInitScript(SqlScripts.Postgres.SIARDSUITE_128_BIT);
+
+    @Rule
+    public PostgreSQLContainer<?> emptyDb = new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"));
 
     @Test
     public void downloadArchive_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
@@ -34,9 +37,9 @@ public class BitTypesPostgresIT {
         // when
         SiardFromDb dbtoSiard = new SiardFromDb(new String[]{
                 "-o",
-                "-j:" + db.getJdbcUrl(),
-                "-u:" + db.getUsername(),
-                "-p:" + db.getPassword(),
+                "-j:" + customDb.getJdbcUrl(),
+                "-u:" + customDb.getUsername(),
+                "-p:" + customDb.getPassword(),
                 "-s:" + createdArchive.getPathToArchiveFile()
         });
 
@@ -87,9 +90,9 @@ public class BitTypesPostgresIT {
         // when
         SiardToDb siardToDb = new SiardToDb(new String[]{
                 "-o",
-                "-j:" + db.getJdbcUrl(),
-                "-u:" + db.getUsername(),
-                "-p:" + db.getPassword(),
+                "-j:" + emptyDb.getJdbcUrl(),
+                "-u:" + emptyDb.getUsername(),
+                "-p:" + emptyDb.getPassword(),
                 "-s:" + siardArchive.getPathToArchiveFile()
         });
 
