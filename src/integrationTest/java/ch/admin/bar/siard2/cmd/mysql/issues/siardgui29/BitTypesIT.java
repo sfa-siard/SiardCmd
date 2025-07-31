@@ -54,7 +54,7 @@ public class BitTypesIT {
 
     //Assert that siard archive created by siardcmd does not fail with the same exception when uploaded to db
     @Test
-    public void uploadCreatedArchive_expectNoException() throws SQLException, IOException, ClassNotFoundException {
+    public void uploadCreatedArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
         val createdArchive = siardArchivesHandler.prepareEmpty();
 
         SiardFromDb dbtoSiard = new SiardFromDb(new String[]{

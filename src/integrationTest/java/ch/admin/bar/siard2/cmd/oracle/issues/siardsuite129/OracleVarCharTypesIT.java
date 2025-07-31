@@ -6,7 +6,10 @@ import ch.admin.bar.siard2.cmd.utils.ConsoleLogConsumer;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
+import ch.admin.bar.siard2.cmd.utils.siard.model.utils.Id;
+import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedColumnId;
 import lombok.val;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,9 +41,8 @@ public class OracleVarCharTypesIT {
                     MountableFile.forHostPath(TestResourcesResolver.resolve(SqlScripts.Oracle.SIARDSUITE_129_VARCHAR).toPath()),
                     "/container-entrypoint-initdb.d/01_varchar_types.sql");
 
-    //Assert that siard archive created by siardcmd is uploaded back to db
     @Test
-    public void uploadCreatedArchive_expectNoException() throws SQLException, IOException, ClassNotFoundException {
+    public void downloadArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
         val createdArchive = siardArchivesHandler.prepareEmpty();
 
         SiardFromDb dbToSiard = new SiardFromDb(new String[]{
@@ -53,15 +55,54 @@ public class OracleVarCharTypesIT {
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
 
+        val metadataExplorer = createdArchive.exploreMetadata();
+
+        val columnId = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("IT_USER"))
+                .tableId(Id.of("VARCHARTEST"))
+                .columnId(Id.of("ID"))
+                .build());
+        Assertions.assertThat(columnId.getType()).contains(Id.of("FLOAT(38)"));
+        Assertions.assertThat(columnId.getTypeOriginal()).contains(Id.of("NUMBER"));
+
+        val columnText2 = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("IT_USER"))
+                .tableId(Id.of("VARCHARTEST"))
+                .columnId(Id.of("TEXT2"))
+                .build());
+        Assertions.assertThat(columnText2.getType()).contains(Id.of("VARCHAR(1)"));
+        Assertions.assertThat(columnText2.getTypeOriginal()).contains(Id.of("VARCHAR2(1)"));
+
+        val columnText3 = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("IT_USER"))
+                .tableId(Id.of("VARCHARTEST"))
+                .columnId(Id.of("TEXT3"))
+                .build());
+        Assertions.assertThat(columnText3.getType()).contains(Id.of("VARCHAR(255)"));
+        Assertions.assertThat(columnText3.getTypeOriginal()).contains(Id.of("VARCHAR2(255)"));
+
+        val columnText4 = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("IT_USER"))
+                .tableId(Id.of("VARCHARTEST"))
+                .columnId(Id.of("TEXT4"))
+                .build());
+        Assertions.assertThat(columnText4.getType()).contains(Id.of("VARCHAR(4000)"));
+        Assertions.assertThat(columnText4.getTypeOriginal()).contains(Id.of("VARCHAR2(4000)"));
+    }
+
+    //Assert that siard archive created by siardcmd is uploaded back to db
+    @Test
+    public void uploadCreatedArchive_expectNoExceptions() throws SQLException, IOException {
         val siardArchive = siardArchivesHandler.prepareResource("oracle/issues/siardsuite129/oracle-created-varchar-types.siard");
-        SiardToDb siardToDb = new SiardToDb(new String[]{
+
+        SiardToDb siardToDb = new SiardToDb(new String[] {
                 "-o",
                 "-j:" + emptyDb.getJdbcUrl(),
                 "-u:" + "IT_USER",
                 "-p:" + "password",
                 "-s:" + siardArchive.getPathToArchiveFile()
         });
+
         Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
-        // TODO: Assert that metadata was extracted once typeOriginal is added to SiardArchivesHandler
     }
 }
