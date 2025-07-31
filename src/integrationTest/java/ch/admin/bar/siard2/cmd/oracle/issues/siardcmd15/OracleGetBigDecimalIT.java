@@ -57,6 +57,4 @@ public class OracleGetBigDecimalIT {
         });
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardToDb.getReturn());
     }
-
-
 }

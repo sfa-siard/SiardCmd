@@ -35,6 +35,8 @@ public class SiardProjectExamples {
      */
     public final static String SIMPLE_TEAMS_EXAMPLE_ORACLE18_2_2 = "siard-project-examples/2_2/simple-teams-example_oracle18_2-2.siard";
 
+    public final static String SIMPLE_TEAMS_EXAMPLE_ORACLE21_2_2 = "siard-project-examples/2_2/simple-teams-example_oracle21_2-2.siard";
+
     /**
      * Trivial example with just two tables (Teams and Teammembers). Can be used for basic tests.
      * <p>

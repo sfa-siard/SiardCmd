@@ -53,7 +53,7 @@ public class ForeignKeyWithSpacesIT {
     }
 
     @Test
-    public void uploadCreatedArchive_expectNoException() throws SQLException, IOException, ClassNotFoundException {
+    public void uploadCreatedArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
 
         val createdArchive = siardArchivesHandler.prepareEmpty();
 

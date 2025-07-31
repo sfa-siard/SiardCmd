@@ -56,7 +56,7 @@ public class TableNameUnderscoreIT {
 
     //Assert that siard archive created by siardcmd does not fail with the same exception
     @Test
-    public void uploadCreatedArchive_expectNoException() throws SQLException, IOException, ClassNotFoundException {
+    public void uploadCreatedArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
 
         val createdArchive = siardArchivesHandler.prepareEmpty();
 
