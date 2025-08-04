@@ -1,10 +1,12 @@
 package ch.admin.bar.siard2.cmd.mssql.issues.siardsuite125;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
-import ch.admin.bar.siard2.cmd.SiardToDb;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
+import ch.admin.bar.siard2.cmd.utils.siard.model.utils.Id;
+import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedColumnId;
 import lombok.val;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,42 +22,51 @@ public class MsSqlBitTypesIT {
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public MSSQLServerContainer<?> emptyDb = new MSSQLServerContainer<>(DockerImageName.parse("mcr.microsoft.com/mssql/server:2017-CU12"))
-            .acceptLicense();
-
-    @Rule
-    public MSSQLServerContainer<?> customDb = new MSSQLServerContainer<>(DockerImageName.parse("mcr.microsoft.com/mssql/server:2017-CU12"))
+    public MSSQLServerContainer<?> db = new MSSQLServerContainer<>(DockerImageName.parse("mcr.microsoft.com/mssql/server:2017-CU12"))
             .acceptLicense()
             .withInitScript(SqlScripts.MsSQL.SIARDSUITE_125);
 
-    // Assert that siard archive created by siardcmd is uploaded back to db
     @Test
-    public void uploadCreatedArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
-        val actualArchive = siardArchivesHandler.prepareEmpty();
+    public void downloadArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
+        // given
+        val siardArchive = siardArchivesHandler.prepareEmpty();
 
+        // when
         SiardFromDb dbToSiard = new SiardFromDb(new String[]{
                 "-o",
-                "-j:" + customDb.getJdbcUrl(),
-                "-u:" + customDb.getUsername(),
-                "-p:" + customDb.getPassword(),
-                "-s:" + actualArchive.getPathToArchiveFile()
+                "-j:" + db.getJdbcUrl(),
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
+                "-s:" + siardArchive.getPathToArchiveFile()
         });
 
+        // then
         Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
 
-        //TODO: explore metadata and check column types and typeOriginal,
-        // as in PrecisionTypesPostgresIT.java, after https://github.com/sfa-siard/Zip64File/issues/11 is resolved
+        val metadataExplorer = siardArchive.exploreMetadata();
 
-        val expectedArchive = siardArchivesHandler.prepareResource("mssql/issues/siardsuite125/mssql-created-bit-types.siard");
+        val columnBit1 = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("BitSchema"))
+                .tableId(Id.of("BitTest"))
+                .columnId(Id.of("bit1"))
+                .build());
+        Assertions.assertThat(columnBit1.getType()).contains(Id.of("BOOLEAN"));
+        Assertions.assertThat(columnBit1.getTypeOriginal()).contains(Id.of("bit"));
 
-        SiardToDb siardToDb = new SiardToDb(new String[]{
-                "-o",
-                "-j:" + emptyDb.getJdbcUrl(),
-                "-u:" + emptyDb.getUsername(),
-                "-p:" + emptyDb.getPassword(),
-                "-s:" + expectedArchive.getPathToArchiveFile()
-        });
+        val columnBitArraySmall = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("BitSchema"))
+                .tableId(Id.of("BitTest"))
+                .columnId(Id.of("bit_array_small"))
+                .build());
+        Assertions.assertThat(columnBitArraySmall.getType()).contains(Id.of("BINARY(8)"));
+        Assertions.assertThat(columnBitArraySmall.getTypeOriginal()).contains(Id.of("binary(8)"));
 
-        Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
+        val columnBitArrayLarge = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("BitSchema"))
+                .tableId(Id.of("BitTest"))
+                .columnId(Id.of("bit_array_large"))
+                .build());
+        Assertions.assertThat(columnBitArrayLarge.getType()).contains(Id.of("BINARY(64)"));
+        Assertions.assertThat(columnBitArrayLarge.getTypeOriginal()).contains(Id.of("binary(64)"));
     }
 }
