@@ -27,7 +27,7 @@ class ObjectValueReader {
     public Object read() throws SQLException, IOException {
 
         if (metaColumn.getTypeOriginal()
-                      .equals("\"ROWID\"")) return null;
+                      .equals("ROWID")) return null;
 
         // TODO: when migrating to Java 17+, use switch expression
         int dataType = getDataType(metaColumn);

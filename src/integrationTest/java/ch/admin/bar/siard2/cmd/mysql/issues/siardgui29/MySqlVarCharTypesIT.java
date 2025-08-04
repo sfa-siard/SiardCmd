@@ -37,7 +37,7 @@ public class MySqlVarCharTypesIT {
 
     //Assert that siard archive created by siardcmd is uploaded back to db
     @Test
-    public void uploadCreatedArchive_expectNoException() throws SQLException, IOException, ClassNotFoundException {
+    public void uploadCreatedArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
         val createdArchive = siardArchivesHandler.prepareEmpty();
 
         SiardFromDb dbToSiard = new SiardFromDb(new String[]{

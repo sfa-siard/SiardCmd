@@ -7,6 +7,8 @@ public class SqlScripts {
         public final static String SIARDCMD_15 = "oracle/issues/siardcmd15/siardcmd_15.sql";
         public final static String MULTPLE_SCHEMAS = "oracle/issues/jdbcoracle6/multiple-schemas.sql";
         public static final String PACKAGE = "oracle/issues/jdbcoracle6/package.sql";
+        public final static String SIARDSUITE_129_BINARY = "oracle/issues/siardsuite129/binary-types-schema.sql";
+        public final static String SIARDSUITE_129_VARCHAR = "oracle/issues/siardsuite129/varchar-types-schema.sql";
     }
 
     public static class Postgres {
