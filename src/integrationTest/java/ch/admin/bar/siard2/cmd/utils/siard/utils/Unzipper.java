@@ -1,26 +1,24 @@
 package ch.admin.bar.siard2.cmd.utils.siard.utils;
 
-import io.chandler.zip.patch64.ZipInputStreamPatch64;
 import lombok.RequiredArgsConstructor;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 
 /**
- * Utility class for extracting the contents of a ZIP archive.
+ * Utility class for extracting ZIP archives.
  * <p>
  * Usage example:
  * <pre>{@code
- * File zipFile = new File("path/to/archive.zip");
+ * File zipArchive = new File("path/to/archive.siard");
  * File extractionDirectory = new File("path/to/extract");
- * Unzipper unzipper = new Unzipper(zipFile, extractionDirectory);
- * unzipper.unzip();
+ * Unzipper unzipper = new Unzipper(zipArchive, extractionDirectory);
+ * File extractedDir = unzipper.unzip();
  * }</pre>
- * </p>
  */
 @RequiredArgsConstructor
 public class Unzipper {
@@ -32,38 +30,39 @@ public class Unzipper {
      * Unzips the contents of the ZIP archive to the specified directory.
      */
     public File unzip() throws IOException {
-        final byte[] buffer = new byte[1024];
-        final ZipInputStream zis = new ZipInputStreamPatch64(Files.newInputStream(pathToArchive.toPath()));
+        try (ZipFile zipFile = new ZipFile(pathToArchive)) {
+            zipFile.stream().forEach(entry -> {
+                try {
+                    File newFile = newFile(extractTo, entry);
+                    
+                    if (entry.isDirectory()) {
+                        if (!newFile.isDirectory() && !newFile.mkdirs()) {
+                            throw new IOException("Failed to create directory " + newFile);
+                        }
+                    } else {
+                        // fix for Windows-created archives
+                        final File parent = newFile.getParentFile();
+                        if (!parent.isDirectory() && !parent.mkdirs()) {
+                            throw new IOException("Failed to create directory " + parent);
+                        }
 
-        ZipEntry zipEntry = zis.getNextEntry();
-        while (zipEntry != null) {
-            final File newFile = newFile(extractTo, zipEntry);
-            if (zipEntry.isDirectory()) {
-                if (!newFile.isDirectory() &&
-                        !newFile.mkdirs()) {
-                    throw new IOException("Failed to create directory " + newFile);
+                        // write file content
+                        try (InputStream is = zipFile.getInputStream(entry);
+                             FileOutputStream fos = new FileOutputStream(newFile)) {
+                            
+                            byte[] buffer = new byte[1024];
+                            int len;
+                            while ((len = is.read(buffer)) > 0) {
+                                fos.write(buffer, 0, len);
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
-            } else {
-                // fix for Windows-created archives
-                final File parent = newFile.getParentFile();
-                if (!parent.isDirectory() && !parent.mkdirs()) {
-                    throw new IOException("Failed to create directory " + parent);
-                }
-
-                // write file content
-                final FileOutputStream fos = new FileOutputStream(newFile);
-                int len;
-                while ((len = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
-                }
-                fos.close();
-            }
-            zipEntry = zis.getNextEntry();
+            });
         }
-
-        zis.closeEntry();
-        zis.close();
-
+        
         return extractTo;
     }
 
