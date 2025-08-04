@@ -59,11 +59,8 @@ dependencies {
     implementation("ch.admin.bar:jdbcoracle:v2.2.4")
     implementation("ch.admin.bar:jdbcmssql:v2.2.3")
     implementation("ch.admin.bar:jdbc-mysql:v2.2.3")
-    implementation("ch.admin.bar:jdbc-access:v2.2.3") {
-        version {
-            branch = "chore/gradle-migration"
-        }
-    }
+    implementation("ch.admin.bar:jdbc-access:v2.2.2")
+    implementation("ch.admin.bar:jdbc-db2:v2.2.2")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
