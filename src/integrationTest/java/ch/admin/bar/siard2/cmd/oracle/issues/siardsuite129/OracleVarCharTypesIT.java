@@ -88,6 +88,22 @@ public class OracleVarCharTypesIT {
                 .build());
         Assertions.assertThat(columnText4.getType()).contains(Id.of("VARCHAR(4000)"));
         Assertions.assertThat(columnText4.getTypeOriginal()).contains(Id.of("VARCHAR2(4000)"));
+
+        val columnDayOfYear = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("IT_USER"))
+                .tableId(Id.of("VARCHARTEST"))
+                .columnId(Id.of("DAY_OF_YEAR"))
+                .build());
+        Assertions.assertThat(columnDayOfYear.getType()).contains(Id.of("SMALLINT"));
+        Assertions.assertThat(columnDayOfYear.getTypeOriginal()).contains(Id.of("NUMBER(3,0)"));
+
+        val columnWeightInKg = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("IT_USER"))
+                .tableId(Id.of("VARCHARTEST"))
+                .columnId(Id.of("WEIGHT_IN_KG"))
+                .build());
+        Assertions.assertThat(columnWeightInKg.getType()).contains(Id.of("DEC(3, 2)"));
+        Assertions.assertThat(columnWeightInKg.getTypeOriginal()).contains(Id.of("NUMBER(3,2)"));
     }
 
     //Assert that siard archive created by siardcmd is uploaded back to db
