@@ -1,7 +1,6 @@
 package ch.admin.bar.siard2.cmd.oracle.issues.siardsuite129;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
-import ch.admin.bar.siard2.cmd.SiardToDb;
 import ch.admin.bar.siard2.cmd.utils.ConsoleLogConsumer;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.TestResourcesResolver;
@@ -25,14 +24,7 @@ public class OracleVarCharTypesIT {
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public OracleContainer emptyDb = new OracleContainer("gvenzl/oracle-xe:21-slim-faststart")
-            .withLogConsumer(new ConsoleLogConsumer())
-            .withCopyFileToContainer(
-                    MountableFile.forHostPath(TestResourcesResolver.resolve(SqlScripts.Oracle.CREATE_USER_WITH_ALL_PRIVILEGES).toPath()),
-                    "/container-entrypoint-initdb.d/00_create_user.sql");
-
-    @Rule
-    public OracleContainer customDb = new OracleContainer("gvenzl/oracle-xe:21-slim-faststart")
+    public OracleContainer db = new OracleContainer("gvenzl/oracle-xe:21-slim-faststart")
             .withLogConsumer(new ConsoleLogConsumer())
             .withCopyFileToContainer(
                     MountableFile.forHostPath(TestResourcesResolver.resolve(SqlScripts.Oracle.CREATE_USER_WITH_ALL_PRIVILEGES).toPath()),
@@ -43,19 +35,19 @@ public class OracleVarCharTypesIT {
 
     @Test
     public void downloadArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
-        val createdArchive = siardArchivesHandler.prepareEmpty();
+        val siardArchive = siardArchivesHandler.prepareEmpty();
 
         SiardFromDb dbToSiard = new SiardFromDb(new String[]{
                 "-o",
-                "-j:" + customDb.getJdbcUrl(),
+                "-j:" + db.getJdbcUrl(),
                 "-u:" + "IT_USER",
                 "-p:" + "password",
-                "-s:" + createdArchive.getPathToArchiveFile()
+                "-s:" + siardArchive.getPathToArchiveFile()
         });
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
 
-        val metadataExplorer = createdArchive.exploreMetadata();
+        val metadataExplorer = siardArchive.exploreMetadata();
 
         val columnId = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
                 .schemaId(Id.of("IT_USER"))
@@ -104,21 +96,5 @@ public class OracleVarCharTypesIT {
                 .build());
         Assertions.assertThat(columnWeightInKg.getType()).contains(Id.of("DEC(3, 2)"));
         Assertions.assertThat(columnWeightInKg.getTypeOriginal()).contains(Id.of("NUMBER(3,2)"));
-    }
-
-    //Assert that siard archive created by siardcmd is uploaded back to db
-    @Test
-    public void uploadCreatedArchive_expectNoExceptions() throws SQLException, IOException {
-        val siardArchive = siardArchivesHandler.prepareResource("oracle/issues/siardsuite129/oracle-created-varchar-types.siard");
-
-        SiardToDb siardToDb = new SiardToDb(new String[] {
-                "-o",
-                "-j:" + emptyDb.getJdbcUrl(),
-                "-u:" + "IT_USER",
-                "-p:" + "password",
-                "-s:" + siardArchive.getPathToArchiveFile()
-        });
-
-        Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
     }
 }

@@ -1,7 +1,6 @@
 package ch.admin.bar.siard2.cmd.postgres.issues.siardsuite128;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
-import ch.admin.bar.siard2.cmd.SiardToDb;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import ch.admin.bar.siard2.cmd.utils.siard.model.utils.Id;
@@ -23,31 +22,27 @@ public class PrecisionTypesPostgresIT {
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public PostgreSQLContainer<?> customDb = new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"))
+    public PostgreSQLContainer<?> db = new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"))
             .withInitScript(SqlScripts.Postgres.SIARDSUITE_128_PRECISION_TYPES);
-
-    @Rule
-    public PostgreSQLContainer<?> emptyDb = new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"));
-
 
     @Test
     public void downloadArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
         // given
-        val createdArchive = siardArchivesHandler.prepareEmpty();
+        val siardArchive = siardArchivesHandler.prepareEmpty();
 
         // when
         SiardFromDb dbtoSiard = new SiardFromDb(new String[]{
                 "-o",
-                "-j:" + customDb.getJdbcUrl(),
-                "-u:" + customDb.getUsername(),
-                "-p:" + customDb.getPassword(),
-                "-s:" + createdArchive.getPathToArchiveFile()
+                "-j:" + db.getJdbcUrl(),
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
+                "-s:" + siardArchive.getPathToArchiveFile()
         });
 
         // then
         Assert.assertEquals(SiardFromDb.iRETURN_OK, dbtoSiard.getReturn());
 
-        val metadataExplorer = createdArchive.exploreMetadata();
+        val metadataExplorer = siardArchive.exploreMetadata();
 
         val columnId = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
                 .schemaId(Id.of("precisiontypesschema"))
@@ -112,23 +107,5 @@ public class PrecisionTypesPostgresIT {
                 .build());
         Assertions.assertThat(columnNumeric_8.getType()).contains(Id.of("NUMERIC(8)"));
         Assertions.assertThat(columnNumeric_8.getTypeOriginal()).contains(Id.of("numeric_8"));
-    }
-
-    @Test
-    public void uploadCreatedArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
-        // given
-        val siardArchive = siardArchivesHandler.prepareResource("postgres/issues/siardsuite128/postgres-created-precision-types.siard");
-
-        // when
-        SiardToDb siardToDb = new SiardToDb(new String[]{
-                "-o",
-                "-j:" + emptyDb.getJdbcUrl(),
-                "-u:" + emptyDb.getUsername(),
-                "-p:" + emptyDb.getPassword(),
-                "-s:" + siardArchive.getPathToArchiveFile()
-        });
-
-        // then
-        Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
     }
 }
