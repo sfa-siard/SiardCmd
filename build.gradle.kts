@@ -47,7 +47,6 @@ dependencies {
     implementation("commons-logging:commons-logging:1.1.3")
     implementation("ch.qos.logback:logback-classic:1.3.14") // latest version which supports java 8
     implementation("com.mysql:mysql-connector-j:8.3.0") // transitive dependency from lib/jdbcmysql.jar
-    implementation(fileTree("lib") { include("*.jar") })
 
     implementation("ch.admin.bar:siard-api:v2.2.126")
     implementation("ch.admin.bar:SqlParser:v2.2.2")
