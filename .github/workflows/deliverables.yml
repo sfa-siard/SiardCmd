@@ -5,6 +5,8 @@ env:
 
 on:
   push:
+    branches:
+      - chore/fix-deliverables-after-gradle-migration
     tags:
       - v*.**
 
@@ -27,7 +29,7 @@ jobs:
       - name: Show current application version
         run: ./gradlew cV
       - name: Execute Gradle build
-        run: ./gradlew packDeliverables
+        run: ./gradlew assembleDist
       - name: Store reports
         if: failure()
         uses: actions/upload-artifact@v4
@@ -36,9 +38,9 @@ jobs:
           path: |
             **/build/reports/
             **/build/test-results/
-      - name: upload deliverables
+      - name: upload distributions
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.NAME_TAG }}
-          path: build/deliverables/
+          path: build/distributions/
           if-no-files-found: error
