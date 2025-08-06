@@ -41,7 +41,11 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.3.14") // latest version which supports java 8
     implementation("com.mysql:mysql-connector-j:8.3.0") // transitive dependency from lib/jdbcmysql.jar
 
-    implementation("ch.admin.bar:siard-api:v2.2.128")
+    implementation("ch.admin.bar:siard-api") {
+        version {
+            branch = "chore/rename-siard2-api-record-to-tablerecord"
+        }
+    }
     implementation("ch.admin.bar:SqlParser:v2.2.2")
     implementation("ch.admin.bar:Zip64File:v2.2.3")
     implementation("ch.admin.bar:enterutilities:v2.2.3")
