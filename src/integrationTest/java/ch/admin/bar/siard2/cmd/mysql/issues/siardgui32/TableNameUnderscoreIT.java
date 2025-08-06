@@ -17,8 +17,13 @@ import org.junit.Test;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class TableNameUnderscoreIT {
 
@@ -68,6 +73,11 @@ public class TableNameUnderscoreIT {
                 "-p:" + db.getPassword(),
                 "-s:" + siardArchive.getPathToArchiveFile()
         });
+
+        String timestamp = new SimpleDateFormat("MM_dd_HH_mm").format(new Date());
+        File desktopDir = new File("/home/cllorente/Desktop");
+        File destFile = new File(desktopDir, "table_names_with_underscore_" + timestamp + ".siard");
+        Files.copy(siardArchive.getPathToArchiveFile().toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
 
@@ -122,5 +132,21 @@ public class TableNameUnderscoreIT {
                 .build());
         Assertions.assertThat(employeesFirstName.getType()).contains(Id.of("VARCHAR(50)"));
         Assertions.assertThat(employeesFirstName.getTypeOriginal()).contains(Id.of("varchar(50)"));
+    }
+
+    //The issue had reported an error when uploading back to db
+    @Test
+    public void uploadSiardArchive_expectNoExceptions() throws SQLException, IOException {
+        val siardArchive = siardArchivesHandler.prepareResource("mysql/issues/siardgui32/created-table-names-underscore.siard");
+
+        SiardToDb siardToDb = new SiardToDb(new String[] {
+                "-o",
+                "-j:" + db.getJdbcUrl(),
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
+                "-s:" + siardArchive.getPathToArchiveFile()
+        });
+
+        Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
     }
 }
