@@ -34,7 +34,7 @@ public class OracleVarCharTypesIT {
                     "/container-entrypoint-initdb.d/01_varchar_types.sql");
 
     @Test
-    public void downloadArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
+    public void downloadArchive() throws SQLException, IOException, ClassNotFoundException {
         val siardArchive = siardArchivesHandler.prepareEmpty();
 
         SiardFromDb dbToSiard = new SiardFromDb(new String[]{

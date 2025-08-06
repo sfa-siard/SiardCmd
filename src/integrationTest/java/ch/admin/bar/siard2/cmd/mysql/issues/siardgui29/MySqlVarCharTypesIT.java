@@ -31,7 +31,7 @@ public class MySqlVarCharTypesIT {
             .withConfigurationOverride("mysql/config/with-blobs");
 
     @Test
-    public void downloadArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
+    public void downloadArchive() throws SQLException, IOException, ClassNotFoundException {
         val siardArchive = siardArchivesHandler.prepareEmpty();
 
         SiardFromDb dbToSiard = new SiardFromDb(new String[]{

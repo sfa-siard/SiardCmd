@@ -26,7 +26,7 @@ public class BitTypesPostgresIT {
             .withInitScript(SqlScripts.Postgres.SIARDSUITE_128_BIT);
 
     @Test
-    public void downloadArchive_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
+    public void downloadArchive() throws IOException, SQLException, ClassNotFoundException {
         // given
         val siardArchive = siardArchivesHandler.prepareEmpty();
 

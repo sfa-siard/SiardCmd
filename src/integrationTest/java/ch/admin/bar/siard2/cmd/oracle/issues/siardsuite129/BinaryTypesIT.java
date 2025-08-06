@@ -34,7 +34,7 @@ public class BinaryTypesIT {
                     "/container-entrypoint-initdb.d/01_binary_types.sql");
 
     @Test
-    public void downloadArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
+    public void downloadArchive() throws SQLException, IOException, ClassNotFoundException {
         val siardArchive = siardArchivesHandler.prepareEmpty();
 
         SiardFromDb dbtoSiard = new SiardFromDb(new String[]{

@@ -56,7 +56,7 @@ public class BitTypesIT {
     }
 
     @Test
-    public void downloadArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
+    public void downloadArchive() throws SQLException, IOException, ClassNotFoundException {
         val siardArchive = siardArchivesHandler.prepareEmpty();
 
         SiardFromDb dbtoSiard = new SiardFromDb(new String[]{

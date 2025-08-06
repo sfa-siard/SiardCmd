@@ -56,7 +56,7 @@ public class ForeignKeyWithSpacesIT {
     }
 
     @Test
-    public void downloadArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
+    public void downloadArchive() throws SQLException, IOException, ClassNotFoundException {
 
         val siardArchive = siardArchivesHandler.prepareEmpty();
 

@@ -27,7 +27,7 @@ public class MsSqlBitTypesIT {
             .withInitScript(SqlScripts.MsSQL.SIARDSUITE_125);
 
     @Test
-    public void downloadArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
+    public void downloadArchive() throws SQLException, IOException, ClassNotFoundException {
         // given
         val siardArchive = siardArchivesHandler.prepareEmpty();
 

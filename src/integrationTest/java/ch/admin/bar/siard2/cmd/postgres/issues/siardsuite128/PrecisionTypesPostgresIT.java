@@ -26,7 +26,7 @@ public class PrecisionTypesPostgresIT {
             .withInitScript(SqlScripts.Postgres.SIARDSUITE_128_PRECISION_TYPES);
 
     @Test
-    public void downloadArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
+    public void downloadArchive() throws SQLException, IOException, ClassNotFoundException {
         // given
         val siardArchive = siardArchivesHandler.prepareEmpty();
 
