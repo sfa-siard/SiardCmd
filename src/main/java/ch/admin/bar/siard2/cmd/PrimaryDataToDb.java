@@ -8,34 +8,23 @@ Created    : 01.09.2016, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.cmd;
 
-import java.io.*;
-import java.math.*;
-import java.sql.*;
-import java.util.*;
-
-import ch.admin.bar.siard2.api.Archive;
-import ch.admin.bar.siard2.api.Cell;
-import ch.admin.bar.siard2.api.Field;
-import ch.admin.bar.siard2.api.MetaColumn;
-import ch.admin.bar.siard2.api.MetaData;
-import ch.admin.bar.siard2.api.MetaField;
-import ch.admin.bar.siard2.api.MetaForeignKey;
-import ch.admin.bar.siard2.api.MetaSchema;
-import ch.admin.bar.siard2.api.MetaTable;
-import ch.admin.bar.siard2.api.MetaType;
-import ch.admin.bar.siard2.api.MetaUniqueKey;
-import ch.admin.bar.siard2.api.Record;
-import ch.admin.bar.siard2.api.RecordDispenser;
-import ch.admin.bar.siard2.api.Schema;
-import ch.admin.bar.siard2.api.Table;
-import ch.admin.bar.siard2.api.Value;
-import ch.enterag.utils.*;
-import ch.enterag.utils.background.*;
-import ch.enterag.sqlparser.*;
-import ch.enterag.sqlparser.identifier.*;
-import ch.admin.bar.siard2.api.generated.*;
+import ch.admin.bar.siard2.api.*;
+import ch.admin.bar.siard2.api.generated.CategoryType;
+import ch.enterag.sqlparser.SqlLiterals;
+import ch.enterag.sqlparser.identifier.QualifiedId;
+import ch.enterag.utils.EU;
+import ch.enterag.utils.StopWatch;
+import ch.enterag.utils.background.Progress;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+
+import java.io.*;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /*====================================================================*/
 /** Transfers primary data from SIARD files to databases.
@@ -393,7 +382,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
    * @throws IOException if an I/O error occurred.
    * @throws SQLException if a database error occurred.
    */
-  private void putRecord(Record record, ResultSet rs,Set<Object> setResources)
+  private void putTableRecord(TableRecord record, ResultSet rs, Set<Object> setResources)
     throws IOException, SQLException
   {
     List<Value> listValues = record.getValues(supportsArrays(),supportsUdts());
@@ -426,12 +415,12 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       mt.getParentMetaSchema().getName(),
       mt.getName());
     System.out.println("  Table: "+qiTable.format());
-    RecordDispenser rd = table.openRecords();
+    TableRecordDispenser rd = table.openTableRecords();
     ResultSet rs = openTable(table,sm);
     Statement stmt = rs.getStatement();
     Set<Object>setResources = new HashSet<Object>();
     long lRecord = 0;
-    Record record = null;
+    TableRecord record = null;
     StopWatch sw = StopWatch.getInstance();
   	sw.start();
   	long lBytesStart = rd.getByteCount();
@@ -440,7 +429,7 @@ public class PrimaryDataToDb extends PrimaryDataTransfer
       record = rd.get();
       setResources.clear();
       rs.moveToInsertRow();
-      putRecord(record,rs,setResources);
+      putTableRecord(record, rs, setResources);
       rs.insertRow();
       freeResources(setResources);
       rs.moveToCurrentRow();
