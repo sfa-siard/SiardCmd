@@ -1,4 +1,4 @@
-package ch.admin.bar.siard2.cmd.issues.jdbcmysql4;
+package ch.admin.bar.siard2.cmd.mysql.issues.jdbcmysql4;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
@@ -25,7 +25,7 @@ public class MySQLDownloadVersionSupport8xIT {
             .withPassword("public")
             .withDatabaseName("public")
             .withInitScript(SqlScripts.MySQL.JDBCMYSQL_4)
-            .withConfigurationOverride("config/mysql-version-support");
+            .withConfigurationOverride("mysql/config/mysql-version-support");
 
     @Ignore
     @Test
