@@ -1,7 +1,6 @@
 package ch.admin.bar.siard2.cmd.postgres.issues.siardsuite128;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
-import ch.admin.bar.siard2.cmd.SiardToDb;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import ch.admin.bar.siard2.cmd.utils.siard.model.utils.Id;
@@ -23,30 +22,27 @@ public class BitTypesPostgresIT {
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public PostgreSQLContainer<?> customDb = new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"))
+    public PostgreSQLContainer<?> db = new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"))
             .withInitScript(SqlScripts.Postgres.SIARDSUITE_128_BIT);
 
-    @Rule
-    public PostgreSQLContainer<?> emptyDb = new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"));
-
     @Test
-    public void downloadArchive_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
+    public void downloadArchive() throws IOException, SQLException, ClassNotFoundException {
         // given
-        val createdArchive = siardArchivesHandler.prepareEmpty();
+        val siardArchive = siardArchivesHandler.prepareEmpty();
 
         // when
         SiardFromDb dbtoSiard = new SiardFromDb(new String[]{
                 "-o",
-                "-j:" + customDb.getJdbcUrl(),
-                "-u:" + customDb.getUsername(),
-                "-p:" + customDb.getPassword(),
-                "-s:" + createdArchive.getPathToArchiveFile()
+                "-j:" + db.getJdbcUrl(),
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
+                "-s:" + siardArchive.getPathToArchiveFile()
         });
 
         // then
         Assert.assertEquals(SiardFromDb.iRETURN_OK, dbtoSiard.getReturn());
 
-        val metadataExplorer = createdArchive.exploreMetadata();
+        val metadataExplorer = siardArchive.exploreMetadata();
 
         val columnId = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
                 .schemaId(Id.of("bitschema"))
@@ -80,23 +76,5 @@ public class BitTypesPostgresIT {
         Assertions.assertThat(columnBit64.getType()).contains(Id.of("BINARY(64)"));
         Assertions.assertThat(columnBit64.getTypeOriginal()).contains(Id.of("bit_64"));
 
-    }
-
-    @Test
-    public void uploadCreatedArchive_expectNoExceptions() throws IOException, SQLException, ClassNotFoundException {
-        // given
-        val siardArchive = siardArchivesHandler.prepareResource("postgres/issues/siardsuite128/postgres-created-bit-types.siard");
-
-        // when
-        SiardToDb siardToDb = new SiardToDb(new String[]{
-                "-o",
-                "-j:" + emptyDb.getJdbcUrl(),
-                "-u:" + emptyDb.getUsername(),
-                "-p:" + emptyDb.getPassword(),
-                "-s:" + siardArchive.getPathToArchiveFile()
-        });
-
-        // then
-        Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
     }
 }

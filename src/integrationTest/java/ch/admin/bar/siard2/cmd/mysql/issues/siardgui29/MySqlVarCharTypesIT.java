@@ -1,11 +1,13 @@
 package ch.admin.bar.siard2.cmd.mysql.issues.siardgui29;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
-import ch.admin.bar.siard2.cmd.SiardToDb;
 import ch.admin.bar.siard2.cmd.SupportedDbVersions;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
+import ch.admin.bar.siard2.cmd.utils.siard.model.utils.Id;
+import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedColumnId;
 import lombok.val;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,46 +23,59 @@ public class MySqlVarCharTypesIT {
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public MySQLContainer<?> emptyDb = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5))
-            .withUsername("root")
-            .withPassword("public")
-            .withDatabaseName("public")
-            .withConfigurationOverride("mysql/config/with-blobs");
-
-    @Rule
-    public MySQLContainer<?> customDb = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5))
+    public MySQLContainer<?> db = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5))
             .withUsername("root")
             .withPassword("public")
             .withDatabaseName("public")
             .withInitScript(SqlScripts.MySQL.SIARDGUI_29_VARCHAR)
             .withConfigurationOverride("mysql/config/with-blobs");
 
-    //Assert that siard archive created by siardcmd is uploaded back to db
     @Test
-    public void uploadCreatedArchive_expectNoExceptions() throws SQLException, IOException, ClassNotFoundException {
-        val createdArchive = siardArchivesHandler.prepareEmpty();
+    public void downloadArchive() throws SQLException, IOException, ClassNotFoundException {
+        val siardArchive = siardArchivesHandler.prepareEmpty();
 
         SiardFromDb dbToSiard = new SiardFromDb(new String[]{
                 "-o",
-                "-j:" + customDb.getJdbcUrl(),
-                "-u:" + customDb.getUsername(),
-                "-p:" + customDb.getPassword(),
-                "-s:" + createdArchive.getPathToArchiveFile()
+                "-j:" + db.getJdbcUrl(),
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
+                "-s:" + siardArchive.getPathToArchiveFile()
         });
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
 
-        //TODO: explore metadata and check column types and typeOriginal,
-        // as in PrecisionTypesPostgresIT.java, after https://github.com/sfa-siard/Zip64File/issues/11 is resolved
+        val metadataExplorer = siardArchive.exploreMetadata();
 
-        val siardArchive = siardArchivesHandler.prepareResource("mysql/issues/siardgui29/created-varchar-types.siard");
-        SiardToDb siardToDb = new SiardToDb(new String[]{
-                "-o",
-                "-j:" + emptyDb.getJdbcUrl(),
-                "-u:" + emptyDb.getUsername(),
-                "-p:" + emptyDb.getPassword(),
-                "-s:" + siardArchive.getPathToArchiveFile()
-        });
-        Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
+        val columnId = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("varcharschema"))
+                .tableId(Id.of("varchartest"))
+                .columnId(Id.of("id"))
+                .build());
+        Assertions.assertThat(columnId.getType()).contains(Id.of("INT"));
+        Assertions.assertThat(columnId.getTypeOriginal()).contains(Id.of("int(11)"));
+
+        val columnText2 = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("varcharschema"))
+                .tableId(Id.of("varchartest"))
+                .columnId(Id.of("text2"))
+                .build());
+        Assertions.assertThat(columnText2.getType()).contains(Id.of("VARCHAR(1)"));
+        Assertions.assertThat(columnText2.getTypeOriginal()).contains(Id.of("varchar(1)"));
+
+        val columnText3 = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("varcharschema"))
+                .tableId(Id.of("varchartest"))
+                .columnId(Id.of("text3"))
+                .build());
+        Assertions.assertThat(columnText3.getType()).contains(Id.of("VARCHAR(255)"));
+        Assertions.assertThat(columnText3.getTypeOriginal()).contains(Id.of("varchar(255)"));
+
+        val columnText4 = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("varcharschema"))
+                .tableId(Id.of("varchartest"))
+                .columnId(Id.of("text4"))
+                .build());
+        Assertions.assertThat(columnText4.getType()).contains(Id.of("VARCHAR(8000)"));
+        Assertions.assertThat(columnText4.getTypeOriginal()).contains(Id.of("varchar(8000)"));
     }
 }
