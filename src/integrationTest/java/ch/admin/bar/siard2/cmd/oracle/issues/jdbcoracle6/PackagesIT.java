@@ -29,11 +29,10 @@ public class PackagesIT {
                                                                    .toPath()),
                     "/container-entrypoint-initdb.d/00_create_package.sql");
 
-    // due to non-resolved issue https://github.com/sfa-siard/JdbcOracle/issues/9 expect an exception instead of ignoring the test.
-    @Test(expected = IOException.class)
+    @Test
     public void download() throws IOException, SQLException, ClassNotFoundException {
         // given
-        val actualArchive = siardArchivesHandler.prepareEmpty();
+        val siardArchive = siardArchivesHandler.prepareEmpty();
 
         // when
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
@@ -41,7 +40,7 @@ public class PackagesIT {
                 "-j:" + db.getJdbcUrl(),
                 "-u:" + "testuser",
                 "-p:" + "testpassword",
-                "-s:" + actualArchive.getPathToArchiveFile()
+                "-s:" + siardArchive.getPathToArchiveFile()
         });
 
         // then
