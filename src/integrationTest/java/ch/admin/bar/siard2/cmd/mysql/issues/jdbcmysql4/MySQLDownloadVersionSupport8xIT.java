@@ -5,7 +5,6 @@ import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import lombok.val;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.MySQLContainer;
@@ -27,12 +26,11 @@ public class MySQLDownloadVersionSupport8xIT {
             .withInitScript(SqlScripts.MySQL.JDBCMYSQL_4)
             .withConfigurationOverride("mysql/config/mysql-version-support");
 
-    @Ignore
     @Test
     public void downloadDb_expectNoException() throws SQLException, IOException, ClassNotFoundException {
         val createdArchive = siardArchivesHandler.prepareEmpty();
 
-        SiardFromDb siardFromDb = new SiardFromDb(new String[]{
+        SiardFromDb dbtoSiard = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + downloadDb.getJdbcUrl() + "?zeroDateTimeBehavior=convertToNull",
                 "-u:" + downloadDb.getUsername(),
@@ -40,6 +38,6 @@ public class MySQLDownloadVersionSupport8xIT {
                 "-s:" + createdArchive.getPathToArchiveFile()
         });
 
-        Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+        Assert.assertEquals(SiardFromDb.iRETURN_OK, dbtoSiard.getReturn());
     }
 }
