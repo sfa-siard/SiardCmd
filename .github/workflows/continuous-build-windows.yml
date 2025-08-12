@@ -5,7 +5,7 @@ name: Continuous build
 
 on:
   push:
-    branches:
+    branches: '*'
 
 jobs:
   execute-unit-tests:
