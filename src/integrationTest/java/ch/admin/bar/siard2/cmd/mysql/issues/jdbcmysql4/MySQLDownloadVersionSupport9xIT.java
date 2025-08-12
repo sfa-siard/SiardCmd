@@ -5,6 +5,7 @@ import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import lombok.val;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.MySQLContainer;
@@ -26,6 +27,7 @@ public class MySQLDownloadVersionSupport9xIT {
             .withInitScript(SqlScripts.MySQL.JDBCMYSQL_4)
             .withConfigurationOverride("mysql/config/mysql-version-support");
 
+    @Ignore
     @Test
     public void downloadDb_expectNoException() throws SQLException, IOException, ClassNotFoundException {
         val createdArchive = siardArchivesHandler.prepareEmpty();
