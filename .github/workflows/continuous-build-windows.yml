@@ -5,8 +5,10 @@ name: Continuous build
 
 on:
   push:
-    branches: '*'
-
+    branches:
+      - feature/*
+      - issue/*
+      - chore/*
 jobs:
   execute-unit-tests:
     runs-on: windows-latest
