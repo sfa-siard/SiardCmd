@@ -25,9 +25,15 @@ public class PackagesIT {
     public final OracleContainer db = new OracleContainer("gvenzl/oracle-xe:21-slim-faststart")
             .withLogConsumer(new ConsoleLogConsumer())
             .withCopyFileToContainer(
-                    MountableFile.forHostPath(TestResourcesResolver.resolve(SqlScripts.Oracle.PACKAGE)
-                                                                   .toPath()),
+                    MountableFile.forHostPath(TestResourcesResolver.resolve(SqlScripts.Oracle.PACKAGE).toPath()),
                     "/container-entrypoint-initdb.d/00_create_package.sql");
+
+    @Rule
+    public final OracleContainer emptyDb = new OracleContainer("gvenzl/oracle-xe:21-slim-faststart")
+            .withLogConsumer(new ConsoleLogConsumer())
+            .withCopyFileToContainer(
+                    MountableFile.forHostPath(TestResourcesResolver.resolve(SqlScripts.Oracle.CREATE_USER_WITH_ALL_PRIVILEGES).toPath()),
+                    "/container-entrypoint-initdb.d/00_create_user.sql");
 
     @Test
     public void download() throws IOException, SQLException, ClassNotFoundException {
