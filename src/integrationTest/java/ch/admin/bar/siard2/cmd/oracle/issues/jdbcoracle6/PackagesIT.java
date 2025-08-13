@@ -35,7 +35,7 @@ public class PackagesIT {
         val siardArchive = siardArchivesHandler.prepareEmpty();
 
         // when
-        SiardFromDb siardFromDb = new SiardFromDb(new String[]{
+        SiardFromDb dbToSiard = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
                 "-u:" + "testuser",
@@ -44,6 +44,6 @@ public class PackagesIT {
         });
 
         // then
-        Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+        Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
     }
 }

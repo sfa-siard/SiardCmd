@@ -18,7 +18,8 @@ CREATE TABLE simple_table
     id    NUMBER,
     value VARCHAR2(100)
 );
-
+-- Used to cause java.io.IOException: Only one view with the same name allowed per schema!
+-- Note that the error message is misleading due to a copy-paste error, and should be fixed in SiardApi#MetaSchemaImpl#createMetaRoutine
 CREATE
     OR REPLACE PACKAGE log_msg_overloaded AS
     -- Overloaded procedures
