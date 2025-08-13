@@ -48,11 +48,7 @@ dependencies {
 
     implementation("ch.admin.bar:jdbc-base:v2.2.10")
     implementation("ch.admin.bar:JdbcPostgres:v2.2.3")
-    implementation("ch.admin.bar:jdbcoracle:v2.2.4") {
-        version {
-            branch = "fix/procedure-overloading"
-        }
-    }
+    implementation("ch.admin.bar:jdbcoracle:v2.2.6")
     implementation("ch.admin.bar:jdbcmssql:v2.2.3")
     implementation("ch.admin.bar:jdbc-mysql:v2.2.3")
     implementation("ch.admin.bar:jdbc-access:v2.2.3")
