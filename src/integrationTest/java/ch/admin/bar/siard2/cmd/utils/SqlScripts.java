@@ -23,6 +23,8 @@ public class SqlScripts {
         public final static String SIARDGUI_29_VARCHAR = "mysql/issues/siardgui29/varchar-types-schema.sql";
         public final static String SIARDGUI_32_FOREIGN_KEY = "mysql/issues/siardgui32/foreign-key-with-spaces.sql";
         public final static String SIARDGUI_32_TABLE_NAME = "mysql/issues/siardgui32/table-with-underscore.sql";
+        public final static String JDBCMYSQL_4 = "mysql/issues/jdbcmysql4/nation.sql";
+        public final static String JDBCMYSQL_4_MARIADB = "mysql/issues/jdbcmysql4/nation-mariadb.sql";
     }
 
     public static class MsSQL {
