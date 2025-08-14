@@ -24,7 +24,7 @@ jobs:
       - name: Java version
         run: java -version
 
-      - name: Run unit tests
+      - name: Run unit tests --info --console=plain
         run: ./gradlew build
 
       - name: Store reports
