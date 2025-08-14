@@ -4,11 +4,9 @@
 name: Continuous build windows-latest
 
 on:
-  push:
-    branches:
-      - feature/*
-      - issue/*
-      - chore/*
+  pull_request:
+    branches: [ main ]
+
 jobs:
   execute-unit-tests:
     runs-on: windows-latest
