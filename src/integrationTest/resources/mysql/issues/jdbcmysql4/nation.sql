@@ -8,6 +8,12 @@
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
  SET NAMES utf8mb4 ;
+
+-- Create it_user with privileges for nation and test databases
+CREATE USER 'it_user'@'%' IDENTIFIED BY 'it_password';
+GRANT ALL PRIVILEGES ON nation.* TO 'it_user'@'%';
+GRANT ALL PRIVILEGES ON test.* TO 'it_user'@'%';
+
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;

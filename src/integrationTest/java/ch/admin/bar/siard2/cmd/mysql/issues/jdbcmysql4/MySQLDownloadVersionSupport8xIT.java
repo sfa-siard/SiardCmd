@@ -5,7 +5,6 @@ import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import lombok.val;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.MySQLContainer;
@@ -23,11 +22,9 @@ public class MySQLDownloadVersionSupport8xIT {
     public MySQLContainer<?> downloadDb = new MySQLContainer<>(DockerImageName.parse("mysql:8.4.5"))
             .withUsername("root")
             .withPassword("public")
-            .withDatabaseName("public")
             .withInitScript(SqlScripts.MySQL.JDBCMYSQL_4)
             .withConfigurationOverride("mysql/config/mysql-version-support");
 
-    @Ignore
     @Test
     public void downloadDb_expectNoException() throws SQLException, IOException, ClassNotFoundException {
         val createdArchive = siardArchivesHandler.prepareEmpty();
@@ -35,8 +32,8 @@ public class MySQLDownloadVersionSupport8xIT {
         SiardFromDb dbtoSiard = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + downloadDb.getJdbcUrl() + "?zeroDateTimeBehavior=convertToNull",
-                "-u:" + downloadDb.getUsername(),
-                "-p:" + downloadDb.getPassword(),
+                "-u:" + "it_user",
+                "-p:" + "it_password",
                 "-s:" + createdArchive.getPathToArchiveFile()
         });
 
