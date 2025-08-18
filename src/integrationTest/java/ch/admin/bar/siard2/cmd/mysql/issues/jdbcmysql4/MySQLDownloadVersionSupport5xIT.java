@@ -1,11 +1,11 @@
 package ch.admin.bar.siard2.cmd.mysql.issues.jdbcmysql4;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
+import ch.admin.bar.siard2.cmd.SupportedDbVersions;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import lombok.val;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.MySQLContainer;
@@ -20,15 +20,14 @@ public class MySQLDownloadVersionSupport5xIT {
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public MySQLContainer<?> downloadDb = new MySQLContainer<>(DockerImageName.parse("mysql:5.7.40"))
+    public MySQLContainer<?> downloadDb = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5_7))
             .withUsername("root")
             .withPassword("public")
             .withDatabaseName("public")
             .withInitScript(SqlScripts.MySQL.JDBCMYSQL_4)
-            .withConfigurationOverride("config/mysql");
+            .withConfigurationOverride("mysql/config/mysql-version-support");
 
 
-    @Ignore
     @Test
     public void downloadDb_expectNoException() throws SQLException, IOException, ClassNotFoundException {
         val createdArchive = siardArchivesHandler.prepareEmpty();
