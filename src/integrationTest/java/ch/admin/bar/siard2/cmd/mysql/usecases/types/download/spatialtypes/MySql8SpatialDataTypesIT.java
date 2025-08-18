@@ -13,7 +13,7 @@ public class MySql8SpatialDataTypesIT {
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public MySQLContainer<?> db = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_8))
+    public MySQLContainer<?> db = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_8_0))
             .withUsername("root")
             .withPassword("test")
             .withCommand("--max-allowed-packet=1G --innodb_log_file_size=256M")
