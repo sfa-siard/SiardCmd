@@ -218,7 +218,7 @@ public class MetaDataFromDb extends MetaDataBase {
     private void incTablesAnalyzed() {
         _iTablesAnalyzed++;
         if ((_progress != null) && (_iTables > 0) && ((_iTablesAnalyzed % _iTablesPercent) == 0)) {
-            int iPercent = (int) ((100 * _iTablesAnalyzed) / _iTables);
+            int iPercent = (100 * _iTablesAnalyzed) / _iTables;
             _progress.notifyProgress(iPercent);
         }
     }
@@ -350,7 +350,7 @@ public class MetaDataFromDb extends MetaDataBase {
      */
     private MetaType createType(String sTypeName, String sDefaultSchema, int iPrecision,
                                 int iScale) throws IOException, SQLException {
-        MetaType mt = null;
+        MetaType mt;
         try {
             QualifiedId qiType = new QualifiedId(sTypeName);
             String sTypeSchema = qiType.getSchema();
@@ -629,7 +629,7 @@ public class MetaDataFromDb extends MetaDataBase {
             /* add the columns in the proper order */
             MetaForeignKey mfk = mt.getMetaForeignKey(sForeignKeyName);
             for (int iColumn = 0; iColumn < mapFkColumns.size(); iColumn++) {
-                String sFkColumnName = mapFkColumns.get(Integer.valueOf(iColumn + 1));
+                String sFkColumnName = mapFkColumns.get(iColumn + 1);
                 mfk.addReference(sFkColumnName, mapPkColumns.get(sFkColumnName));
             }
             mapFkColumns.clear();
@@ -650,7 +650,7 @@ public class MetaDataFromDb extends MetaDataBase {
         if (sUniqueKeyName != null) {
             MetaUniqueKey muk = mt.getMetaCandidateKey(sUniqueKeyName);
             for (int iColumn = 0; iColumn < mapUniqueColumns.size(); iColumn++) {
-                String sColumnName = mapUniqueColumns.get(Integer.valueOf(iColumn + 1));
+                String sColumnName = mapUniqueColumns.get(iColumn + 1);
                 muk.addColumn(sColumnName);
             }
             mapUniqueColumns.clear();
@@ -670,8 +670,8 @@ public class MetaDataFromDb extends MetaDataBase {
         String sTypeName = rs.getString("TYPE_NAME");
         long lColumnSize = rs.getLong("COLUMN_SIZE");
         int iDecimalDigits = rs.getInt("DECIMAL_DIGITS");
-        MetaSchema ms = null;
-        QualifiedId qiParent = null;
+        MetaSchema ms;
+        QualifiedId qiParent;
         if (mc.getParentMetaTable() != null) {
             MetaTable mt = mc.getParentMetaTable();
             ms = mt.getParentMetaSchema();
@@ -733,9 +733,8 @@ public class MetaDataFromDb extends MetaDataBase {
      * get all roles that are grantees of table privileges and not users.
      *
      * @throws IOException  if an I/O error occurred.
-     * @throws SQLException in a database error occurred.
      */
-    private void getRoles() throws IOException, SQLException {
+    private void getRoles() throws IOException {
         /* all grantees that are not users (probably) are roles */
         for (int iPrivilege = 0; iPrivilege < _md.getMetaPrivileges(); iPrivilege++) {
             MetaPrivilege mp = _md.getMetaPrivilege(iPrivilege);
@@ -843,7 +842,7 @@ public class MetaDataFromDb extends MetaDataBase {
                 String sQueryText = null;
                 try {
                     sQueryText = getQuery(rs.getString(BaseDatabaseMetaData._sQUERY_TEXT));
-                } catch (SQLException se) {
+                } catch (SQLException ignored) {
                 }
                 if (sQueryText != null) mv.setQueryOriginal(sQueryText);
                 getColumns(mv);
@@ -900,7 +899,7 @@ public class MetaDataFromDb extends MetaDataBase {
                 }
             }
             rs.close();
-        } catch (java.sql.SQLFeatureNotSupportedException sfnse) {
+        } catch (java.sql.SQLFeatureNotSupportedException ignored) {
         }
     }
 
@@ -970,7 +969,7 @@ public class MetaDataFromDb extends MetaDataBase {
      */
     private void getUniqueKeys(MetaTable mt) throws IOException, SQLException {
         String sUniqueKeyName = null;
-        Map<Integer, String> mapUniqueColumns = new HashMap<Integer, String>();
+        Map<Integer, String> mapUniqueColumns = new HashMap<>();
         ResultSet rs = _dmd.getIndexInfo(null, ((BaseDatabaseMetaData) _dmd).toPattern(mt.getParentMetaSchema().getName()), ((BaseDatabaseMetaData) _dmd).toPattern(mt.getName()), true, false);
         while (rs.next()) {
             String sTableSchema = rs.getString("TABLE_SCHEM");
@@ -983,9 +982,7 @@ public class MetaDataFromDb extends MetaDataBase {
             String sIndexName = rs.getString("INDEX_NAME");
             int iIndexType = rs.getInt("TYPE");
             /* do not list primary key among the candidate keys */
-            boolean bPrimary = false;
-            if ((mt.getMetaPrimaryKey() != null) && (mt.getMetaPrimaryKey().getName().equals(sIndexName)))
-                bPrimary = true;
+            boolean bPrimary = (mt.getMetaPrimaryKey() != null) && (mt.getMetaPrimaryKey().getName().equals(sIndexName));
             if ((iIndexType != DatabaseMetaData.tableIndexStatistic) && (iIndexType != DatabaseMetaData.tableIndexOther) && (!bPrimary)) {
                 MetaUniqueKey muk = mt.getMetaCandidateKey(sIndexName);
                 if (muk == null) {
@@ -995,7 +992,7 @@ public class MetaDataFromDb extends MetaDataBase {
                 }
                 int iOrdinalPosition = rs.getInt("ORDINAL_POSITION");
                 String sColumnName = rs.getString("COLUMN_NAME");
-                mapUniqueColumns.put(Integer.valueOf(iOrdinalPosition), sColumnName);
+                mapUniqueColumns.put(iOrdinalPosition, sColumnName);
             }
 
             LOG.debug("Metadata for unique key '{}' (table '{}.{}') loaded",
@@ -1016,8 +1013,8 @@ public class MetaDataFromDb extends MetaDataBase {
      */
     private void getForeignKeys(MetaTable mt) throws IOException, SQLException {
         String sForeignKeyName = null;
-        Map<Integer, String> mapFkColumns = new HashMap<Integer, String>();
-        Map<String, String> mapPkColumns = new HashMap<String, String>();
+        Map<Integer, String> mapFkColumns = new HashMap<>();
+        Map<String, String> mapPkColumns = new HashMap<>();
         ResultSet rs = _dmd.getImportedKeys(null, mt.getParentMetaSchema().getName(), mt.getName());
         while (rs.next()) {
             String sPkTableSchema = rs.getString("PKTABLE_SCHEM");
@@ -1044,7 +1041,7 @@ public class MetaDataFromDb extends MetaDataBase {
                 mfk = mt.createMetaForeignKey(sForeignKeyName);
             }
             mapPkColumns.put(sFkColumnName, sPkColumnName);
-            mapFkColumns.put(Integer.valueOf(iKeySeq), sFkColumnName);
+            mapFkColumns.put(iKeySeq, sFkColumnName);
             mfk.setReferencedSchema(sPkTableSchema);
             mfk.setReferencedTable(sPkTableName);
             mfk.setDeleteAction(getReferentialAction(iDeleteRule));
@@ -1069,7 +1066,7 @@ public class MetaDataFromDb extends MetaDataBase {
      */
     private void getPrimaryKey(MetaTable mt) throws IOException, SQLException {
         String sPkName = "PK_" + mt.getName();
-        Map<Integer, String> mapPkColumns = new HashMap<Integer, String>();
+        Map<Integer, String> mapPkColumns = new HashMap<>();
         ResultSet rs = _dmd.getPrimaryKeys(null, mt.getParentMetaSchema().getName(), mt.getName());
         while (rs.next()) {
             String sTableSchema = rs.getString("TABLE_SCHEM");
@@ -1079,7 +1076,7 @@ public class MetaDataFromDb extends MetaDataBase {
             if (!mt.getName().equals(sTableName)) throw new IOException("Invalid table name for primary key found!");
             String sColumnName = rs.getString("COLUMN_NAME");
             int iKeySeq = rs.getInt("KEY_SEQ");
-            mapPkColumns.put(Integer.valueOf(iKeySeq), sColumnName);
+            mapPkColumns.put(iKeySeq, sColumnName);
             String s = rs.getString("PK_NAME");
             if (s != null) {
                 sPkName = s;
@@ -1101,7 +1098,7 @@ public class MetaDataFromDb extends MetaDataBase {
         if (mapPkColumns.size() > 0) {
             MetaUniqueKey muk = mt.createMetaPrimaryKey(sPkName);
             for (int iColumn = 0; iColumn < mapPkColumns.size(); iColumn++) {
-                String sColumnName = mapPkColumns.get(Integer.valueOf(iColumn + 1));
+                String sColumnName = mapPkColumns.get(iColumn + 1);
                 muk.addColumn(sColumnName);
             }
         }
