@@ -1,4 +1,4 @@
-package ch.admin.bar.siard2.cmd.mariadb.usecases.issues.jdbcmysql4;
+package ch.admin.bar.siard2.cmd.mariadb.issues.jdbcmysql4;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
@@ -21,7 +21,7 @@ public class MariaDBDownloadNationsIT {
 
     @Rule
     public MariaDBContainer<?> downloadDb = new MariaDBContainer<>(DockerImageName.parse("mariadb:11.8.2"))
-            .withCopyFileToContainer(MountableFile.forClasspathResource(SqlScripts.MySQL.JDBCMYSQL_4_MARIADB),
+            .withCopyFileToContainer(MountableFile.forClasspathResource(SqlScripts.MySQL.JDBCMYSQL_4),
                     "/docker-entrypoint-initdb.d/");
 
 
