@@ -1,6 +1,7 @@
 package ch.admin.bar.siard2.cmd.mysql.issues.jdbcmysql4;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
+import ch.admin.bar.siard2.cmd.SupportedDbVersions;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
 import lombok.val;
@@ -19,7 +20,7 @@ public class MySQLDownloadVersionSupport9xIT {
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public MySQLContainer<?> downloadDb = new MySQLContainer<>(DockerImageName.parse("mysql:9.3.0"))
+    public MySQLContainer<?> downloadDb = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_9_3))
             .withUsername("root")
             .withPassword("public")
             .withInitScript(SqlScripts.MySQL.JDBCMYSQL_4)
