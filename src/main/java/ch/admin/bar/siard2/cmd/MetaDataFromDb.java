@@ -8,23 +8,31 @@ Created    : 29.08.2016, Hartwig Thomas, Enter AG, Rüti ZH
 ======================================================================*/
 package ch.admin.bar.siard2.cmd;
 
-import java.io.*;
-import java.net.*;
-import java.sql.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
-
-import ch.enterag.utils.*;
-import ch.enterag.utils.background.*;
-import ch.enterag.utils.jdbc.*;
-import ch.enterag.sqlparser.*;
-import ch.enterag.sqlparser.datatype.*;
-import ch.enterag.sqlparser.identifier.*;
 import ch.admin.bar.siard2.api.*;
+import ch.admin.bar.siard2.api.generated.CategoryType;
+import ch.admin.bar.siard2.api.generated.ReferentialActionType;
 import ch.admin.bar.siard2.api.meta.*;
-import ch.admin.bar.siard2.api.generated.*;
+import ch.enterag.sqlparser.BaseSqlFactory;
+import ch.enterag.sqlparser.SqlLiterals;
+import ch.enterag.sqlparser.datatype.DataType;
+import ch.enterag.sqlparser.datatype.PredefinedType;
+import ch.enterag.sqlparser.identifier.QualifiedId;
+import ch.enterag.utils.EU;
+import ch.enterag.utils.ProgramInfo;
+import ch.enterag.utils.background.Progress;
+import ch.enterag.utils.jdbc.BaseDatabaseMetaData;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.sql.*;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Transfers meta data from databases to SIARD files.
@@ -963,7 +971,7 @@ public class MetaDataFromDb extends MetaDataBase {
     private void getUniqueKeys(MetaTable mt) throws IOException, SQLException {
         String sUniqueKeyName = null;
         Map<Integer, String> mapUniqueColumns = new HashMap<Integer, String>();
-        ResultSet rs = _dmd.getIndexInfo(null, mt.getParentMetaSchema().getName(), mt.getName(), true, false);
+        ResultSet rs = _dmd.getIndexInfo(null, ((BaseDatabaseMetaData) _dmd).toPattern(mt.getParentMetaSchema().getName()), ((BaseDatabaseMetaData) _dmd).toPattern(mt.getName()), true, false);
         while (rs.next()) {
             String sTableSchema = rs.getString("TABLE_SCHEM");
             if (!sTableSchema.equals(mt.getParentMetaSchema().getName()))
