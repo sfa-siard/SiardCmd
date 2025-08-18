@@ -25,14 +25,14 @@ public class ForeignKeyWithSpacesIT {
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public MySQLContainer<?> emptyDb = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5))
+    public MySQLContainer<?> emptyDb = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5_6))
             .withUsername("root")
             .withPassword("public")
             .withDatabaseName("public")
             .withConfigurationOverride("mysql/config/with-blobs");
 
     @Rule
-    public MySQLContainer<?> db = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5))
+    public MySQLContainer<?> db = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5_6))
             .withUsername("root")
             .withPassword("public")
             .withDatabaseName("public")
