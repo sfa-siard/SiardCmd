@@ -1165,11 +1165,11 @@ public class MetaDataFromDb extends MetaDataBase {
      * @throws IOException  if an I/O error occurred.
      * @throws SQLException in a database error occurred.
      */
-    private void getTables(boolean restrictToUserSchema) throws IOException, SQLException {
+    private void getTables(String schemaName) throws IOException, SQLException {
         /* first count the tables for progress */
         String[] asTypes = new String[]{"TABLE"};
         if (_bViewsAsTables) asTypes = new String[]{"TABLE", "VIEW"};
-        String schemaPattern = restrictToUserSchema ? _dmd.getUserName() : "%";
+        String schemaPattern = schemaName;
         ResultSet rs = _dmd.getTables(null, schemaPattern, "%", asTypes);
         _iTables = 0;
         while (rs.next()) _iTables++;
@@ -1235,7 +1235,7 @@ public class MetaDataFromDb extends MetaDataBase {
      * download gets the metadata from the database connection.
      *
      * @param bViewsAsTables if true, views are saved as tables.
-     * @param restrictToUserSchema if true, restrict to user's schema.
+     * @param schema         the schema to be downloaded.
      * @param progress       receives progress notifications and sends cancel
      *                       requests.
      * @throws IOException  if an I/O error occurred.
@@ -1244,14 +1244,14 @@ public class MetaDataFromDb extends MetaDataBase {
     public void download(
             boolean bViewsAsTables,
             boolean bMaxLobNeeded,
-            boolean restrictToUserSchema,
+            String schema,
             Progress progress
     ) throws IOException, SQLException {
-        LOG.info("Start meta data download to archive {} (view-as-tables: {}, max-lob-needed: {}, restrict-to-user-schema: {})",
+        LOG.info("Start meta data download to archive {} (view-as-tables: {}, max-lob-needed: {}, schema: {})",
                 this._md.getArchive().getFile().getAbsoluteFile(),
                 bViewsAsTables,
                 bMaxLobNeeded,
-                restrictToUserSchema);
+                schema);
 
         System.out.println("Meta Data");
         _progress = progress;
@@ -1260,7 +1260,7 @@ public class MetaDataFromDb extends MetaDataBase {
         /* global meta data */
         logDownload();
         /* get tables (and Types and relevant schemas) */
-        getTables(restrictToUserSchema);
+        getTables(schema);
         /* get schema meta data (Views, Routines and Types) */
         if (!cancelRequested()) getSchemaMetaData();
         /* get global meta data (Users, Roles, Privileges) */
@@ -1268,5 +1268,13 @@ public class MetaDataFromDb extends MetaDataBase {
         if (cancelRequested()) throw new IOException("Meta data download cancelled!");
 
         LOG.info("Meta data download finished");
+    }
+
+    public void download(
+            boolean bViewsAsTables,
+            boolean bMaxLobNeeded,
+            Progress progress
+    ) throws IOException, SQLException {
+        this.download(bViewsAsTables, bMaxLobNeeded, "%", progress);
     }
 }
