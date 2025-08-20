@@ -299,7 +299,7 @@ public class SiardFromDb {
                         /* get meta data from DB */
                         MetaDataFromDb mdfd = MetaDataFromDb.newInstance(_conn.getMetaData(), _archive.getMetaData());
                         mdfd.setQueryTimeout(_iQueryTimeoutSeconds);
-                        mdfd.download(_bViewsAsTables, (_uriExternalLobFolder != null), null);
+                        mdfd.download(_bViewsAsTables, (_uriExternalLobFolder != null),null);
                         /* set external LOB stuff */
                         if (_uriExternalLobFolder != null) {
                             MetaColumn mcMaxLob = mdfd.getMaxLobColumn();
