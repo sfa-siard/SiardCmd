@@ -33,12 +33,20 @@ public class TableNameUnderscoreIT {
             .withConfigurationOverride("mysql/config/with-blobs");
 
     @Rule
-    public MySQLContainer<?> db = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5_6))
+    public MySQLContainer<?> dbMySql5 = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5_6))
             .withUsername("root")
             .withPassword("public")
             .withDatabaseName("public")
             .withInitScript(SqlScripts.MySQL.SIARDGUI_32_TABLE_NAME)
             .withConfigurationOverride("mysql/config/with-blobs");
+
+    @Rule
+    public MySQLContainer<?> dbMySql8 = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_8_4))
+            .withUsername("root")
+            .withPassword("public")
+            .withDatabaseName("public")
+            .withInitScript(SqlScripts.MySQL.SIARDGUI_32_TABLE_NAME)
+            .withConfigurationOverride("mysql/config/mysql-version-support");
 
     //This test fails because the provided archive may have not been created by siard software
     @Ignore
@@ -58,14 +66,14 @@ public class TableNameUnderscoreIT {
     }
 
     @Test
-    public void downloadArchive() throws SQLException, IOException, ClassNotFoundException {
+    public void downloadArchiveMySql5() throws SQLException, IOException, ClassNotFoundException {
         val siardArchive = siardArchivesHandler.prepareEmpty();
 
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
-                "-j:" + db.getJdbcUrl(),
-                "-u:" + db.getUsername(),
-                "-p:" + db.getPassword(),
+                "-j:" + dbMySql5.getJdbcUrl(),
+                "-u:" + dbMySql5.getUsername(),
+                "-p:" + dbMySql5.getPassword(),
                 "-s:" + siardArchive.getPathToArchiveFile()
         });
 
@@ -126,14 +134,64 @@ public class TableNameUnderscoreIT {
 
     //The issue had reported an error when uploading back to db
     @Test
-    public void uploadSiardArchive_expectNoExceptions() throws SQLException, IOException {
-        val siardArchive = siardArchivesHandler.prepareResource("mysql/issues/siardgui32/created-table-names-underscore.siard");
+    public void uploadSiardArchiveMySql5_expectNoExceptions() throws SQLException, IOException {
+        val siardArchive = siardArchivesHandler.prepareResource("mysql/issues/siardgui32/created-table-names-underscore-mysql5.siard");
 
         SiardToDb siardToDb = new SiardToDb(new String[] {
                 "-o",
-                "-j:" + db.getJdbcUrl(),
-                "-u:" + db.getUsername(),
-                "-p:" + db.getPassword(),
+                "-j:" + dbMySql5.getJdbcUrl(),
+                "-u:" + dbMySql5.getUsername(),
+                "-p:" + dbMySql5.getPassword(),
+                "-s:" + siardArchive.getPathToArchiveFile()
+        });
+
+        Assert.assertEquals(SiardToDb.iRETURN_OK, siardToDb.getReturn());
+    }
+
+    @Test
+    public void downloadArchiveMySql8() throws SQLException, IOException, ClassNotFoundException {
+        val siardArchive = siardArchivesHandler.prepareEmpty();
+
+        SiardFromDb siardFromDb = new SiardFromDb(new String[]{
+                "-o",
+                "-j:" + dbMySql5.getJdbcUrl(),
+                "-u:" + dbMySql5.getUsername(),
+                "-p:" + dbMySql5.getPassword(),
+                "-s:" + siardArchive.getPathToArchiveFile()
+        });
+
+        Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+
+        val metadataExplorer = siardArchive.exploreMetadata();
+
+        val testTable = metadataExplorer.findByTableId(QualifiedTableId.builder()
+                .schemaId(Id.of("public"))
+                .tableId(Id.of("test_table"))
+                .build());
+        Assertions.assertThat(testTable.getName()).isEqualTo(Id.of("test_table"));
+
+        val jobHistoryTable = metadataExplorer.findByTableId(QualifiedTableId.builder()
+                .schemaId(Id.of("public"))
+                .tableId(Id.of("job_history"))
+                .build());
+        Assertions.assertThat(jobHistoryTable.getName()).isEqualTo(Id.of("job_history"));
+
+        val employeesTable = metadataExplorer.findByTableId(QualifiedTableId.builder()
+                .schemaId(Id.of("public"))
+                .tableId(Id.of("employees"))
+                .build());
+        Assertions.assertThat(employeesTable.getName()).isEqualTo(Id.of("employees"));
+    }
+
+    @Test
+    public void uploadSiardArchiveMySql8_expectNoExceptions() throws SQLException, IOException {
+        val siardArchive = siardArchivesHandler.prepareResource("mysql/issues/siardgui32/created-table-names-underscore-mysql8.siard");
+
+        SiardToDb siardToDb = new SiardToDb(new String[]{
+                "-o",
+                "-j:" + dbMySql5.getJdbcUrl(),
+                "-u:" + dbMySql5.getUsername(),
+                "-p:" + dbMySql5.getPassword(),
                 "-s:" + siardArchive.getPathToArchiveFile()
         });
 
