@@ -1161,7 +1161,7 @@ public class MetaDataFromDb extends MetaDataBase {
     /**
      * get all table metadata.
      *
-     * @param restrictToUserSchema if true, use the database user's schema instead of "%" pattern.
+     * @param schemaName schema instead of "%" pattern.
      * @throws IOException  if an I/O error occurred.
      * @throws SQLException in a database error occurred.
      */
@@ -1169,14 +1169,13 @@ public class MetaDataFromDb extends MetaDataBase {
         /* first count the tables for progress */
         String[] asTypes = new String[]{"TABLE"};
         if (_bViewsAsTables) asTypes = new String[]{"TABLE", "VIEW"};
-        String schemaPattern = schemaName;
-        ResultSet rs = _dmd.getTables(null, schemaPattern, "%", asTypes);
+        ResultSet rs = _dmd.getTables(null, schemaName, "%", asTypes);
         _iTables = 0;
         while (rs.next()) _iTables++;
         rs.close();
         _iTablesPercent = (_iTables + 99) / 100;
         _iTablesAnalyzed = 0;
-        rs = _dmd.getTables(null, schemaPattern, "%", asTypes);
+        rs = _dmd.getTables(null, schemaName, "%", asTypes);
         while ((rs.next()) && (!cancelRequested())) {
             String sTableSchema = rs.getString("TABLE_SCHEM");
             String sTableName = rs.getString("TABLE_NAME");
