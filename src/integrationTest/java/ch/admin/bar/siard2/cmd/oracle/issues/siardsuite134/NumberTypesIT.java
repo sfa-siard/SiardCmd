@@ -49,7 +49,7 @@ public class NumberTypesIT {
 
         val metadataExplorer = siardArchive.exploreMetadata();
 
-        // NUMBER without precision/scale - currently FLOAT(38), should become BIGINT for BAZG Quickfix
+        // NUMBER without precision/scale: usually FLOAT(38), should be BIGINT for BAZG Quickfix
         val columnId = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
                 .schemaId(Id.of("IT_USER"))
                 .tableId(Id.of("SAMPLE_TABLE"))
@@ -58,7 +58,7 @@ public class NumberTypesIT {
         Assertions.assertThat(columnId.getType()).contains(Id.of("FLOAT(38)"));
         Assertions.assertThat(columnId.getTypeOriginal()).contains(Id.of("NUMBER"));
 
-        // NUMBER without precision/scale - currently FLOAT(38), should become BIGINT for BAZG Quickfix
+        // NUMBER without precision/scale: usually FLOAT(38), should be BIGINT for BAZG Quickfix
         val columnAge = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
                 .schemaId(Id.of("IT_USER"))
                 .tableId(Id.of("SAMPLE_TABLE"))
