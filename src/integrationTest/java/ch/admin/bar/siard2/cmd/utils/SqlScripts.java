@@ -9,6 +9,7 @@ public class SqlScripts {
         public static final String PACKAGE = "oracle/issues/jdbcoracle6/package.sql";
         public final static String SIARDSUITE_129_BINARY = "oracle/issues/siardsuite129/binary-types-schema.sql";
         public final static String SIARDSUITE_129_VARCHAR = "oracle/issues/siardsuite129/varchar-types-schema.sql";
+        public final static String SIARDSUITE_134 = "oracle/issues/siardsuite134/number-types-schema.sql";
     }
 
     public static class Postgres {
