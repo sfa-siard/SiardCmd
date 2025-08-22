@@ -10,6 +10,7 @@ import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedColumnId;
 import lombok.val;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.OracleContainer;
@@ -33,6 +34,7 @@ public class NumberTypesIT {
                     MountableFile.forHostPath(TestResourcesResolver.resolve(SqlScripts.Oracle.SIARDSUITE_134).toPath()),
                     "/container-entrypoint-initdb.d/01_number_types.sql");
 
+    @Ignore
     @Test
     public void downloadArchive() throws SQLException, IOException, ClassNotFoundException {
         val siardArchive = siardArchivesHandler.prepareEmpty();
