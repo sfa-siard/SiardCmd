@@ -34,14 +34,14 @@ public class MultipleSchemasIT {
                                                                    .toPath()),
                     "/container-entrypoint-initdb.d/00_create_schemas.sql");
 
-    // due to non-resolved issue https://github.com/sfa-siard/JdbcOracle/issues/10 expect an exception instead of ignoring the test.
+    // Expect exception since by default all schemas are archived
     @Test(expected = SQLSyntaxErrorException.class)
     public void download() throws IOException, SQLException, ClassNotFoundException {
         // given
         val actualArchive = siardArchivesHandler.prepareEmpty();
 
         // when
-        SiardFromDb siardFromDb = new SiardFromDb(new String[]{
+        SiardFromDb dbToSiard = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
                 "-u:" + "testuser",
@@ -50,7 +50,7 @@ public class MultipleSchemasIT {
         });
 
         // then
-        Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+        Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
 
         val metadataExplorer = actualArchive.exploreMetadata();
 
