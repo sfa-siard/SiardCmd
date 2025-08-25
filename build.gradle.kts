@@ -49,7 +49,11 @@ dependencies {
     implementation("ch.admin.bar:jdbc-base:v2.2.10")
     implementation("ch.admin.bar:JdbcPostgres:v2.2.3")
     implementation("ch.admin.bar:jdbcoracle:v2.2.6")
-    implementation("ch.admin.bar:jdbcmssql:v2.2.3")
+    implementation("ch.admin.bar:jdbcmssql:v2.2.3") {
+        version {
+            branch = "fix/siardsuite-106"
+        }
+    }
     implementation("ch.admin.bar:jdbc-mysql:v2.2.3")
     implementation("ch.admin.bar:jdbc-access:v2.2.3")
     implementation("ch.admin.bar:jdbc-db2:v2.2.3")
