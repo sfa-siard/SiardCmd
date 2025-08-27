@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
@@ -30,7 +31,11 @@ public class PostgresFileTypesIT {
 
     @Rule
     public PostgreSQLContainer<?> db = new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"))
-            .withInitScript(SqlScripts.Postgres.SIARDSUITE_112);
+            .withUsername("testuser")
+            .withPassword("testpass")
+            .withDatabaseName("postgres_filetypes")
+            .withInitScript(SqlScripts.Postgres.SIARDSUITE_112)
+            .waitingFor(Wait.forLogMessage(".*database system is ready to accept connections.*\\s", 1));
 
     @Test
     public void downloadArchive() throws SQLException, IOException, ClassNotFoundException {
@@ -105,7 +110,7 @@ public class PostgresFileTypesIT {
     private List<String> getFilesInDirectory(String fileType) {
         List<String> files = new ArrayList<>();
         try {
-            URL resourceUrl = getClass().getResource("/testfiles/" + fileType);
+            URL resourceUrl = getClass().getResource("/postgres/issues/siardsuite112/testfiles/" + fileType);
             if (resourceUrl != null) {
                 Path dirPath = Paths.get(resourceUrl.toURI());
                 Files.list(dirPath)
@@ -121,7 +126,7 @@ public class PostgresFileTypesIT {
     }
 
     private byte[] loadFileData(String fileType, String filename) throws IOException {
-        String resourcePath = "/testfiles/" + fileType + "/" + filename;
+        String resourcePath = "/postgres/issues/siardsuite112/testfiles/" + fileType + "/" + filename;
 
         try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
             if (is == null) {
