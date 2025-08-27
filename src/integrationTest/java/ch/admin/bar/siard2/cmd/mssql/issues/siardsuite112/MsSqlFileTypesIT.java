@@ -50,10 +50,6 @@ public class MsSqlFileTypesIT {
         });
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
-
-        File desktopDir = new File("/home/cllorente/Desktop");
-        File destFile = new File(desktopDir, "binary_files_original.siard");
-        Files.copy(siardArchive.getPathToArchiveFile().toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
     private void loadFilesIntoDatabase() throws SQLException, IOException {
@@ -112,7 +108,7 @@ public class MsSqlFileTypesIT {
     private List<String> getFilesInDirectory(String fileType) {
         List<String> files = new ArrayList<>();
         try {
-            URL resourceUrl = getClass().getResource("/mssql/issues/siardsuite112/" + fileType);
+            URL resourceUrl = getClass().getResource("/testfiles/" + fileType);
             if (resourceUrl != null) {
                 Path dirPath = Paths.get(resourceUrl.toURI());
                 Files.list(dirPath)
@@ -128,7 +124,7 @@ public class MsSqlFileTypesIT {
     }
 
     private byte[] loadFileData(String fileType, String filename) throws IOException {
-        String resourcePath = "/mssql/issues/siardsuite112/" + fileType + "/" + filename;
+        String resourcePath = "/testfiles/" + fileType + "/" + filename;
 
         try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
             if (is == null) {
