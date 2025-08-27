@@ -17,7 +17,7 @@ plugins {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -38,29 +38,32 @@ dependencies {
     implementation("org.apache.tika:tika-core:2.9.1") // used for getting mime-type from binary data
     implementation("commons-lang:commons-lang:2.6")
     implementation("commons-logging:commons-logging:1.1.3")
-    implementation("ch.qos.logback:logback-classic:1.3.14") // latest version which supports java 8
+    implementation("ch.qos.logback:logback-classic:1.5.18")
     implementation("com.mysql:mysql-connector-j:8.3.0") // transitive dependency from lib/jdbcmysql.jar
 
-    implementation("ch.admin.bar:siard-api:v2.2.131")
-    implementation("ch.admin.bar:SqlParser:v2.2.3")
-    implementation("ch.admin.bar:Zip64File:v2.2.4")
-    implementation("ch.admin.bar:enterutilities:v2.2.4")
+    implementation("ch.admin.bar:siard-api:v2.2.132") {
+        version {
+            branch = "chore/java-17-fix"
+        }
+    }
 
-    implementation("ch.admin.bar:jdbc-base:v2.2.10")
-    implementation("ch.admin.bar:JdbcPostgres:v2.2.3")
-    implementation("ch.admin.bar:jdbcoracle:v2.2.6")
-    implementation("ch.admin.bar:jdbcmssql:v2.2.3")
-    implementation("ch.admin.bar:jdbc-mysql:v2.2.3")
-    implementation("ch.admin.bar:jdbc-access:v2.2.3")
-    implementation("ch.admin.bar:jdbc-db2:v2.2.3")
+    implementation("ch.admin.bar:SqlParser:v2.2.4")
+    implementation("ch.admin.bar:Zip64File:v2.2.5")
+    implementation("ch.admin.bar:enterutilities:v2.2.5")
+
+    implementation("ch.admin.bar:jdbc-base:v2.2.11")
+    implementation("ch.admin.bar:JdbcPostgres:v2.2.4")
+    implementation("ch.admin.bar:jdbcoracle:v2.2.7")
+    implementation("ch.admin.bar:jdbcmssql:v2.2.4")
+    implementation("ch.admin.bar:jdbc-mysql:v2.2.4")
+    implementation("ch.admin.bar:jdbc-access:v2.2.4")
+    implementation("ch.admin.bar:jdbc-db2:v2.2.4")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
-    testImplementation("io.chandler:ZipInputStreamPatch64:1.0.0") // needed because of a bug in java.util.zip (see https://github.com/cjgriscom/ZipInputStreamPatch64)
-    testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.2")
-    testImplementation("org.mockito:mockito-core:4.11.0") // latest version which supports java 8
+    testImplementation("org.mockito:mockito-core:5.19.0")
 
     // testcontainers
     testImplementation("org.testcontainers:testcontainers:1.19.0")
