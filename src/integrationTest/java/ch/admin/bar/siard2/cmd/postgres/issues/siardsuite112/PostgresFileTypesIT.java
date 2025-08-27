@@ -1,4 +1,4 @@
-package ch.admin.bar.siard2.cmd.mssql.issues.siardsuite112;
+package ch.admin.bar.siard2.cmd.postgres.issues.siardsuite112;
 
 import ch.admin.bar.siard2.cmd.SiardFromDb;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
@@ -7,7 +7,7 @@ import lombok.val;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
@@ -23,15 +23,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MsSqlFileTypesIT {
+public class PostgresFileTypesIT {
 
     @Rule
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public MSSQLServerContainer<?> db = new MSSQLServerContainer<>(DockerImageName.parse("mcr.microsoft.com/mssql/server:2022-CU20-ubuntu-20.04"))
-            .acceptLicense()
-            .withInitScript(SqlScripts.MsSQL.SIARDSUITE_112);
+    public PostgreSQLContainer<?> db = new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"))
+            .withInitScript(SqlScripts.Postgres.SIARDSUITE_112);
 
     @Test
     public void downloadArchive() throws SQLException, IOException, ClassNotFoundException {
@@ -56,9 +55,9 @@ public class MsSqlFileTypesIT {
         try (Connection connection = DriverManager.getConnection(db.getJdbcUrl(), db.getUsername(), db.getPassword())) {
             connection.setAutoCommit(false);
 
-            String insertSql = "INSERT INTO FileTypes.AllFiles (filename, file_type, file_data) VALUES (?, ?, ?)";
-            String insertPdfSql = "INSERT INTO FileTypes.PdfFiles (filename, file_data) VALUES (?, ?)";
-            String insertJpgSql = "INSERT INTO FileTypes.JpgFiles (filename, file_data) VALUES (?, ?)";
+            String insertSql = "INSERT INTO file_types.all_files (filename, file_type, file_data) VALUES (?, ?, ?)";
+            String insertPdfSql = "INSERT INTO file_types.pdf_files (filename, file_data) VALUES (?, ?)";
+            String insertJpgSql = "INSERT INTO file_types.jpg_files (filename, file_data) VALUES (?, ?)";
 
             try {
                 for (String fileType : fileTypes) {
