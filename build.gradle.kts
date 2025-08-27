@@ -6,7 +6,7 @@ version = scmVersion.version
 val siardVersion = "2.2"
 val versionedProjectName = "${project.name}-${scmVersion.version}"
 
-val generatedResourcesDir = Files.createDirectories(File("${buildDir}/generated/resources").toPath())
+val generatedResourcesDir = Files.createDirectories(layout.buildDirectory.dir("generated/resources").get().asFile.toPath())
 
 plugins {
     application
@@ -40,6 +40,7 @@ dependencies {
     implementation("commons-logging:commons-logging:1.1.3")
     implementation("ch.qos.logback:logback-classic:1.5.18")
     implementation("com.mysql:mysql-connector-j:8.3.0") // transitive dependency from lib/jdbcmysql.jar
+    implementation("org.glassfish.jaxb:jaxb-runtime:2.3.9")
 
     implementation("ch.admin.bar:siard-api:v2.2.132") {
         version {
