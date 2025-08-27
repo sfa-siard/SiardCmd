@@ -29,6 +29,7 @@ public class SqlScripts {
     }
 
     public static class MsSQL {
+        public final static String SIARDSUITE_112 = "mssql/issues/siardsuite112/mssql-file-types.sql";
         public final static String SIARDSUITE_115 = "mssql/issues/siardsuite115/mssql-varchar-types.sql";
         public final static String SIARDSUITE_125 = "mssql/issues/siardsuite125/mssql-bit-types.sql";
         public final static String SIARDSUITE_106_SCHEMA_NAME = "mssql/issues/siardsuite106/schema-with-underscore.sql";
