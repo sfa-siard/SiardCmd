@@ -16,7 +16,6 @@ public class SqlScripts {
         public final static String SIARDCMD_31 = "postgres/issues/siardcmd31/case-sensitive-column-names-postgres.sql";
         public static final String SIARDSUITE_128_BIT = "postgres/issues/siardsuite128/bit-types-schema-postgres.sql";
         public static final String SIARDSUITE_128_PRECISION_TYPES = "postgres/issues/siardsuite128/precision-types-schema-postgres.sql";
-        public final static String SIARDSUITE_112 = "postgres/issues/siardsuite112/postgres-file-types.sql";
     }
 
     public static class MySQL {
@@ -27,6 +26,7 @@ public class SqlScripts {
         public final static String SIARDGUI_32_TABLE_NAME = "mysql/issues/siardgui32/table-with-underscore.sql";
         public final static String JDBCMYSQL_4 = "mysql/issues/jdbcmysql4/nation.sql";
         public final static String JDBCMYSQL_4_WILDCARD = "mysql/issues/jdbcmysql4/wildcard.sql";
+        public final static String SIARDSUITE_112 = "mysql/issues/siardsuite112/mysql-file-types.sql";
     }
 
     public static class MsSQL {
