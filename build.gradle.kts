@@ -49,7 +49,7 @@ dependencies {
     implementation("ch.admin.bar:jdbc-base:v2.2.11")
     implementation("ch.admin.bar:JdbcPostgres:v2.2.4")
     implementation("ch.admin.bar:jdbcoracle:v2.2.7")
-    implementation("ch.admin.bar:jdbcmssql:v2.2.4")
+    implementation("ch.admin.bar:jdbcmssql:v2.2.5")
     implementation("ch.admin.bar:jdbc-mysql:v2.2.4")
     implementation("ch.admin.bar:jdbc-access:v2.2.4")
     implementation("ch.admin.bar:jdbc-db2:v2.2.4")

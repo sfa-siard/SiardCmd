@@ -9,6 +9,7 @@ public class SqlScripts {
         public static final String PACKAGE = "oracle/issues/jdbcoracle6/package.sql";
         public final static String SIARDSUITE_129_BINARY = "oracle/issues/siardsuite129/binary-types-schema.sql";
         public final static String SIARDSUITE_129_VARCHAR = "oracle/issues/siardsuite129/varchar-types-schema.sql";
+        public final static String SIARDSUITE_106_SCHEMA_NAME = "oracle/issues/siardsuite106/schema-with-underscore.sql";
     }
 
     public static class Postgres {
@@ -28,5 +29,6 @@ public class SqlScripts {
     public static class MsSQL {
         public final static String SIARDSUITE_115 = "mssql/issues/siardsuite115/mssql-varchar-types.sql";
         public final static String SIARDSUITE_125 = "mssql/issues/siardsuite125/mssql-bit-types.sql";
+        public final static String SIARDSUITE_106_SCHEMA_NAME = "mssql/issues/siardsuite106/schema-with-underscore.sql";
     }
 }
