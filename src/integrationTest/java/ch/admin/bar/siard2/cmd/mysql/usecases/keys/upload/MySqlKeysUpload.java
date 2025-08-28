@@ -14,7 +14,6 @@ public class MySqlKeysUpload {
     /**
      * Output of {@link MySql8DefaultDataTypesIT}
      */
-    public final static String SIARD_ARCHIVE = "mysql/usecases/keys/upload/simple-teams-example_mysql5.siard";
     public final static String CREATE_IT_USER_SQL_SCRIPT = "mysql/usecases/keys/upload/create-it-user.sql";
 
     @SneakyThrows
