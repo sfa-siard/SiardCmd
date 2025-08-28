@@ -131,6 +131,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             else if (oValue instanceof byte[]) {
                 byte[] bytes = (byte[]) oValue;
                 mimeTypeHandler.add(value, bytes);
+                mimeTypeHandler.applyMimeType(value);
                 value.setBytes(bytes);
             } else if (oValue instanceof Boolean)
                 value.setBoolean((Boolean) oValue);
@@ -159,6 +160,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             else if (oValue instanceof Clob) {
                 Clob clob = (Clob) oValue;
                 mimeTypeHandler.add(value, clob);
+                mimeTypeHandler.applyMimeType(value);
                 value.setReader(clob.getCharacterStream());
                 clob.free();
             } else if (oValue instanceof SQLXML) {
@@ -168,6 +170,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             } else if (oValue instanceof Blob) {
                 Blob blob = (Blob) oValue;
                 mimeTypeHandler.add(value, blob);
+                mimeTypeHandler.applyMimeType(value);
                 value.setInputStream(blob.getBinaryStream());
                 blob.free();
             } else if (oValue instanceof URL) {
@@ -219,7 +222,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
 
     private void setValue(MimeTypeHandler mimeTypeHandler, Cell cell, Object oValue) throws IOException, SQLException {
         setValue(cell, oValue, mimeTypeHandler);
-        mimeTypeHandler.applyMimeType(cell);
         setValueStopWatch.stop();
     }
 
