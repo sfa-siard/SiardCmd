@@ -76,6 +76,17 @@ dependencies {
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.13.1")
 }
 
+tasks.withType(JavaExec::class) {
+    jvmArgs =
+        listOf("-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl")
+}
+
+tasks.withType<Test> {
+    jvmArgs = listOf(
+        "-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl"
+    )
+}
+
 task<Test>("integrationTest") {
     description = "Runs the integration tests"
     group = "verification"
@@ -164,6 +175,31 @@ val createSiardToDbStartScript by tasks.registering(CreateStartScripts::class) {
     outputDir = layout.buildDirectory.dir("scripts").get().asFile
     classpath = files(tasks.named<Jar>("jar").get().archiveFile, configurations.runtimeClasspath.get())
 }
+
+tasks.withType<CreateStartScripts>().configureEach {
+    doLast {
+        val jvmArgsLine = listOf(
+            "-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl"
+        ).joinToString(" ")
+
+        // UNIX script
+        unixScript.writeText(
+            unixScript.readText().replace(
+                "DEFAULT_JVM_OPTS=\"\"",
+                "DEFAULT_JVM_OPTS=\"$jvmArgsLine\""
+            )
+        )
+
+        // Windows script
+        windowsScript.writeText(
+            windowsScript.readText().replace(
+                "set DEFAULT_JVM_OPTS=",
+                "set DEFAULT_JVM_OPTS=$jvmArgsLine"
+            )
+        )
+    }
+}
+
 
 tasks.named<CreateStartScripts>("startScripts") {
     mainClass.set("ch.admin.bar.siard2.cmd.SiardFromDb")
