@@ -106,7 +106,7 @@ public class MsSqlFileTypesIT {
     private List<String> getFilesInDirectory(String fileType) {
         List<String> files = new ArrayList<>();
         try {
-            URL resourceUrl = getClass().getResource("/mssql/issues/siardsuite112/testfiles/" + fileType);
+            URL resourceUrl = getClass().getResource("/mssql/issues/siardsuite112/" + fileType);
             if (resourceUrl != null) {
                 Path dirPath = Paths.get(resourceUrl.toURI());
                 Files.list(dirPath)
@@ -122,7 +122,7 @@ public class MsSqlFileTypesIT {
     }
 
     private byte[] loadFileData(String fileType, String filename) throws IOException {
-        String resourcePath = "/mssql/issues/siardsuite112/testfiles/" + fileType + "/" + filename;
+        String resourcePath = "/mssql/issues/siardsuite112/" + fileType + "/" + filename;
 
         try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
             if (is == null) {
