@@ -4,7 +4,10 @@ import ch.admin.bar.siard2.cmd.SiardFromDb;
 import ch.admin.bar.siard2.cmd.SupportedDbVersions;
 import ch.admin.bar.siard2.cmd.utils.SqlScripts;
 import ch.admin.bar.siard2.cmd.utils.siard.SiardArchivesHandler;
+import ch.admin.bar.siard2.cmd.utils.siard.model.utils.Id;
+import ch.admin.bar.siard2.cmd.utils.siard.model.utils.QualifiedColumnId;
 import lombok.val;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,6 +55,29 @@ public class MySqlFileTypesIT {
         });
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
+
+        val metadataExplorer = siardArchive.exploreMetadata();
+
+        val columnAllFiles = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("file_types"))
+                .tableId(Id.of("all_files"))
+                .columnId(Id.of("file_data"))
+                .build());
+        Assertions.assertThat(columnAllFiles.getMimeType()).contains(Id.of("mixed"));
+
+        val columnJpgFiles = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("file_types"))
+                .tableId(Id.of("jpg_files"))
+                .columnId(Id.of("file_data"))
+                .build());
+        Assertions.assertThat(columnJpgFiles.getMimeType()).contains(Id.of("image/jpeg"));
+
+        val columnPdfFiles = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
+                .schemaId(Id.of("file_types"))
+                .tableId(Id.of("pdf_files"))
+                .columnId(Id.of("file_data"))
+                .build());
+        Assertions.assertThat(columnPdfFiles.getMimeType()).contains(Id.of("application/pdf"));
     }
 
     private void loadFilesIntoDatabase() throws SQLException, IOException {
