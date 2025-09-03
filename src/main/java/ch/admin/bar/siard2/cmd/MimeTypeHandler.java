@@ -57,6 +57,13 @@ class MimeTypeHandler {
         if (value instanceof Field) this.applyMimeType((Field) value);
     }
 
+    public void applyColumnMimeType(Table table) throws IOException {
+        for (int i = 0; i < table.getMetaTable().getMetaColumns(); i++) {
+            MetaColumn metaColumn = table.getMetaTable().getMetaColumn(i);
+            applyMimeType(metaColumn);
+        }
+    }
+
     private void add(Cell cell, byte[] bytes) {
         String mimeType = tika.detect(bytes);
         add(cell, mimeType);
@@ -131,6 +138,6 @@ class MimeTypeHandler {
         Set<String> types = mimeTypes.get(metaValue.getName());
         if (types == null) return;
         if (types.size() == 1) metaValue.setMimeType((String) types.toArray()[0]);
-        if (types.size() != 1) metaValue.setMimeType("");
+        if (types.size() > 1) metaValue.setMimeType("mixed");
     }
 }
