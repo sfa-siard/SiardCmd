@@ -128,9 +128,9 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
         if (oValue != null) {
             if (oValue instanceof String)
                 value.setString((String) oValue);
-            else if (oValue instanceof byte[]) {
-                byte[] bytes = (byte[]) oValue;
+            else if (oValue instanceof byte[] bytes) {
                 mimeTypeHandler.add(value, bytes);
+                mimeTypeHandler.applyMimeType(value);
                 value.setBytes(bytes);
             } else if (oValue instanceof Boolean)
                 value.setBoolean((Boolean) oValue);
@@ -156,25 +156,22 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                 value.setDate((Date) oValue);
             else if (oValue instanceof Duration)
                 value.setDuration((Duration) oValue);
-            else if (oValue instanceof Clob) {
-                Clob clob = (Clob) oValue;
+            else if (oValue instanceof Clob clob) {
                 mimeTypeHandler.add(value, clob);
+                mimeTypeHandler.applyMimeType(value);
                 value.setReader(clob.getCharacterStream());
                 clob.free();
-            } else if (oValue instanceof SQLXML) {
-                SQLXML sqlxml = (SQLXML) oValue;
+            } else if (oValue instanceof SQLXML sqlxml) {
                 value.setReader(sqlxml.getCharacterStream());
                 sqlxml.free();
-            } else if (oValue instanceof Blob) {
-                Blob blob = (Blob) oValue;
+            } else if (oValue instanceof Blob blob) {
                 mimeTypeHandler.add(value, blob);
+                mimeTypeHandler.applyMimeType(value);
                 value.setInputStream(blob.getBinaryStream());
                 blob.free();
-            } else if (oValue instanceof URL) {
-                URL url = (URL) oValue;
+            } else if (oValue instanceof URL url) {
                 value.setInputStream(url.openStream(), url.getPath());
-            } else if (oValue instanceof Array) {
-                Array array = (Array) oValue;
+            } else if (oValue instanceof Array array) {
                 Object[] ao = (Object[]) array.getArray();
                 for (int iElement = 0; iElement < ao.length; iElement++) {
                     Value valueElement = value.getElement(iElement);
@@ -182,8 +179,7 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
                     mimeTypeHandler.applyMimeType(valueElement);
                 }
                 array.free();
-            } else if (oValue instanceof Struct) {
-                Struct struct = (Struct) oValue;
+            } else if (oValue instanceof Struct struct) {
                 Object[] ao = struct.getAttributes();
                 for (int iAttribute = 0; iAttribute < ao.length; iAttribute++) {
                     setValue(value.getAttribute(iAttribute), ao[iAttribute], mimeTypeHandler);
@@ -219,7 +215,6 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
 
     private void setValue(MimeTypeHandler mimeTypeHandler, Cell cell, Object oValue) throws IOException, SQLException {
         setValue(cell, oValue, mimeTypeHandler);
-        mimeTypeHandler.applyMimeType(cell);
         setValueStopWatch.stop();
     }
 
@@ -258,6 +253,9 @@ public class PrimaryDataFromDb extends PrimaryDataTransfer {
             lBytesStart = logTableRecordProgress(lRecord++, sw, rr, lBytesStart);
             incDownloaded();
         }
+        
+        mimeTypeHandler.applyColumnMimeType(table);
+        
         System.out.println("    Record " + lRecord + " (" + sw.formatRate(rr.getByteCount() - lBytesStart,
                 sw.stop()) + " kB/s)");
         System.out.println("    Total: " + StopWatch.formatLong(lRecord) + " records (" + StopWatch.formatLong(rr.getByteCount()) + " bytes in " + sw.formatMs() + " ms)");
