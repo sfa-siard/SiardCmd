@@ -10,6 +10,7 @@ public class SqlScripts {
         public final static String SIARDSUITE_129_BINARY = "oracle/issues/siardsuite129/binary-types-schema.sql";
         public final static String SIARDSUITE_129_VARCHAR = "oracle/issues/siardsuite129/varchar-types-schema.sql";
         public final static String SIARDSUITE_106_SCHEMA_NAME = "oracle/issues/siardsuite106/schema-with-underscore.sql";
+        public final static String SIARDSUITE_134 = "oracle/issues/siardsuite134/number-types-schema.sql";
     }
 
     public static class Postgres {
