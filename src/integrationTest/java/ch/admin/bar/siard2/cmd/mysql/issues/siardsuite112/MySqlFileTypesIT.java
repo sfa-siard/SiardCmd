@@ -49,13 +49,14 @@ public class MySqlFileTypesIT {
         SiardFromDb dbToSiard = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
-                "-u:" + db.getUsername(),
-                "-p:" + db.getPassword(),
+                "-u:" + "testuser",
+                "-p:" + "testpassword",
                 "-s:" + siardArchive.getPathToArchiveFile()
         });
 
         Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
 
+        siardArchive.preserveArchive();
         val metadataExplorer = siardArchive.exploreMetadata();
 
         val columnAllFiles = metadataExplorer.findByColumnId(QualifiedColumnId.builder()

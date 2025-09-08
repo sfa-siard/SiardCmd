@@ -42,7 +42,7 @@ dependencies {
     implementation("com.mysql:mysql-connector-j:8.3.0") // transitive dependency from lib/jdbcmysql.jar
     implementation("org.glassfish.jaxb:jaxb-runtime:2.3.9")
 
-    implementation("ch.admin.bar:siard-api:v2.2.133")
+    implementation("ch.admin.bar:siard-api:v2.2.134")
     implementation("ch.admin.bar:SqlParser:v2.2.4")
     implementation("ch.admin.bar:Zip64File:v2.2.5")
     implementation("ch.admin.bar:enterutilities:v2.2.5")
