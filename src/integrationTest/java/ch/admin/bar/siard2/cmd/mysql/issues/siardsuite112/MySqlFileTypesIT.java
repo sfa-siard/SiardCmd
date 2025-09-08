@@ -34,9 +34,9 @@ public class MySqlFileTypesIT {
 
     @Rule
     public MySQLContainer<?> db = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5_6))
-            .withUsername("root")
-            .withPassword("test")
-            .withDatabaseName("testdb")
+            .withUsername("public")
+            .withPassword("public")
+            .withDatabaseName("public")
             .withInitScript(SqlScripts.MySQL.SIARDSUITE_112)
             .withConfigurationOverride("mysql/config/with-blobs");
 
@@ -49,8 +49,8 @@ public class MySqlFileTypesIT {
         SiardFromDb dbToSiard = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
-                "-u:" + "testuser",
-                "-p:" + "testpassword",
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
                 "-s:" + siardArchive.getPathToArchiveFile()
         });
 
@@ -60,21 +60,21 @@ public class MySqlFileTypesIT {
         val metadataExplorer = siardArchive.exploreMetadata();
 
         val columnAllFiles = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
-                .schemaId(Id.of("file_types"))
+                .schemaId(Id.of("public"))
                 .tableId(Id.of("all_files"))
                 .columnId(Id.of("file_data"))
                 .build());
         Assertions.assertThat(columnAllFiles.getMimeType()).contains(Id.of("mixed"));
 
         val columnJpgFiles = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
-                .schemaId(Id.of("file_types"))
+                .schemaId(Id.of("public"))
                 .tableId(Id.of("jpg_files"))
                 .columnId(Id.of("file_data"))
                 .build());
         Assertions.assertThat(columnJpgFiles.getMimeType()).contains(Id.of("image/jpeg"));
 
         val columnPdfFiles = metadataExplorer.findByColumnId(QualifiedColumnId.builder()
-                .schemaId(Id.of("file_types"))
+                .schemaId(Id.of("public"))
                 .tableId(Id.of("pdf_files"))
                 .columnId(Id.of("file_data"))
                 .build());
@@ -87,9 +87,9 @@ public class MySqlFileTypesIT {
         try (Connection connection = DriverManager.getConnection(db.getJdbcUrl(), db.getUsername(), db.getPassword())) {
             connection.setAutoCommit(false);
 
-            String insertSql = "INSERT INTO file_types.all_files (filename, file_type, file_data) VALUES (?, ?, ?)";
-            String insertPdfSql = "INSERT INTO file_types.pdf_files (filename, file_data) VALUES (?, ?)";
-            String insertJpgSql = "INSERT INTO file_types.jpg_files (filename, file_data) VALUES (?, ?)";
+            String insertSql = "INSERT INTO public.all_files (filename, file_type, file_data) VALUES (?, ?, ?)";
+            String insertPdfSql = "INSERT INTO public.pdf_files (filename, file_data) VALUES (?, ?)";
+            String insertJpgSql = "INSERT INTO public.jpg_files (filename, file_data) VALUES (?, ?)";
 
             try {
                 for (String fileType : fileTypes) {

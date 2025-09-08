@@ -1,5 +1,4 @@
-CREATE SCHEMA IF NOT EXISTS file_types;
-USE file_types;
+USE public;
 
 -- Create table to store all files
 CREATE TABLE all_files
@@ -25,8 +24,3 @@ CREATE TABLE jpg_files
     filename  VARCHAR(255) NOT NULL,
     file_data LONGBLOB     NOT NULL
 );
-
-CREATE USER 'testuser'@'%' IDENTIFIED BY 'testpassword';
-GRANT ALL PRIVILEGES ON `file_types`.* TO 'testuser'@'%';
-GRANT ALL PRIVILEGES ON `testdb`.* TO 'testuser'@'%';
-FLUSH PRIVILEGES;

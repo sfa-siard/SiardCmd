@@ -23,9 +23,9 @@ public class MySQLUploadDownloadSiardProjectIT {
 
     @Rule
     public MySQLContainer<?> db = new MySQLContainer<>(DockerImageName.parse(SupportedDbVersions.MY_SQL_5_6))
-            .withUsername("root")
-            .withPassword("test")
-            .withDatabaseName("testdb")
+            .withUsername("public")
+            .withPassword("public")
+            .withDatabaseName("public")
             .withConfigurationOverride("mysql/config/with-blobs");
 
 
@@ -46,8 +46,8 @@ public class MySQLUploadDownloadSiardProjectIT {
         SiardFromDb siardFromDb = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
-                "-u:" + "testuser",
-                "-p:" + "testpassword",
+                "-u:" + db.getUsername(),
+                "-p:" + db.getPassword(),
                 "-s:" + actualArchive.getPathToArchiveFile()
         });
 
