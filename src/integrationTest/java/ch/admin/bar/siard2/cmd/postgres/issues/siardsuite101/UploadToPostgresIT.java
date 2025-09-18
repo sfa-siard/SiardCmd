@@ -20,7 +20,7 @@ public class UploadToPostgresIT {
     public SiardArchivesHandler siardArchivesHandler = new SiardArchivesHandler();
 
     @Rule
-    public PostgreSQLContainer<?> db = new PostgreSQLContainer<>(DockerImageName.parse("postgres:13"));
+    public PostgreSQLContainer<?> db = new PostgreSQLContainer<>(DockerImageName.parse("postgres:16.3"));
 
     @Test
     public void uploadOracle() throws IOException, SQLException {
