@@ -23,8 +23,7 @@ import ch.admin.bar.siard2.api.generated.*;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-/*====================================================================*/
-/** Transfers meta data from databases to SIARD files and back.
+/** Transfers metadata from databases to SIARD files and back.
  @author Hartwig Thomas
  */
 @Slf4j
@@ -40,7 +39,6 @@ public class MetaDataToDb
   private int _iTables = -1;
   private int _iTablesPercent = -1;
 
-  /*------------------------------------------------------------------*/
   /** increment the number or tables created, issuing a notification,
    * when a percent is reached.
    */
@@ -52,7 +50,7 @@ public class MetaDataToDb
       int iPercent = (int)((100*_iTablesCreated)/_iTables);
       _progress.notifyProgress(iPercent);
     }
-  } /* incTablesCreated */
+  }
   
   /** check if cancel was requested.
    * @return true, if cancel was requested.
@@ -65,9 +63,8 @@ public class MetaDataToDb
     return false;
   }
 
-  /*------------------------------------------------------------------*/
   /** create an attribute definition for a CREATE TYPE statement from
-   * attribute meta data.
+   * attribute metadata.
    * @param ma attribute meta data
    * @param tm mapping of names in type.
    * @return SQL fragment defining the attribute.
@@ -92,10 +89,9 @@ public class MetaDataToDb
       sbSql.append(qiType.format());
     }
     return sbSql.toString();
-  } /* createMetaAttribute */
+  }
 
-  /*------------------------------------------------------------------*/
-  /** create a CREATE TYPE statement from type meta data and execute it.
+  /** create a CREATE TYPE statement from type metadata and execute it.
    * @param mt type meta data.
    * @param sm mapping of names in schema.
    * @throws SQLException if a database error occurred.
@@ -147,9 +143,8 @@ public class MetaDataToDb
         LOG.debug("Type '{}.{}' successfully created", qiType.getSchema(), qiType.getName());
       }
     }
-  } /* createType */
+  }
 
-  /*------------------------------------------------------------------*/
   /** create all types of a schema.
    * @param ms schema meta data.
    * @param sm mapping of names in schema.
@@ -169,9 +164,8 @@ public class MetaDataToDb
           createType(mt, sm);
       }
     }
-  } /* createTypes */
+  }
   
-  /*------------------------------------------------------------------*/
   /** check, whether a type exists in the database.
    * @param sMangledSchema schema name.
    * @param sMangledType type name.
@@ -190,9 +184,8 @@ public class MetaDataToDb
       bExists = true;
     rs.close();
     return bExists;
-  } /* existsType */
+  }
   
-  /*------------------------------------------------------------------*/
   /** drop all types that will be created within a schema.
    * @param ms schema meta data
    * @param sm mapping of names in schema.
@@ -247,9 +240,8 @@ public class MetaDataToDb
         }
       }
     }
-  } /* dropTypes */
+  }
 
-  /*------------------------------------------------------------------*/
   /** create a column definition for a CREATE TABLE statement
    * @param mc column meta data
    * @param tm mapping names within table.
@@ -288,9 +280,8 @@ public class MetaDataToDb
     if (!mc.isNullable())
       sbSql.append(" NOT NULL");
     return sbSql.toString();
-  } /* createColumn */
+  }
 
-  /*------------------------------------------------------------------*/
   /** get the set of available tables in the database.
    * @return set of tables.
    * @throws SQLException if a database error occurred.
@@ -310,9 +301,8 @@ public class MetaDataToDb
     }
     rs.close();
     return setTables;
-  } /* getTables */
+  }
   
-  /*------------------------------------------------------------------*/
   /** create a CREATE TABLE statement from table meta data and execute it.
    * @param mt table meta data.
    * @param sm mapping of names in schema.
@@ -417,9 +407,8 @@ public class MetaDataToDb
     rsColumns.close();
 
     LOG.debug("Table '{}.{}' successfully created", sm.getMappedSchemaName(), tm.getMappedTableName());
-  } /* createTable */
+  }
   
-  /*------------------------------------------------------------------*/
   /** create all tables of a schema.
    * @param ms schema meta data.
    * @param sm mapping of names in schema.
@@ -437,9 +426,8 @@ public class MetaDataToDb
       createTable(mt, sm);
       incTablesCreated();
     }
-  } /* createTables */
+  }
 
-  /*------------------------------------------------------------------*/
   /** check, whether table exists in the database.
    * @param sMangledSchema schema name.
    * @param sMangledTable table name.
@@ -458,9 +446,8 @@ public class MetaDataToDb
       bExists = true;
     rs.close();
     return bExists;
-  } /* existsTable */
+  }
   
-  /*------------------------------------------------------------------*/
   /** drop all tables that will be created within a schema.
    * @param ms schema meta data
    * @param sm mapping of names in schema.
@@ -493,26 +480,24 @@ public class MetaDataToDb
       catch(SQLException se) { System.out.println("  Could not drop "+tm.getMappedTableName()+" "+EU.getExceptionMessage(se)); } // could not drop this time but maybe next
       finally{ stmt.close(); }
     }
-  } /* dropTables */
+  }
 
-  /*------------------------------------------------------------------*/
   /** check, whether schema exists in the database.
    * @param sMangledSchema schema name.
    * @return true, if schema exists.
    * @throws SQLException if a database error occurred.
    */
-  private boolean existsSchema(String sMangledSchema)
-    throws SQLException
-  {
-    boolean bExists = false;
-    ResultSet rs = _dmd.getSchemas(null, ((BaseDatabaseMetaData)_dmd).toPattern(sMangledSchema));
-    if (rs.next())
-      bExists = true;
-    rs.close();
-    return bExists;
-  } /* existsSchema */
-
-  /*------------------------------------------------------------------*/
+  private boolean existsSchema(String sMangledSchema) throws SQLException {
+    try (ResultSet rs = _dmd.getSchemas()) {
+      while (rs.next()) {
+        if (rs.getString("TABLE_SCHEM").equalsIgnoreCase(sMangledSchema)) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+  
   /** create the schema if it does not exist.
    * @param ms schema meta data.
    * @param sm mapping of names in schema.
@@ -549,9 +534,8 @@ public class MetaDataToDb
       }
       finally { stmt.close(); }
     }
-  } /* createSchema */
+  }
   
-  /*------------------------------------------------------------------*/
   /** upload creates all types and tables in the database.
    * @throws IOException if an I/O error occurred.
    * @throws SQLException if a database error occurred.
@@ -625,10 +609,9 @@ public class MetaDataToDb
     _dmd.getConnection().commit();
 
     LOG.info("Meta data upload finished");
-  } /* upload */
+  }
   
-  /*------------------------------------------------------------------*/
-  /** returns the number of tables that exist in the database and will 
+  /** returns the number of tables that exist in the database and will
    * be dropped, when upload is executed.
    * @return number of tables that will be dropped, when upload is executed.
    */
@@ -648,9 +631,8 @@ public class MetaDataToDb
       }
     }
     return iTablesDropped;
-  } /* tablesDroppedByUpload */
+  }
 
-  /*------------------------------------------------------------------*/
   /** matchAttributes returns true, if the attributes of the given
    * type meta data match the attributes in the database.
    * @param mt type meta data.
@@ -762,10 +744,9 @@ public class MetaDataToDb
     if (iPosition < mt.getMetaAttributes())
       bMatches = false;
     return bMatches;
-  } /* matchAttributes */
+  }
 
-  /*------------------------------------------------------------------*/
-  /** matchType returns true, if a type of the given name exists in the 
+  /** matchType returns true, if a type of the given name exists in the
    * database and has the same relevant properties.
    * @param mt type meta data.
    * @param sm mapping of names in schema.
@@ -808,10 +789,9 @@ public class MetaDataToDb
     }
     rs.close();
     return bMatches;
-  } /* matchType */
+  }
   
-  /*------------------------------------------------------------------*/
-  /** returns the number of types that exist in the database and will be 
+  /** returns the number of types that exist in the database and will be
    * dropped, when upload is executed.
    * @return number of tables that will be dropped, when upload is executed.
    * @throws IOException if an I/O error occurred
@@ -836,9 +816,8 @@ public class MetaDataToDb
       }
     }
     return iTypesDropped;
-  } /* typesDroppedByUpload */
+  }
 
-  /*------------------------------------------------------------------*/
   /** constructor
    * @param dmd database meta data.
    * @param md SIARD meta data.
@@ -855,9 +834,8 @@ public class MetaDataToDb
     _iMaxColumnNameLength = _dmd.getMaxColumnNameLength();
     _am = ArchiveMapping.newInstance(supportsArrays(), supportsUdts(), 
       mapSchemas, _md, _iMaxTableNameLength, _iMaxColumnNameLength);
-  } /* constructor */
+  }
   
-  /*------------------------------------------------------------------*/
   /** factory
    * @param dmd database meta data.
    * @param md SIARD meta data.
@@ -870,6 +848,6 @@ public class MetaDataToDb
     throws IOException, SQLException
   {
     return new MetaDataToDb(dmd,md,mapSchemas);
-  } /* factory */
-  
-} /* class MetaDataTransfer */
+  }
+
+}
