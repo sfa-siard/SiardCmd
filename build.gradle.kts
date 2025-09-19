@@ -43,8 +43,8 @@ dependencies {
     implementation("org.glassfish.jaxb:jaxb-runtime:2.3.9")
 
     api("ch.admin.bar:siard-api:v2.2.136")
-    implementation("ch.admin.bar:SqlParser:v2.2.4")
-    implementation("ch.admin.bar:Zip64File:v2.2.5")
+    api("ch.admin.bar:SqlParser:v2.2.4")
+    api("ch.admin.bar:Zip64File:v2.2.5")
     implementation("ch.admin.bar:enterutilities:v2.2.5")
     implementation("ch.admin.bar:jdbc-base:v2.2.11")
     implementation("ch.admin.bar:JdbcPostgres:v2.2.4")
