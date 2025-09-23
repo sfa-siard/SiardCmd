@@ -60,7 +60,7 @@ public class ForeignKeyWithSpacesIT {
 
         val siardArchive = siardArchivesHandler.prepareEmpty();
 
-        SiardFromDb siardFromDb = new SiardFromDb(new String[]{
+        SiardFromDb dbToSiard = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + db.getJdbcUrl(),
                 "-u:" + db.getUsername(),
@@ -68,7 +68,7 @@ public class ForeignKeyWithSpacesIT {
                 "-s:" + siardArchive.getPathToArchiveFile()
         });
 
-        Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+        Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
 
         val metadataExplorer = siardArchive.exploreMetadata();
 

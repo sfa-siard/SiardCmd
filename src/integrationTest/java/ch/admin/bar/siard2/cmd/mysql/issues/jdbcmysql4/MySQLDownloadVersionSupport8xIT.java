@@ -30,7 +30,7 @@ public class MySQLDownloadVersionSupport8xIT {
     public void downloadDb_expectNoException() throws SQLException, IOException, ClassNotFoundException {
         val createdArchive = siardArchivesHandler.prepareEmpty();
 
-        SiardFromDb dbtoSiard = new SiardFromDb(new String[]{
+        SiardFromDb dbToSiard = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + downloadDb.getJdbcUrl() + "?zeroDateTimeBehavior=convertToNull",
                 "-u:" + "it_user",
@@ -38,6 +38,6 @@ public class MySQLDownloadVersionSupport8xIT {
                 "-s:" + createdArchive.getPathToArchiveFile()
         });
 
-        Assert.assertEquals(SiardFromDb.iRETURN_OK, dbtoSiard.getReturn());
+        Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
     }
 }

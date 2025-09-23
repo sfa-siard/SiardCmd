@@ -68,7 +68,7 @@ public class TableNameUnderscoreIT {
     public void downloadArchiveMySql5() throws SQLException, IOException, ClassNotFoundException {
         val siardArchive = siardArchivesHandler.prepareEmpty();
 
-        SiardFromDb siardFromDb = new SiardFromDb(new String[]{
+        SiardFromDb dbToSiard = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + dbMySql5.getJdbcUrl(),
                 "-u:" + dbMySql5.getUsername(),
@@ -76,7 +76,7 @@ public class TableNameUnderscoreIT {
                 "-s:" + siardArchive.getPathToArchiveFile()
         });
 
-        Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+        Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
 
         val metadataExplorer = siardArchive.exploreMetadata();
 
@@ -119,7 +119,7 @@ public class TableNameUnderscoreIT {
     public void downloadArchiveMySql8() throws SQLException, IOException, ClassNotFoundException {
         val siardArchive = siardArchivesHandler.prepareEmpty();
 
-        SiardFromDb siardFromDb = new SiardFromDb(new String[]{
+        SiardFromDb dbToSiard = new SiardFromDb(new String[]{
                 "-o",
                 "-j:" + dbMySql8.getJdbcUrl(),
                 "-u:" + dbMySql8.getUsername(),
@@ -128,7 +128,7 @@ public class TableNameUnderscoreIT {
         });
 
 
-        Assert.assertEquals(SiardFromDb.iRETURN_OK, siardFromDb.getReturn());
+        Assert.assertEquals(SiardFromDb.iRETURN_OK, dbToSiard.getReturn());
 
         val metadataExplorer = siardArchive.exploreMetadata();
 
