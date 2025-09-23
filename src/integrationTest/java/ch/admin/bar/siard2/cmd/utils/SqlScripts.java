@@ -27,6 +27,7 @@ public class SqlScripts {
         public final static String JDBCMYSQL_4 = "mysql/issues/jdbcmysql4/nation.sql";
         public final static String JDBCMYSQL_4_WILDCARD = "mysql/issues/jdbcmysql4/wildcard.sql";
         public final static String SIARDSUITE_112 = "mysql/issues/siardsuite112/mysql-file-types.sql";
+        public final static String SIARDSUITE_98 = "mysql/issues/siardsuite98/mysql-table-actions.sql";
     }
 
     public static class MsSQL {
