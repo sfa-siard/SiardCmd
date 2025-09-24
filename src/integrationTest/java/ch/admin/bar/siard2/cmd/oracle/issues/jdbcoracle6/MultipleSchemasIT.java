@@ -80,7 +80,7 @@ public class MultipleSchemasIT {
                 "-j:" + db.getJdbcUrl(),
                 "-u:" + "testuser",
                 "-p:" + "testpassword",
-                "-schema:" + "TESTUSER",
+                "--schema:" + "TESTUSER",
                 "-s:" + actualArchive.getPathToArchiveFile()
         });
 

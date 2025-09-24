@@ -84,7 +84,7 @@ public class SiardFromDb {
         System.out.println("Usage:");
         System.out.println("java -cp <siardpath>/lib/siardcmd.jar ch.admin.bar.siard2.cmd.SiardFromDb [-h]");
         System.out.println(
-                "  [-o][-v][-l=<login timeout>][-q=<query timeout>][-i=<import xml>] [-x=<external lob folder>] [-m=<mime type>] [-schema=<schema name>]");
+                "  [-o][-v][-l=<login timeout>][-q=<query timeout>][-i=<import xml>] [-x=<external lob folder>] [-m=<mime type>] [--schema=<schema name>]");
         System.out.println(
                 "  -j=<JDBC URL> -u=<database user> -p=<database password> (-s=<siard file> | -e=<export xml>)");
         System.out.println("where");
