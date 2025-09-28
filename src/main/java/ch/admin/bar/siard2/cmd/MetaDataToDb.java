@@ -462,6 +462,17 @@ public class MetaDataToDb
         }
     }
 
+    private boolean existsSchemaInPostgres(String mangledSchema) throws SQLException {
+        try (ResultSet rs = _dmd.getSchemas()) {
+            while (rs.next()) {
+                if (rs.getString("TABLE_SCHEM").equalsIgnoreCase(mangledSchema)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
     /**
      * check, whether schema exists in the database.
      *
@@ -470,13 +481,17 @@ public class MetaDataToDb
      * @throws SQLException if a database error occurred.
      */
     private boolean existsSchema(String sMangledSchema) throws SQLException {
-        try (ResultSet rs = _dmd.getSchemas()) {
-            while (rs.next()) {
-                if (rs.getString("TABLE_SCHEM").equalsIgnoreCase(sMangledSchema)) {
-                    return true;
-                }
-            }
-            return false;
+        boolean isPostgresTarget = _dmd.getDatabaseProductName().toLowerCase().contains("postgresql");
+        
+        if (isPostgresTarget) {
+            return existsSchemaInPostgres(sMangledSchema);
+        } else {
+            boolean bExists = false;
+            ResultSet rs = _dmd.getSchemas(null, ((BaseDatabaseMetaData)_dmd).toPattern(sMangledSchema));
+            if (rs.next())
+                bExists = true;
+            rs.close();
+            return bExists;
         }
     }
 
