@@ -45,7 +45,7 @@ dependencies {
     implementation("ch.admin.bar:siard-api:v2.2.134")
     implementation("ch.admin.bar:SqlParser:v2.2.4")
     implementation("ch.admin.bar:Zip64File:v2.2.5")
-    implementation("ch.admin.bar:enterutilities:v2.2.5")
+    implementation("ch.admin.bar:enterutilities:v2.2.6")
     implementation("ch.admin.bar:jdbc-base:v2.2.11")
     implementation("ch.admin.bar:JdbcPostgres:v2.2.4")
     implementation("ch.admin.bar:jdbcoracle:v2.2.8")
