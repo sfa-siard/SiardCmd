@@ -1,10 +1,10 @@
-# SiardCmd - SIARD 2.2 Command-line Interface to download and upload relational databases
-
 > **⚠️ ARCHIVED REPOSITORY**  
 > This repository is archived and no longer maintained. All development has moved to the new monorepo:  
 > **https://github.com/sfa-siard/siard-suite**  
 > 
 > Please create any issues or pull requests in the new monorepo, which now contains all submodules including this one.
+
+# SiardCmd - SIARD 2.2 Command-line Interface to download and upload relational databases
 
 This package contains the SIARD command-line interface to download and upload relational databases in SIARD (Software-Independent Archival of Relational Databases) Format 2.2.
 
