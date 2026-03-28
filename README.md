@@ -36,7 +36,7 @@ For example, to archive a database, you would use `siard-from-db`:
 ./siard-from-db -j=jdbc:mysql://localhost:3306/database_name -u=username -p=password -s=/path/to/siard/file/filename.siard
 ```
 
-To archive a specific schema only, you can use the `--schema` parameter. Passages 6.3. and 6.4. of the User Manual further describe the parameters in detail.
+To archive a specific schema(s) only, you can use the `--schema` parameter. Passages 6.3. and 6.4. of the User Manual further describe the parameters in detail.
 
 ### Deliverables
 Builds the project, runs unit tests, and packages all artifacts with additional required files for execution in a CLI into ZIP and TAR under `build/distributions/`:

@@ -84,7 +84,7 @@ public class SiardFromDb {
         System.out.println("Usage:");
         System.out.println("java -cp <siardpath>/lib/siardcmd.jar ch.admin.bar.siard2.cmd.SiardFromDb [-h]");
         System.out.println(
-                "  [-o][-v][-l=<login timeout>][-q=<query timeout>][-i=<import xml>] [-x=<external lob folder>] [-m=<mime type>] [--schema=<schema name>]");
+                "  [-o][-v][-l=<login timeout>][-q=<query timeout>][-i=<import xml>] [-x=<external lob folder>] [-m=<mime type>] [--schema=<schema names>]");
         System.out.println(
                 "  -j=<JDBC URL> -u=<database user> -p=<database password> (-s=<siard file> | -e=<export xml>)");
         System.out.println("where");
@@ -98,7 +98,7 @@ public class SiardFromDb {
         System.out.println("  <lob folder>         folder for storing largest LOB column of database externally");
         System.out.println("                       (contents will be deleted if they exist!)");
         System.out.println("  <mime type>          MIME type of data in the largest LOB column of database");
-        System.out.println("  <schema name>        name of schema to be downloaded");
+        System.out.println("  <schema names>       comma separated list of schema names to be downloaded");
         System.out.println("  <JDBC URL>           JDBC URL of database to be downloaded");
         System.out.print("                       e.g. ");
         SiardConnection sc = SiardConnection.getSiardConnection();

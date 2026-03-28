@@ -28,9 +28,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.*;
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1166,46 +1164,54 @@ public class MetaDataFromDb extends MetaDataBase {
     /**
      * get all table metadata.
      *
-     * @param schemaName schema instead of "%" pattern.
+     * @param schemaNames list of schema names or null.
      * @throws IOException  if an I/O error occurred.
      * @throws SQLException in a database error occurred.
      */
-    private void getTables(String schemaName) throws IOException, SQLException {
+    private void getTables(List<String> schemaNames) throws IOException, SQLException {
+        String[] asTypes = _bViewsAsTables ? new String[]{"TABLE", "VIEW"} : new String[]{"TABLE"};
+        List<String> schemas = (schemaNames == null || schemaNames.isEmpty()) ? Collections.singletonList(null) : schemaNames;
+
         /* first count the tables for progress */
-        String[] asTypes = new String[]{"TABLE"};
-        if (_bViewsAsTables) asTypes = new String[]{"TABLE", "VIEW"};
-        ResultSet rs = _dmd.getTables(null, schemaName, "%", asTypes);
         _iTables = 0;
-        while (rs.next()) _iTables++;
-        rs.close();
+        for (String schemaName : schemas) {
+            try (ResultSet rs = _dmd.getTables(null, schemaName, "%", asTypes)) {
+                while (rs.next()) _iTables++;
+            }
+        }
+
         _iTablesPercent = (_iTables + 99) / 100;
         _iTablesAnalyzed = 0;
-        rs = _dmd.getTables(null, schemaName, "%", asTypes);
-        while ((rs.next()) && (!cancelRequested())) {
-            String sTableSchema = rs.getString("TABLE_SCHEM");
-            String sTableName = rs.getString("TABLE_NAME");
-            String sTableType = rs.getString("TABLE_TYPE");
-            if (!Arrays.asList(asTypes).contains(sTableType)) throw new IOException("Invalid table type found!");
-            String sRemarks = rs.getString("REMARKS");
-            Schema schema = _md.getArchive().getSchema(sTableSchema);
-            if (schema == null) schema = _md.getArchive().createSchema(sTableSchema);
-            Table table = schema.getTable(sTableName);
-            if (table == null) table = schema.createTable(sTableName);
-            MetaTable mt = table.getMetaTable();
-            QualifiedId qiTable = new QualifiedId(null, sTableSchema, sTableName);
-            System.out.println("  Table: " + qiTable.format());
-            if ((sRemarks != null) && (sRemarks.length() > 0)) mt.setDescription(sRemarks);
 
-            LOG.debug("Load metadata for table '{}.{}'", sTableSchema, sTableName);
+        for (String schemaName : schemas) {
+            try (ResultSet rs = _dmd.getTables(null, schemaName, "%", asTypes)) {
+                while (rs.next() && !cancelRequested()) {
+                    String sTableSchema = rs.getString("TABLE_SCHEM");
+                    String sTableName = rs.getString("TABLE_NAME");
+                    String sTableType = rs.getString("TABLE_TYPE");
+                    if (!Arrays.asList(asTypes).contains(sTableType)) throw new IOException("Invalid table type found!");
+                    String sRemarks = rs.getString("REMARKS");
+                    Schema schema = _md.getArchive().getSchema(sTableSchema);
+                    if (schema == null) schema = _md.getArchive().createSchema(sTableSchema);
+                    Table table = schema.getTable(sTableName);
+                    if (table == null) table = schema.createTable(sTableName);
+                    MetaTable mt = table.getMetaTable();
+                    QualifiedId qiTable = new QualifiedId(null, sTableSchema, sTableName);
+                    System.out.println("  Table: " + qiTable.format());
+                    if (sRemarks != null && !sRemarks.isEmpty()) mt.setDescription(sRemarks);
 
-            getColumns(mt);
-            getPrimaryKey(mt);
-            getForeignKeys(mt);
-            getUniqueKeys(mt);
-            getRows(mt);
-            incTablesAnalyzed();
+                    LOG.debug("Load metadata for table '{}.{}'", sTableSchema, sTableName);
+
+                    getColumns(mt);
+                    getPrimaryKey(mt);
+                    getForeignKeys(mt);
+                    getUniqueKeys(mt);
+                    getRows(mt);
+
+                    incTablesAnalyzed();
+                }
+            }
         }
-        rs.close();
     }
 
     /**
@@ -1239,7 +1245,7 @@ public class MetaDataFromDb extends MetaDataBase {
      * download gets the metadata from the database connection.
      *
      * @param bViewsAsTables if true, views are saved as tables.
-     * @param schema         the schema to be downloaded.
+     * @param schema         comma separated list of schemas to be downloaded.
      * @param progress       receives progress notifications and sends cancel
      *                       requests.
      * @throws IOException  if an I/O error occurred.
@@ -1264,7 +1270,7 @@ public class MetaDataFromDb extends MetaDataBase {
         /* global meta data */
         logDownload();
         /* get tables (and Types and relevant schemas) */
-        getTables(schema);
+        getTables(parseSchemas(schema));
         /* get schema meta data (Views, Routines and Types) */
         if (!cancelRequested()) getSchemaMetaData();
         /* get global meta data (Users, Roles, Privileges) */
@@ -1272,6 +1278,20 @@ public class MetaDataFromDb extends MetaDataBase {
         if (cancelRequested()) throw new IOException("Meta data download cancelled!");
 
         LOG.info("Meta data download finished");
+    }
+
+    /**
+     * Return a list of schemas or null
+     * @param schemas comma separated list of schemas
+     * @return List<String> schemas or null
+     */
+    private List<String> parseSchemas(String schemas) {
+        if (schemas == null || schemas.isBlank()) return null;
+
+        return Arrays.stream(schemas.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
     }
 
     public void download(
