@@ -55,6 +55,9 @@ public class SiardFromDb {
 
     private boolean _bOverwrite = false;
     private boolean _bViewsAsTables = false;
+    private boolean _bPrivileges = true;
+    private boolean _bUsers = true;
+    private boolean _bRoles = true;
     private int _iLoginTimeoutSeconds = SiardConnection.iDEFAULT_LOGIN_TIMEOUT_SECONDS;
     private int _iQueryTimeoutSeconds = SiardConnection.iDEFAULT_QUERY_TIMEOUT_SECONDS;
     private File _fileImportXml = null;
@@ -92,6 +95,9 @@ public class SiardFromDb {
         System.out.println("  -h (help)            prints this usage information");
         System.out.println("  -o (overwrite)       overwrite existing siard file");
         System.out.println("  -v (views as tables) archive views as tables");
+        System.out.println("  --noprivileges       omit privileges from archive metadata.xml");
+        System.out.println("  --nousers            omit users from archive metadata.xml");
+        System.out.println("  --noroles            omit roles from archive metadata.xml");
         System.out.println("  <login timeout>      login timeout in seconds (default: " + _iLoginTimeoutSeconds + "), 0 for unlimited");
         System.out.println("  <query timeout>      query timeout in seconds (default: " + _iQueryTimeoutSeconds + "), 0 for unlimited");
         System.out.println("  <import xml>         name of meta data XML file to be used as a template");
@@ -128,6 +134,9 @@ public class SiardFromDb {
         if (args.getOption("o") != null) _bOverwrite = true;
         /* views as tables */
         if (args.getOption("v") != null) _bViewsAsTables = true;
+        if (args.getOption("noprivileges") != null) _bPrivileges = false;
+        if (args.getOption("nousers") != null)  _bUsers = false;
+        if (args.getOption("noroles") != null)  _bRoles = false;
         /* login time out */
         String sLoginTimeoutSeconds = args.getOption("l");
         /* query time out */
@@ -301,7 +310,8 @@ public class SiardFromDb {
                         /* get meta data from DB */
                         MetaDataFromDb mdfd = MetaDataFromDb.newInstance(_conn.getMetaData(), _archive.getMetaData());
                         mdfd.setQueryTimeout(_iQueryTimeoutSeconds);
-                        mdfd.download(_bViewsAsTables, (_uriExternalLobFolder != null), schemaName, null);
+                        MetaDataFromDb.GlobalMetadataOptions options = new MetaDataFromDb.GlobalMetadataOptions(_bUsers, _bRoles, _bPrivileges);
+                        mdfd.download(_bViewsAsTables, (_uriExternalLobFolder != null), schemaName, null, options);
                         /* set external LOB stuff */
                         if (_uriExternalLobFolder != null) {
                             MetaColumn mcMaxLob = mdfd.getMaxLobColumn();

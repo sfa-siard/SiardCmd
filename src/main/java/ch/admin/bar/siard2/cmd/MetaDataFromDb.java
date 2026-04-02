@@ -731,7 +731,6 @@ public class MetaDataFromDb extends MetaDataBase {
 
     /**
      * get all roles that are grantees of table privileges and not users.
-     *
      * @throws IOException  if an I/O error occurred.
      */
     private void getRoles() throws IOException {
@@ -1134,17 +1133,16 @@ public class MetaDataFromDb extends MetaDataBase {
 
     /**
      * get all global meta data.
-     *
      * @throws IOException  if an I/O error occurred.
      * @throws SQLException in a database error occurred.
      */
-    private void getGlobalMetaData() throws IOException, SQLException {
+    private void getGlobalMetaData(GlobalMetadataOptions option) throws IOException, SQLException {
         /* get table privileges for all tables */
-        getPrivileges();
+        if (option.privileges) getPrivileges();
         /* get the current user and all users that are grantor in a table privilege */
-        getUsers();
+        if (option.users) getUsers();
         /* get all roles that are grantees in a table privilege and not users */
-        getRoles();
+        if (option.roles) getRoles();
     }
 
     /**
@@ -1245,11 +1243,28 @@ public class MetaDataFromDb extends MetaDataBase {
      * @throws IOException  if an I/O error occurred.
      * @throws SQLException if a database error occurred.
      */
+
     public void download(
             boolean bViewsAsTables,
             boolean bMaxLobNeeded,
             String schema,
             Progress progress
+    ) throws IOException, SQLException {
+        download(bViewsAsTables, bMaxLobNeeded, schema, progress, new GlobalMetadataOptions(true, true, true));
+    }
+
+    public record GlobalMetadataOptions(
+            boolean users,
+            boolean roles,
+            boolean privileges
+    ){}
+
+    public void download(
+            boolean bViewsAsTables,
+            boolean bMaxLobNeeded,
+            String schema,
+            Progress progress,
+            GlobalMetadataOptions options
     ) throws IOException, SQLException {
         LOG.info("Start meta data download to archive {} (view-as-tables: {}, max-lob-needed: {}, schema: {})",
                 this._md.getArchive().getFile().getAbsoluteFile(),
@@ -1268,7 +1283,7 @@ public class MetaDataFromDb extends MetaDataBase {
         /* get schema meta data (Views, Routines and Types) */
         if (!cancelRequested()) getSchemaMetaData();
         /* get global meta data (Users, Roles, Privileges) */
-        if (!cancelRequested()) getGlobalMetaData();
+        if (!cancelRequested()) getGlobalMetaData(options);
         if (cancelRequested()) throw new IOException("Meta data download cancelled!");
 
         LOG.info("Meta data download finished");
